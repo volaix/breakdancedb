@@ -35,7 +35,7 @@ const Header = () => {
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </div>
-            <ul className="flex flex-col items-center justify-between min-h-[250px]">
+            <ul className="text-black	flex flex-col items-center justify-between min-h-[250px]">
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/">Learn Flow</a>
               </li>
