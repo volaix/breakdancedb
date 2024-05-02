@@ -1,4 +1,5 @@
 'use client'
+//TODO: add move type so it wont crash on production lol
 const Move = ({move}) => {
   return (
     <>
