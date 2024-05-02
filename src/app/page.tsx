@@ -3,59 +3,57 @@
 import fundamentals from '@/db/fundamentals.json'
 import Header from './Header'
 import Move from './Move'
-import {useState} from 'react'
-
-//use state to get which view flow - transitions - move
+import {useState, useEffect} from 'react'
 
 const localStorageKeys = {
   FLOWS: 'flows',
-}
-
-const getRandomInt = (max: number) => {
-  return Math.floor(Math.random() * max)
-}
-
-const displayMoves = () => {
-  //gets random moves
-  let randomMoves = [] as number[]
-  while (randomMoves.length < 3) {
-    let r = getRandomInt(Object.keys(fundamentals).length)
-    if (randomMoves.indexOf(r) === -1) randomMoves.push(r)
-  }
-  const keys = Object.keys(fundamentals)
-  const displayMoveObj = {
-    entryMove: fundamentals[keys[randomMoves[0]]],
-    keyMove: fundamentals[keys[randomMoves[1]]],
-    exitMove: fundamentals[keys[randomMoves[2]]],
-  }
-
-  return displayMoveObj
+  ALLMOVES: 'allMoves',
 }
 
 const Home = () => {
-  const [moves, setMoves] = useState(displayMoves())
+  //TODO: check local storage for allmoves
+  const hasLocalStorageMoves = false
 
-  // When user submits the form, save the favorite number to the local storage
+  //moves refer to "all the moves"
+  const [moves, setMoves] = useState(
+    hasLocalStorageMoves
+      ? localStorage.getItem(localStorageKeys.ALLMOVES)
+      : fundamentals,
+  )
+
+  //learning refers to "what will be displayed"
+  const [learning, setLearning] = useState(null)
+
+  //on mount setLearning
+  useEffect(
+    () => {
+      const moveKeys = Object.keys(moves)
+      if (moveKeys) {
+        setLearning({
+          entryMove: moves[moveKeys[0]],
+          keyMove: moves[moveKeys[1]],
+          exitMove: moves[moveKeys[2]],
+        })
+      }
+    },
+    [moves],
+  )
+
   const saveToLocalStorage = () => {
-    localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify(moves))
+    console.log('updating localStorage')
+    //TODO: add to localStorage.flows rather than replace it
+    localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify(learning))
   }
 
-  const refreshMoves = () => {
-    setMoves(displayMoves())
-  }
   const onClickYes = () => {
-    console.log('update DB')
-    //wait for setmoves to complete before saving
     saveToLocalStorage()
-    refreshMoves()
+    //TODO: Shuffle learning
   }
   const onClickSkip = () => {
-    refreshMoves()
+    //TODO: Shuffle learning
   }
   const onClickNo = () => {
-    console.log('popup for "entrance or exit"')
-    console.log('update DB')
-    refreshMoves()
+    //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
   }
 
   return (
@@ -65,11 +63,16 @@ const Home = () => {
         className="z-10 
    w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <div className="mt-10">
-          <Move move={moves['entryMove']} />
-          <Move move={moves['keyMove']} />
-          <Move move={moves['exitMove']} />
+          {learning && (
+            <>
+              <Move move={learning['entryMove']} />
+              <Move move={learning['keyMove']} />
+              <Move move={learning['exitMove']} />
+            </>
+          )}
         </div>
         <div className="py-5 px-2 flex justify-evenly">
+          {/* TODO: clicking buttons feels weird */}
           <a
             onClick={onClickYes}
             className="px-6 py-2  text-center text-white bg-violet-600 border border-violet-600 rounded active:text-violet-500 hover:bg-transparent hover:text-violet-600 focus:outline-none focus:ring">
