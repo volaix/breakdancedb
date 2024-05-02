@@ -1,0 +1,30 @@
+{
+  "1_step": {
+    "move_name": "1 step",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "windmill": {
+    "move_name": "windmill",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "12_step": {
+    "move_name": "12 step",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "pretzel": {
+    "move_name": "pretzel",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "6_step": {
+    "move_name": "6 step",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "baby_freeze": {
+    "move_name": "baby freeze",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  },
+  "cc": {
+    "move_name": "cc",
+    "cover_img": "https://dummyimage.com/600x400/000/fff"
+  }
+}
