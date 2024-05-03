@@ -1,6 +1,6 @@
 'use client'
 // @format
-import fundamentals from '@/db/fundamentals.json'
+import moveListExample from '@/db/moveListExample.json'
 import Header from './Header'
 import Move from './Move'
 import {useState, useEffect} from 'react'
@@ -10,6 +10,9 @@ const localStorageKeys = {
   ALLMOVES: 'allMoves',
 }
 
+const getRandomItem = (items: string[]) =>
+  items[Math.floor(Math.random() * items.length)]
+
 const Home = () => {
   //TODO: check local storage for allmoves
   const hasLocalStorageMoves = false
@@ -18,7 +21,7 @@ const Home = () => {
   const [moves, setMoves] = useState(
     hasLocalStorageMoves
       ? localStorage.getItem(localStorageKeys.ALLMOVES)
-      : fundamentals,
+      : moveListExample,
   )
 
   //learning refers to "what will be displayed"
@@ -27,14 +30,14 @@ const Home = () => {
   //on mount setLearning
   useEffect(
     () => {
-      const moveKeys = Object.keys(moves)
-      if (moveKeys) {
-        setLearning({
-          entryMove: moves[moveKeys[0]],
-          keyMove: moves[moveKeys[1]],
-          exitMove: moves[moveKeys[2]],
-        })
-      }
+      console.log('moves', moves)
+      //TODO: Learn moves according to algorithm
+      //setLearning to "some random moves"
+      setLearning({
+        entryMove: getRandomItem(moves),
+        keyMove: getRandomItem(moves),
+        exitMove: getRandomItem(moves),
+      })
     },
     [moves],
   )
