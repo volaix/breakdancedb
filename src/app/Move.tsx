@@ -1,5 +1,4 @@
 'use client'
-//TODO: add move type so it wont crash on production lol
 const Move = ({move}: {move: string}) => {
   return (
     <>
@@ -10,7 +9,7 @@ const Move = ({move}: {move: string}) => {
             alt="move name"
             src={'https://dummyimage.com/600x400/000/fff'}
           />
-          <div className="capitalize">{move}</div>
+          <div className="capitalize text-black">{move}</div>
         </div>
       )}
     </>
