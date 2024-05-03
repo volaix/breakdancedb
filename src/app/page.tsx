@@ -14,8 +14,12 @@ const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
 const Home = () => {
-  //TODO: check local storage for allmoves
-  const hasLocalStorageMoves = false
+  let hasLocalStorageMoves: boolean = false
+
+  // if rendered for client check local storage for all moves
+  if (typeof window !== 'undefined') {
+    hasLocalStorageMoves = !!localStorage.getItem(localStorageKeys.ALLMOVES)
+  }
 
   //moves refer to "all the moves"
   const [moves, setMoves] = useState(
