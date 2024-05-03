@@ -4,11 +4,7 @@ import moveListExample from '@/db/moveListExample.json'
 import Header from './Header'
 import Move from './Move'
 import {useState, useEffect} from 'react'
-
-const localStorageKeys = {
-  FLOWS: 'flows', //ds array of objects
-  ALLMOVES: 'allMoves', //ds array of strings
-}
+import {localStorageKeys} from './lib'
 
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
