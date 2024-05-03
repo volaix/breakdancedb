@@ -1,4 +1,5 @@
 import HamburgerMenu from './HamburgerMenu'
+//TODO have header still look good even when i scroll past it
 
 const Profile = () => {
   return (
