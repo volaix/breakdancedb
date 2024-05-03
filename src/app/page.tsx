@@ -6,18 +6,19 @@ import Move from './Move'
 import {useState, useEffect} from 'react'
 
 const localStorageKeys = {
-  FLOWS: 'flows',
-  ALLMOVES: 'allMoves',
+  FLOWS: 'flows', //ds array of objects
+  ALLMOVES: 'allMoves', //ds array of strings
 }
 
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
 const Home = () => {
-  let hasLocalStorageMoves: boolean = false
+  let accessToLocalStorage: boolean = typeof window !== 'undefined'
 
-  // if rendered for client check local storage for all moves
-  if (typeof window !== 'undefined') {
+  //check access to localStorage.FLOWS
+  let hasLocalStorageMoves: boolean = false
+  if (accessToLocalStorage) {
     hasLocalStorageMoves = !!localStorage.getItem(localStorageKeys.ALLMOVES)
   }
 
@@ -31,35 +32,49 @@ const Home = () => {
   //learning refers to "what will be displayed"
   const [learning, setLearning] = useState(null)
 
+  const setLearningToRandom = () => {
+    setLearning({
+      entryMove: getRandomItem(moves),
+      keyMove: getRandomItem(moves),
+      exitMove: getRandomItem(moves),
+    })
+  }
+
   //on mount setLearning
   useEffect(
     () => {
       console.log('moves', moves)
       //TODO: Learn moves according to algorithm
-      //setLearning to "some random moves"
-      setLearning({
-        entryMove: getRandomItem(moves),
-        keyMove: getRandomItem(moves),
-        exitMove: getRandomItem(moves),
-      })
+      setLearningToRandom()
     },
     [moves],
   )
 
   const saveToLocalStorage = () => {
     console.log('updating localStorage')
-    //TODO: add to localStorage.flows rather than replace it
-    localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify(learning))
+    if (
+      accessToLocalStorage &&
+      !!localStorage.getItem(localStorageKeys.FLOWS)
+    ) {
+      const currentFlows: string[] = JSON.parse(
+        localStorage.getItem(localStorageKeys.FLOWS),
+      )
+      const newFlows: string[] = [...currentFlows, learning]
+      localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify(newFlows))
+    } else {
+      localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify([learning]))
+    }
   }
 
   const onClickYes = () => {
     saveToLocalStorage()
-    //TODO: Shuffle learning
+    setLearningToRandom()
   }
   const onClickSkip = () => {
-    //TODO: Shuffle learning
+    setLearningToRandom()
   }
   const onClickNo = () => {
+    setLearningToRandom()
     //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
   }
 
