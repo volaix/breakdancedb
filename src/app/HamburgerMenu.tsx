@@ -43,10 +43,13 @@ const Header = () => {
                 <a href="/">Learn Transitions</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/">Learn Moves</a>
+                <a href="/vocab">Learn Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/dblist">All Moves</a>
+              </li>
+              <li className="border-b border-gray-400 my-2 uppercase">
+                <a href="/combos">Your Combos</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/completed">Completed</a>
@@ -60,13 +63,7 @@ const Header = () => {
 
         <ul className="DESKTOP-MENU hidden space-x-8 lg:flex">
           <li>
-            <a href="/about">About</a>
-          </li>
-          <li>
-            <a href="/portfolio">Portfolio</a>
-          </li>
-          <li>
-            <a href="/contact">Contact</a>
+            <a href="/faq">mobile only website</a>
           </li>
         </ul>
       </nav>
