@@ -75,6 +75,7 @@ const Home = () => {
     setLearningToRandom()
     //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
     //TODO: FUTURE have refresh UI feeling
+    //TODO: Delete entry if you have it in flows
   }
 
   return (
