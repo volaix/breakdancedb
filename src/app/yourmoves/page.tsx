@@ -4,6 +4,13 @@ import Header from '@/app/Header'
 import {localStorageKeys} from '@/app/lib'
 import {useState, useEffect} from 'react'
 
+const convertMoveString = (moveString: string): string[] => {
+  return moveString.split('\n')
+}
+const convertMoveArray = (moveArray): string => {
+  return moveArray.join('\r\n')
+}
+
 const YourMoves = () => {
   const [userMoves, setUserMoves] = useState([''])
   const [saveText, setSaveText] = useState('Save')
@@ -13,18 +20,26 @@ const YourMoves = () => {
     setAccessToLocalStorage(typeof window !== 'undefined')
   }, [])
 
+  //Populate existing moves
   useEffect(() => {
     if (
       accessToLocalStorage &&
       !!localStorage.getItem(localStorageKeys.USERMOVES)
     ) {
-      setUserMoves(JSON.parse(localStorage.getItem(localStorageKeys.USERMOVES)))
+      setUserMoves(
+        convertMoveArray(
+          JSON.parse(localStorage.getItem(localStorageKeys.USERMOVES)),
+        ),
+      )
     }
   }, [accessToLocalStorage])
 
   const saveToLocalStorage = localStorageKey => {
     if (accessToLocalStorage)
-      localStorage.setItem(localStorageKey, JSON.stringify([userMoves]))
+      localStorage.setItem(
+        localStorageKey,
+        JSON.stringify(convertMoveString(userMoves)),
+      )
   }
   const onClickSave = () => {
     saveToLocalStorage(localStorageKeys.USERMOVES)
@@ -51,13 +66,11 @@ const YourMoves = () => {
             <div className="flex flex-wrap -m-2">
               <div className="p-2 w-full">
                 <div className="relative">
-                  <label
-                    for="message"
-                    className="leading-7 text-sm text-gray-600">
+                  <label className="leading-7 text-sm text-gray-600">
                     Your Moves
                   </label>
                   <textarea
-                    id="message"
+                    id="moves"
                     name="message"
                     defaultValue={userMoves}
                     onChange={e => setUserMoves(e.target.value)}
@@ -70,8 +83,7 @@ const YourMoves = () => {
               <div className="p-2 w-full flex">
                 <button
                   onClick={onClickSave}
-                  className="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg"
-                  jf-ext-button-ct="save">
+                  className="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
                   {saveText}
                 </button>
                 <button
