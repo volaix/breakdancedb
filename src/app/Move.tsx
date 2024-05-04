@@ -6,7 +6,7 @@ const Move = ({move}: {move: string}) => {
   return (
     <>
       {move && (
-        <div className="bg-slate-300 w-full py-3 flex flex-col items-center">
+        <div className="bg-slate-300 dark:bg-gray-900 w-full py-3 flex flex-col items-center">
           <Image
       width="600"
       height="400"
@@ -14,7 +14,7 @@ const Move = ({move}: {move: string}) => {
             alt="move name"
             src={'https://dummyimage.com/600x400/000/fff'}
           />
-          <div className="capitalize text-black">{move}</div>
+          <div className="capitalize text-black dark:text-white">{move}</div>
         </div>
       )}
     </>

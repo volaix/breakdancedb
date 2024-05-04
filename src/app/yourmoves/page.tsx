@@ -1,9 +1,9 @@
 'use client'
 //@format
 import Header from '@/app/Header'
-import { lsUserMoves} from '@/app/lib'
+import {lsUserMoves} from '@/app/lib'
 import {useState, useEffect} from 'react'
-import { LocalStorageStructureKeys } from '@/app/lib';
+import {LocalStorageStructureKeys} from '@/app/lib'
 
 const convertMoveString = (moveString: string): string[] => {
   return moveString.split('\n')
@@ -23,14 +23,9 @@ const YourMoves = () => {
 
   //Populate existing moves
   useEffect(() => {
-    if (
-      accessToLocalStorage &&
-      !!localStorage.getItem(lsUserMoves)
-    ) {
+    if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
       setUserMoves(
-        convertMoveArray(
-          JSON.parse(localStorage.getItem(lsUserMoves) || ''),
-        ),
+        convertMoveArray(JSON.parse(localStorage.getItem(lsUserMoves) || '')),
       )
     }
   }, [accessToLocalStorage])
@@ -56,7 +51,7 @@ const YourMoves = () => {
       <section className="text-gray-600 body-font relative">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-6">
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
+            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white">
               Your Moves
             </h1>
             <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
@@ -102,10 +97,10 @@ const YourMoves = () => {
 }
 const Page = () => {
   return (
-    <>
+    <div>
       <Header />
       <YourMoves />
-    </>
+    </div>
   )
 }
 export default Page
