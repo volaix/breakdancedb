@@ -46,6 +46,9 @@ const Header = () => {
                 <a href="/vocab">Learn Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
+                <a href="/yourmoves">Your Moves</a>
+              </li>
+              <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/dblist">All Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
