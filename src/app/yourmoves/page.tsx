@@ -1,18 +1,19 @@
 'use client'
 //@format
 import Header from '@/app/Header'
-import {localStorageKeys} from '@/app/lib'
+import { lsUserMoves} from '@/app/lib'
 import {useState, useEffect} from 'react'
+import { LocalStorageStructureKeys } from '@/app/lib';
 
 const convertMoveString = (moveString: string): string[] => {
   return moveString.split('\n')
 }
-const convertMoveArray = (moveArray): string => {
+const convertMoveArray = (moveArray: string[]): string => {
   return moveArray.join('\r\n')
 }
 
 const YourMoves = () => {
-  const [userMoves, setUserMoves] = useState([''])
+  const [userMoves, setUserMoves] = useState('')
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
@@ -24,17 +25,17 @@ const YourMoves = () => {
   useEffect(() => {
     if (
       accessToLocalStorage &&
-      !!localStorage.getItem(localStorageKeys.USERMOVES)
+      !!localStorage.getItem(lsUserMoves)
     ) {
       setUserMoves(
         convertMoveArray(
-          JSON.parse(localStorage.getItem(localStorageKeys.USERMOVES)),
+          JSON.parse(localStorage.getItem(lsUserMoves) || ''),
         ),
       )
     }
   }, [accessToLocalStorage])
 
-  const saveToLocalStorage = localStorageKey => {
+  const saveToLocalStorage = (localStorageKey: LocalStorageStructureKeys) => {
     if (accessToLocalStorage)
       localStorage.setItem(
         localStorageKey,
@@ -42,7 +43,7 @@ const YourMoves = () => {
       )
   }
   const onClickSave = () => {
-    saveToLocalStorage(localStorageKeys.USERMOVES)
+    saveToLocalStorage('userMoves')
     setSaveText('Saved')
     //TODO show modal saved to localstorage
   }
