@@ -48,13 +48,13 @@ const YourMoves = () => {
   }
   return (
     <div>
-      <section className="text-gray-600 body-font relative">
+      <section className=" dark:text-gray-600 text-gray-600 body-font relative">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-6">
             <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white">
               Your Moves
             </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+            <p className="dark:text-gray-400 lg:w-2/3 mx-auto leading-relaxed text-base">
               Add and view everything here. One per line.
             </p>
           </div>
@@ -62,7 +62,7 @@ const YourMoves = () => {
             <div className="flex flex-wrap -m-2">
               <div className="p-2 w-full">
                 <div className="relative">
-                  <label className="leading-7 text-sm text-gray-600">
+                  <label className="dark:text-gray-400 leading-7 text-sm text-gray-600">
                     Your Moves
                   </label>
                   <textarea
@@ -70,9 +70,11 @@ const YourMoves = () => {
                     name="message"
                     defaultValue={userMoves}
                     onChange={e => setUserMoves(e.target.value)}
-                    className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                    className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out 
+                    dark:bg-gray-800 dark:bg-opacity-40 dark:border-gray-700 dark:focus:bg-gray-900 dark:focus:ring-indigo-900 dark:text-gray-100"></textarea>
                   <div className="text-xs">
-                    New move created for each line. No spaces please.
+                    {convertMoveString(userMoves).length + 1} moves. New move
+                    created each line. No spaces please.
                   </div>
                 </div>
               </div>
