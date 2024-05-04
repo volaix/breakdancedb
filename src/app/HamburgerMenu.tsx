@@ -37,28 +37,28 @@ const Header = () => {
             </div>
             <ul className="text-black	flex flex-col items-center justify-between min-h-[250px]">
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/">Learn Flow</a>
+                <a href="/learnmoves">Learn Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/">Learn Transitions</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/vocab">Learn Moves</a>
+                <a href="/">Learn Flow</a>
+              </li>
+              <li className="border-b border-gray-400 my-2 uppercase">
+                <a href="/combos">Learn Combos</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/yourmoves">Your Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/dblist">All Moves</a>
+                <a href="/dblist">(old)All Moves</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/combos">Your Combos</a>
+                <a href="/completed">History</a>
               </li>
               <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/completed">Completed</a>
-              </li>
-              <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/nodes">View Connections</a>
+                <a href="/nodes">Nodeview</a>
               </li>
             </ul>
           </div>
