@@ -3,16 +3,19 @@
 import Header from './Header'
 import Move from './Move'
 import {useState, useEffect} from 'react'
-import {localStorageKeys} from './lib'
+import { Flow, lsFlows, lsUserMoves} from './lib'
 
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
+type Learning = Flow | null
+
 const Home = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
-  const [userMoves, setUserMoves] = useState([])
+
+  const [userMoves, setUserMoves] = useState<string[]>([])
   //learning refers to "what will be displayed"
-  const [learning, setLearning] = useState(null)
+  const [learning, setLearning] = useState<Learning>(null)
 
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== 'undefined')
@@ -22,13 +25,13 @@ const Home = () => {
   useEffect(() => {
     if (
       accessToLocalStorage &&
-      !!localStorage.getItem(localStorageKeys.USERMOVES)
+      !!localStorage.getItem(lsUserMoves)
     ) {
-      setUserMoves(JSON.parse(localStorage.getItem(localStorageKeys.USERMOVES)))
+      setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ''))
     }
   }, [accessToLocalStorage])
 
-  const setLearningToRandom = (moves) => {
+  const setLearningToRandom = (moves: string[]) => {
     setLearning({
       entryMove: getRandomItem(moves),
       keyMove: getRandomItem(moves),
@@ -44,32 +47,33 @@ const Home = () => {
   }, [userMoves])
 
   const saveToLocalStorage = () => {
-    console.log('updating localStorage')
+    console.log('saving to localStorage new flow')
     if (
       accessToLocalStorage &&
-      !!localStorage.getItem(localStorageKeys.FLOWS)
+      !!localStorage.getItem(lsFlows) &&
+      !!learning
     ) {
-      const currentFlows: string[] = JSON.parse(
-        localStorage.getItem(localStorageKeys.FLOWS),
-      )
-      const newFlows: string[] = [...currentFlows, learning]
-      localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify(newFlows))
+      const currentFlows: Flow[] = JSON.parse(
+        localStorage.getItem(lsFlows) || '')
+      const newFlows: Flow[] = currentFlows &&[...currentFlows, learning]
+      localStorage.setItem(lsFlows, JSON.stringify(newFlows))
     } else {
-      localStorage.setItem(localStorageKeys.FLOWS, JSON.stringify([learning]))
+      localStorage.setItem(lsFlows, JSON.stringify([learning]))
     }
   }
 
   const onClickYes = () => {
     //TODO: FUTURE have a celebration UI element
     saveToLocalStorage()
-    setLearningToRandom()
+    setLearningToRandom(userMoves)
+    //TODO: FUTURE popup on 5 star rating for each move multi select
     //TODO: FUTURE have refresh UI feeling
   }
   const onClickSkip = () => {
-    setLearningToRandom()
+    setLearningToRandom(userMoves)
   }
   const onClickNo = () => {
-    setLearningToRandom()
+    setLearningToRandom(userMoves)
     //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
     //TODO: FUTURE have refresh UI feeling
     //TODO: Delete entry if you have it in flows

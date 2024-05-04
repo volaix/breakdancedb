@@ -13,11 +13,6 @@ const Page = () => {
     setFavoriteNumber(value)
   }, [])
 
-  // When user submits the form, save the favorite number to the local storage
-  const saveToLocalStorage = e => {
-    e.preventDefault()
-    localStorage.setItem('favoriteNumber', favoriteNumber)
-  }
 
   return (
     <>
@@ -39,17 +34,7 @@ const Page = () => {
         <a>view as nodes</a>
       </div>
       <div>
-        <div>
-          <label htmlFor="number">Your favorite number</label>
-          <form onSubmit={saveToLocalStorage}>
-            <input
-              id="number"
-              value={favoriteNumber}
-              onChange={e => setFavoriteNumber(e.target.value)}
-            />
-            <input type="submit" value="Save" />
-          </form>
-        </div>
+        
       </div>
     </>
   )

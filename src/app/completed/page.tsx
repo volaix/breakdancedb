@@ -2,15 +2,10 @@
 //@format
 import Header from '@/app/Header'
 import {useState, useEffect} from 'react'
-import {localStorageKeys} from '@/app/lib'
+import { Flow, lsFlows} from '@/app/lib'
 
-type Flow = {
-  entryMove: string
-  keyMove: string
-  exitMove: string
-}
 
-const FlowBox = ({flow}) => {
+const FlowBox = ({flow}:{flow: Flow}) => {
   //todo: only display unique flows
   //todo: make delete button functional
   //todo: make hierarchy in text
@@ -85,16 +80,18 @@ const FlowBox = ({flow}) => {
   )
 }
 
+
+type Flows = Flow[] | null
 const Completed = () => {
-  const [flows, setFlows] = useState(null)
+  const [flows, setFlows] = useState<Flows>(null)
   useEffect(() => {
     let hasLocalStorageFlows: boolean = false
     let accessToLocalStorage = typeof window !== 'undefined'
     if (
       accessToLocalStorage &&
-      !!localStorage.getItem(localStorageKeys.FLOWS)
+      !!localStorage.getItem(lsFlows)
     ) {
-      setFlows(JSON.parse(localStorage.getItem(localStorageKeys.FLOWS)))
+      setFlows(JSON.parse(localStorage.getItem(lsFlows) || ''))
     }
   }, [])
   console.log('flows', flows)

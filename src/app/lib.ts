@@ -1,6 +1,19 @@
 
-export const localStorageKeys = {
-  FLOWS: 'flows', //ds array of objects
-  ALLMOVES: 'allMoves', //ds array of strings
-  USERMOVES: 'userMoves', //ds array of strings
+export type Flow = {
+  entryMove: string
+  keyMove: string
+  exitMove: string
 }
+
+export const lsFlows= 'flows'
+export const lsAllMoves = 'allMoves'
+export const lsUserMoves = 'userMoves'
+
+interface LocalStorageStructure {
+  [lsFlows]: Flow[]
+  [lsAllMoves]: string[]
+  [lsUserMoves]: string[]
+}
+
+export type LocalStorageStructureKeys = keyof LocalStorageStructure
+
