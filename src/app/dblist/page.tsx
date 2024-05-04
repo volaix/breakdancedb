@@ -1,5 +1,6 @@
 import Header from '@/app/Header'
 import moveListExample from '@/db/moveListExample.json'
+import Image from 'next/image'
 
 const DbEntry = ({move}: {move: string}) => {
   //green overlay for moves you have, grey for ones you dont have
@@ -7,7 +8,9 @@ const DbEntry = ({move}: {move: string}) => {
     <div className="overflow-hidden w-2/6 p-1 justify-center	items-center flex">
       <h1 className="absolute z-10 font-bold text-white">{move}</h1>
       <div className="bg-gray-900 opacity-80 blur-sm">
-        <img
+        <Image
+      width="600"
+      height="400"
           className="w-full p-1"
           alt="move name"
           src={'https://dummyimage.com/600x400/000/fff'}

@@ -1,10 +1,15 @@
+import Image from 'next/image'
+
 import HamburgerMenu from './HamburgerMenu'
+
 //TODO have header still look good even when i scroll past it
 
 const Profile = () => {
   return (
-    <img
+    <Image
       className="w-5 h-5 rounded-full"
+      width="64"
+      height="64"
       src="https://dummyimage.com/64x64/000/fff"
       alt="Rounded avatar"
     />
