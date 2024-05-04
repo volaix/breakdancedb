@@ -1,6 +1,5 @@
 'use client'
 // @format
-import moveListExample from '@/db/moveListExample.json'
 import Header from './Header'
 import Move from './Move'
 import {useState, useEffect} from 'react'
@@ -10,41 +9,39 @@ const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
 const Home = () => {
-  let accessToLocalStorage: boolean = typeof window !== 'undefined'
-
-  //check access to localStorage.FLOWS
-  let hasLocalStorageMoves: boolean = false
-  if (accessToLocalStorage) {
-    hasLocalStorageMoves = !!localStorage.getItem(localStorageKeys.ALLMOVES)
-  }
-
-  //moves refer to "all the moves"
-  const [moves, setMoves] = useState(
-    hasLocalStorageMoves
-      ? localStorage.getItem(localStorageKeys.ALLMOVES)
-      : moveListExample,
-  )
-
+  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const [userMoves, setUserMoves] = useState([])
   //learning refers to "what will be displayed"
   const [learning, setLearning] = useState(null)
 
+  useEffect(() => {
+    setAccessToLocalStorage(typeof window !== 'undefined')
+  }, [])
+
+  //Populate existing moves
+  useEffect(() => {
+    if (
+      accessToLocalStorage &&
+      !!localStorage.getItem(localStorageKeys.USERMOVES)
+    ) {
+      setUserMoves(JSON.parse(localStorage.getItem(localStorageKeys.USERMOVES)))
+    }
+  }, [accessToLocalStorage])
+
   const setLearningToRandom = () => {
     setLearning({
-      entryMove: getRandomItem(moves),
-      keyMove: getRandomItem(moves),
-      exitMove: getRandomItem(moves),
+      entryMove: getRandomItem(userMoves),
+      keyMove: getRandomItem(userMoves),
+      exitMove: getRandomItem(userMoves),
     })
   }
 
   //on mount setLearning
-  useEffect(
-    () => {
-      console.log('moves', moves)
-      //TODO: Learn moves according to algorithm
-      setLearningToRandom()
-    },
-    [moves],
-  )
+  useEffect(() => {
+    console.log('moves', userMoves)
+    //TODO: Learn moves according to algorithm
+    setLearningToRandom()
+  }, [userMoves])
 
   const saveToLocalStorage = () => {
     console.log('updating localStorage')
@@ -78,6 +75,7 @@ const Home = () => {
     //TODO: Delete entry if you have it in flows
   }
 
+  const displayMoves = learning && userMoves.length > 0
   return (
     <main>
       <Header />
@@ -85,12 +83,15 @@ const Home = () => {
         className="z-10 
    w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <div className="mt-10">
-          {learning && (
+          {displayMoves && (
             <>
               <Move move={learning['entryMove']} />
               <Move move={learning['keyMove']} />
               <Move move={learning['exitMove']} />
             </>
+          )}
+          {displayMoves || (
+            <div>please add your moves or import move db here</div>
           )}
         </div>
         <div className="py-5 px-2 flex justify-evenly">
