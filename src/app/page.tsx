@@ -28,11 +28,11 @@ const Home = () => {
     }
   }, [accessToLocalStorage])
 
-  const setLearningToRandom = () => {
+  const setLearningToRandom = (moves) => {
     setLearning({
-      entryMove: getRandomItem(userMoves),
-      keyMove: getRandomItem(userMoves),
-      exitMove: getRandomItem(userMoves),
+      entryMove: getRandomItem(moves),
+      keyMove: getRandomItem(moves),
+      exitMove: getRandomItem(moves),
     })
   }
 
@@ -40,7 +40,7 @@ const Home = () => {
   useEffect(() => {
     console.log('moves', userMoves)
     //TODO: Learn moves according to algorithm
-    setLearningToRandom()
+    setLearningToRandom(userMoves)
   }, [userMoves])
 
   const saveToLocalStorage = () => {
