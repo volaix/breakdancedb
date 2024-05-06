@@ -1,7 +1,7 @@
 'use client';
 import rocks from '@/db/rocks.json';
 
-export const Position = ({ position }) => {
+export const Position = ({ position }: {position: number}) => {
   return (
     <div className="flex">
       <div className="mr-2"></div>
