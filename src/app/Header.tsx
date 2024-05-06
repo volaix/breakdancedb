@@ -2,8 +2,6 @@ import Image from 'next/image'
 
 import HamburgerMenu from './HamburgerMenu'
 
-//TODO have header still look good even when i scroll past it
-
 const Profile = () => {
   return (
     <Image
@@ -18,9 +16,7 @@ const Profile = () => {
 export default function Header() {
   return (
     <div
-      className="
-      z-10
-   fixed left-0 top-0 flex w-full justify-center
+      className="z-10 fixed left-0 top-0 flex w-full justify-center
    border-b border-slate-300 bg-gradient-to-b
    from-slate-200 pb-2 pt-4 backdrop-blur-2xl
    dark:border-neutral-800 dark:bg-slate-800/30
