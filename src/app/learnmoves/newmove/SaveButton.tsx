@@ -9,12 +9,17 @@ export const SaveButton = () => {
 
   const [saveText, setSaveText] = useState<string>('Save');
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false);
-
-  const existingMoves = []; //TODO get this using localStorage
+  const [existingMoves, setExistingMoves] = useState([]);
 
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== 'undefined');
   }, []);
+
+  useEffect(() => {
+    if (accessToLocalStorage) {
+      setExistingMoves(JSON.parse(localStorage.getItem(lsUserLearning) || '') || [])
+    }
+  }, [accessToLocalStorage])
 
   const onSave = () => {
     if (accessToLocalStorage)
