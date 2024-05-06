@@ -38,7 +38,7 @@ const YourMoves = () => {
       )
   }
   const onClickSave = () => {
-    saveToLocalStorage('userMoves')
+    saveToLocalStorage(lsUserMoves)
     setSaveText('Saved')
     //TODO show modal saved to localstorage
   }
