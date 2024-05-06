@@ -5,9 +5,9 @@ import {lsUserLearning} from '@/app/lib'
 import Link from 'next/link'
 
 const MoveBox = ({move}: {move: string}) => {
- const noSpacesMove = move.replace(/[^A-Z0-9]+/ig, "_")
+  const noSpacesMove = move.replace(/[^A-Z0-9]+/gi, '_')
   return (
-   <Link href={`/learnmoves/${noSpacesMove}`}>
+    <Link href={`/learnmoves/${noSpacesMove}`}>
       <div className="p-2 w-1/3">
         <div className="h-full bg-gray-800 bg-opacity-40 px-3 pt-5 pb-6 rounded-lg overflow-hidden text-center relative flex flex-col">
           <h2 className="tracking-widest title-font font-medium text-gray-500 mb-1 text-[7px]">
@@ -85,46 +85,40 @@ const LearnMoves = () => {
   //get learning moves
   useEffect(() => {
     if (accessToLocalStorage) {
-      setLearning(JSON.parse(localStorage.getItem(lsUserLearning)))
+      setLearning(JSON.parse(localStorage.getItem(lsUserLearning) || '') || [])
     }
   }, [accessToLocalStorage])
 
   return (
-    <div className="mt-20">
-      <div>
-        <a
-          href="/learnmoves/newmove"
-          className="text-indigo-400 inline-flex items-center">
-          add new move
-          <svg
-            className="w-4 h-4 ml-2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M5 12h14"></path>
-            <path d="M12 5l7 7-7 7"></path>
-          </svg>
-        </a>
-      </div>
-      <h1>Moves Learning</h1>
+    <div
+      className="mt-20"
+      style={{ width: '375px' }}
+     >
+      <><div>
+          <a
+            href="/learnmoves/newmove"
+            className="text-indigo-400 inline-flex items-center">
+            add new move
+            <svg
+              className="w-4 h-4 ml-2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M5 12h14"></path>
+              <path d="M12 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div><h1>Moves Learning</h1></>
       {learning &&
         learning.map(move => {
-          return <MoveBox move={move} />
+          return <MoveBox key={move} move={move} />
         })}
     </div>
   )
 }
 
-const Page = () => {
-  return (
-    <div>
-      <Header />
-      <LearnMoves />
-    </div>
-  )
-}
 
-export default Page
+export default LearnMoves
