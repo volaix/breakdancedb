@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <div>
       <Header />
-      <div className="mt-20 w-full dark:text-gray-600 flex flex-col items-center w-xs">{children}</div>
+      <div className="container text-gray-600 body-font relative w-full dark:text-gray-600 flex flex-col items-center w-xs">{children}</div>
     </div>
   );
 }

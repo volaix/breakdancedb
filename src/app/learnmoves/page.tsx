@@ -13,7 +13,7 @@ const MoveBox = ({move}: {move: string}) => {
           <h2 className="tracking-widest title-font font-medium text-gray-500 mb-1 text-[7px]">
             Learning
           </h2>
-          <h1 className="title-font sm:text-2xl text-[9px] font-medium text-white mb-1">
+          <h1 className="title-font text-[9px] font-medium text-white mb-1">
             <div className="whitespace-nowrap	overflow-hidden text-ellipsis">
               {move}
             </div>
@@ -94,10 +94,17 @@ const LearnMoves = () => {
       className="mt-20"
       style={{ width: '375px' }}
      >
-      <><div>
+      <><h1
+      className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white"
+      >Moves Learning</h1></>
+      {learning &&
+        learning.map(move => {
+          return <MoveBox key={move} move={move} />
+        })}
+<div>
           <a
             href="/learnmoves/newmove"
-            className="text-indigo-400 inline-flex items-center">
+            className="text-indigo-400 inline-flex items-center text-sm mt-5">
             add new move
             <svg
               className="w-4 h-4 ml-2"
@@ -111,11 +118,7 @@ const LearnMoves = () => {
               <path d="M12 5l7 7-7 7"></path>
             </svg>
           </a>
-        </div><h1>Moves Learning</h1></>
-      {learning &&
-        learning.map(move => {
-          return <MoveBox key={move} move={move} />
-        })}
+        </div>
     </div>
   )
 }

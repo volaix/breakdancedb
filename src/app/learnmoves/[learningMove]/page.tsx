@@ -50,7 +50,7 @@ const LearnMove = () => {
   const moveName = "Tristan's Combination";
 
   return (
-    <div className="">
+    <div className="mt-20">
       <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white">
         {moveName}
       </h1>
