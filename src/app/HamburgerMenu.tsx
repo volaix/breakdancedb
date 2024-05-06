@@ -3,15 +3,15 @@ import {useState} from 'react'
 
 const Header = () => {
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const inDevelopment = true
 
   return (
     <div className="flex items-center justify-between fixed w-4/5">
       <nav>
-        <section className="MOBILE-MENU flex lg:hidden">
+        <section className="flex">
           <div
-           className="space-y-2"
+            className="space-y-2"
             onClick={() => setIsNavOpen(prev => !prev)}>
-
             <div className="grid justify-items-center gap-1.5">
               <span className="h-0.5 w-5 rounded-full bg-slate-400 transition group-hover:rotate-45 group-hover:translate-y-2.5" />
               <span className="h-0.5 w-5 rounded-full bg-slate-400 group-hover:scale-x-0 transition" />
@@ -39,36 +39,39 @@ const Header = () => {
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/learnmoves">Learn Moves</a>
               </li>
-              <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/">Learn Transitions</a>
-              </li>
+              {inDevelopment || (
+                <li className="border-b border-gray-400 my-2 uppercase">
+                  <a href="/">Learn Transitions</a>
+                </li>
+              )}
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/">Learn Flow</a>
               </li>
-              <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/combos">Learn Combos</a>
-              </li>
+              {inDevelopment || (
+                <li className="border-b border-gray-400 my-2 uppercase">
+                  <a href="/combos">Learn Combos</a>
+                </li>
+              )}
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/yourmoves">Your Moves</a>
               </li>
-              <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/dblist">(old)All Moves</a>
-              </li>
+              {inDevelopment || (
+                <li className="border-b border-gray-400 my-2 uppercase">
+                  <a href="/dblist">(old)All Moves</a>
+                </li>
+              )}
               <li className="border-b border-gray-400 my-2 uppercase">
                 <a href="/completed">History</a>
               </li>
-              <li className="border-b border-gray-400 my-2 uppercase">
-                <a href="/nodes">Nodeview</a>
-              </li>
+              {inDevelopment || (
+                <li className="border-b border-gray-400 my-2 uppercase">
+                  <a href="/nodes">Nodeview</a>
+                </li>
+              )}
             </ul>
           </div>
         </section>
 
-        <ul className="DESKTOP-MENU hidden space-x-8 lg:flex">
-          <li>
-            <a href="/faq">mobile only website</a>
-          </li>
-        </ul>
       </nav>
       <style>{`
       .hideMenuNav {
