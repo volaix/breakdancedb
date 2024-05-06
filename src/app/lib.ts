@@ -8,6 +8,7 @@ export type Flow = {
 export const lsFlows= 'flows'
 export const lsAllMoves = 'allMoves'
 export const lsUserMoves = 'userMoves'
+export const lsUserLearning = 'userLearning'
 
 interface LocalStorageStructure {
   [lsFlows]: Flow[]
