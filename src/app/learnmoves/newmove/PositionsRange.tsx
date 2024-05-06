@@ -1,10 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { FormEventHandler, SetStateAction, useState } from 'react';
 import { Position } from './Position';
 
 export const PositionsRange = () => {
   const [positions, setPositions] = useState<string>('6');
-  const updatePositions = e => {
+  const updatePositions: FormEventHandler<HTMLInputElement> = (e) => {
     setPositions(e.target.value);
   };
   const max = '20';
@@ -15,7 +15,7 @@ export const PositionsRange = () => {
         <div>switch</div>
       </div>
       <div className="mb-4">
-        <label htmlFor="price-range" class="block text-gray-700 font-bold mb-2">
+        <label htmlFor="price-range" className="block text-gray-700 font-bold mb-2">
           Move Positions
         </label>
         <input
