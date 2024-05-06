@@ -3,7 +3,7 @@
 import Header from './Header'
 import Move from './Move'
 import {useState, useEffect} from 'react'
-import { Flow, lsFlows, lsUserMoves} from './lib'
+import {Flow, lsFlows, lsUserMoves} from './lib'
 
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
@@ -23,10 +23,7 @@ const Home = () => {
 
   //Populate existing moves
   useEffect(() => {
-    if (
-      accessToLocalStorage &&
-      !!localStorage.getItem(lsUserMoves)
-    ) {
+    if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
       setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ''))
     }
   }, [accessToLocalStorage])
@@ -48,14 +45,11 @@ const Home = () => {
 
   const saveToLocalStorage = () => {
     console.log('saving to localStorage new flow')
-    if (
-      accessToLocalStorage &&
-      !!localStorage.getItem(lsFlows) &&
-      !!learning
-    ) {
+    if (accessToLocalStorage && !!localStorage.getItem(lsFlows) && !!learning) {
       const currentFlows: Flow[] = JSON.parse(
-        localStorage.getItem(lsFlows) || '')
-      const newFlows: Flow[] = currentFlows &&[...currentFlows, learning]
+        localStorage.getItem(lsFlows) || '',
+      )
+      const newFlows: Flow[] = currentFlows && [...currentFlows, learning]
       localStorage.setItem(lsFlows, JSON.stringify(newFlows))
     } else {
       localStorage.setItem(lsFlows, JSON.stringify([learning]))
@@ -85,7 +79,7 @@ const Home = () => {
       <Header />
       <div
         className="z-10 
-   w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+   w-full max-w-xs items-center justify-between font-mono text-sm mt-20 dark:text-gray-600 flex flex-col items-center ">
         <div className="mt-10">
           {displayMoves && (
             <>
