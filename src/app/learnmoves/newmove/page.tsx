@@ -23,11 +23,8 @@ const GoBack = () => (
 )
 
 const NewMove = () => {
-  //  display: flex;
-  // flex-direction: column;
-  // align-items: center;
   return (
-    <div className="mt-20 dark:text-gray-600 flex items-center">
+    <div className="">
       <GoBack />
 
       <NameInput />
@@ -49,7 +46,6 @@ const NewMove = () => {
 const Page = () => {
   return (
     <div>
-      <Header />
       <NewMove />
     </div>
   )
