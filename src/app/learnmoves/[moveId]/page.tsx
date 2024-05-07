@@ -1,8 +1,8 @@
-"use client";
-import Header from "@/app/Header";
-import { useState, useEffect } from "react";
-import { lsUserLearning } from "@/app/lib";
-import Link from "next/link";
+'use client'
+import Header from '@/app/Header'
+import {useState, useEffect} from 'react'
+import {lsUserLearning} from '@/app/lib'
+import Link from 'next/link'
 
 const PositionList = () => {
   return (
@@ -23,34 +23,38 @@ const PositionList = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
 const LearnMove = () => {
-  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false);
-  const [learning, setLearning] = useState([]);
+  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const [learning, setLearning] = useState([])
 
   const StaticImage = () => {
-    return <div>One position at a time</div>;
-  };
+    return <div>One position at a time</div>
+  }
 
-  const existingMoves = []; //TODO get this using localStorage
+  const existingMoves = [] //TODO get this using localStorage
 
   useEffect(() => {
-    setAccessToLocalStorage(typeof window !== "undefined");
-  }, []);
+    setAccessToLocalStorage(typeof window !== 'undefined')
+  }, [])
 
   //get learning moves
   useEffect(() => {
     if (accessToLocalStorage) {
-      setLearning(JSON.parse(localStorage.getItem(lsUserLearning) || ""));
+      setLearning(JSON.parse(localStorage.getItem(lsUserLearning) || ''))
     }
-  }, [accessToLocalStorage]);
+  }, [accessToLocalStorage])
 
-  const moveName = "Tristan's Combination";
+  const moveName = "Tristan's Combination"
 
   return (
     <div className="mt-20">
+      <div className="flex">
+        <input type="checkbox" />
+        <div className="ml-5">mark as learned move</div>
+      </div>
       <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white">
         {moveName}
       </h1>
@@ -66,7 +70,7 @@ const LearnMove = () => {
       <h1>SLOW</h1>
       <p>
         Slow defined smaller than60mpm (moves per minute) or no faster than 1
-        move per second{" "}
+        move per second{' '}
       </p>
       <p>Feel 4/5 stars comforatble before moving on</p>
       <h1>static poses and dance</h1>
@@ -74,15 +78,15 @@ const LearnMove = () => {
       <h1>5 stars</h1>
       <StaticImage />
     </div>
-  );
-};
+  )
+}
 
 const Page = () => {
   return (
     <div>
       <LearnMove />
     </div>
-  );
-};
+  )
+}
 
-export default Page;
+export default Page
