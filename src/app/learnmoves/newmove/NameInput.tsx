@@ -1,31 +1,24 @@
-'use client';
-import { useMoveStore } from './store';
+"use client";
+import { useMoveStore } from "./store";
 
-export const NameInput = () => {
-  //TODO update input value to zustand
-  // const useMoveStore = create<moveStore>()(set => ({
-  //   moveName: 'helloworld',
-  //   updateMove: newText => set(state => ({bears: newText})),
-  // }))
+export const RenderNameInput = () => {
   const { moveName, updateMove } = useMoveStore();
-  const onChangeName = (e) => {
-    //synthetic base event
-    console.log('e', e);
+  const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("e", e);
     updateMove(e.target.value);
   };
 
   return (
     <div className="relative text-xs">
-      <label className="dark:text-gray-400 leading-7 text-sm text-gray-600">
+      <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
         Move Name
       </label>
       <input
         value={moveName}
         onChange={onChangeName}
         type="text"
-        id="name"
-        name="name"
-        className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out dark:bg-gray-800 dark:bg-opacity-40 dark:border-gray-700 dark:focus:bg-gray-900 dark:focus:ring-indigo-900 dark:text-gray-100" />
+        className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+      />
       recommended 1-3 words
     </div>
   );
