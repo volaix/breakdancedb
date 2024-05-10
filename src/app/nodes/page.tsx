@@ -1,6 +1,6 @@
 'use client'
 import Header from '@/app/Header'
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 
 const Page = () => {
   // Set the value received from the local storage to a local state
@@ -12,7 +12,6 @@ const Page = () => {
     value = localStorage.getItem('favoriteNumber') || ''
     setFavoriteNumber(value)
   }, [])
-
 
   return (
     <>
@@ -33,9 +32,7 @@ const Page = () => {
       <div className="mt-5">
         <a>view as nodes</a>
       </div>
-      <div>
-        
-      </div>
+      <div></div>
     </>
   )
 }

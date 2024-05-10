@@ -1,6 +1,19 @@
 'use client'
 import { useState, useEffect, SetStateAction, Dispatch } from 'react'
-import { Hold, Move, MoveExecution, MovementKeys, Position, PositionId, Transition, TransitionId, getLocalStorageGlobal, lsUserLearning, updateLocalStorageGlobal, useLocalStorage } from '@/app/lib'
+import {
+  Hold,
+  Move,
+  MoveExecution,
+  MovementKeys,
+  Position,
+  PositionId,
+  Transition,
+  TransitionId,
+  getLocalStorageGlobal,
+  lsUserLearning,
+  updateLocalStorageGlobal,
+  useLocalStorage,
+} from '@/app/lib'
 import { useSearchParams } from 'next/navigation'
 import { v4 } from 'uuid'
 
@@ -17,9 +30,9 @@ type MovementType = 'static' | 'transition' | 'hold'
 //-------------------------------Local Utils---------------------------------
 
 /**
- * 
+ *
  * Gets text for tooltip
- * @returns 
+ * @returns
  */
 const getText = (type: MovementType): string => {
   switch (type) {
@@ -32,13 +45,17 @@ const getText = (type: MovementType): string => {
   }
 }
 
-/** 
+/**
  *  Reorders positions and transitions into the correct display order for learnmoves/move/learn page
  * @param positions Position[]
  * @param transitions Transition[]
  * @returns [] of Position, Transition, and Hold
  */
-const formatPosTransHolds = (positions: Position[] = [], transitions: Transition[] = [], holds: Hold[] = []): (MovementGroup)[] => {
+const formatPosTransHolds = (
+  positions: Position[] = [],
+  transitions: Transition[] = [],
+  holds: Hold[] = [],
+): MovementGroup[] => {
   //return early if empty arr is given
   if (positions.length === 0) return []
   if (transitions.length === 0) return []
@@ -50,27 +67,33 @@ const formatPosTransHolds = (positions: Position[] = [], transitions: Transition
   const baseArr: MovementGroup[] = [
     {
       displayName: 'First-Movement',
-      position: positions[0]
+      position: positions[0],
     },
     {
       displayName: 'Loop-Movement',
       transition: lastTransition,
       hold: lastHold,
-    }
+    },
   ]
   //get rid of the first and last of positions as these are manually made in base arr.
-  const removedFirstAndLast = positions.filter((a, i) => !(i === positions.length || i === 0))
+  const removedFirstAndLast = positions.filter(
+    (a, i) => !(i === positions.length || i === 0),
+  )
 
   //insert a formatted Movement[] inside baseArr
-  return baseArr.toSpliced(1, 0, ...removedFirstAndLast.map((a, i) => {
-    //i is 0 based index
-    return {
-      displayName: `movement-group-${i + 2}`,
-      position: a,
-      transition: transitions[i],
-      hold: holds[i]
-    }
-  }))
+  return baseArr.toSpliced(
+    1,
+    0,
+    ...removedFirstAndLast.map((a, i) => {
+      //i is 0 based index
+      return {
+        displayName: `movement-group-${i + 2}`,
+        position: a,
+        transition: transitions[i],
+        hold: holds[i],
+      }
+    }),
+  )
 }
 
 //-----------------------Renders ------------------------------
@@ -79,8 +102,20 @@ const formatPosTransHolds = (positions: Position[] = [], transitions: Transition
  * Renders 10 hearts. Used above each movement. Occurs multiple times per movement group.
  * @returns jsx
  */
-const RenderHearts = ({ rating, move, accessToLocalStorage, currentlyEditing, movementId, setMove }: {
-  rating: number, move: Move, accessToLocalStorage: boolean, currentlyEditing: MovementType, movementId: string, setMove: Dispatch<SetStateAction<Move | null>>
+const RenderHearts = ({
+  rating,
+  move,
+  accessToLocalStorage,
+  currentlyEditing,
+  movementId,
+  setMove,
+}: {
+  rating: number
+  move: Move
+  accessToLocalStorage: boolean
+  currentlyEditing: MovementType
+  movementId: string
+  setMove: Dispatch<SetStateAction<Move | null>>
 }) => {
   //zustand to get state here rather than passed as props?
 
@@ -100,91 +135,108 @@ const RenderHearts = ({ rating, move, accessToLocalStorage, currentlyEditing, mo
 
   //----------------------------------------render-------------------------------
   return (
-    <div className="flex flex-row-reverse justify-end items-center">
+    <div className="flex flex-row-reverse items-center justify-end">
       {
-        //render 10 hearts 
+        //render 10 hearts
         Array.from(Array(10)).map((a, i) => {
-          return (<>
-            <input
-              //When heart is clicked, the input will update local state and localstorage
-              onChange={(e) => {
-                //-----------------------makes the updated move------------------
+          return (
+            <>
+              <input
+                //When heart is clicked, the input will update local state and localstorage
+                onChange={(e) => {
+                  //-----------------------makes the updated move------------------
 
-                //checks if hearts id can be found in the MoveId
-                //of the hearts we're editing, to match the move[] that's used for localstoragedb
-                const indexToUpdate = move[moveKey]?.findIndex((c) => !!(
-                  (c as Position).positionId === movementId ||
-                  (c as Transition).transitionId === movementId ||
-                  (c as Hold).holdId === movementId
-                ))
+                  //checks if hearts id can be found in the MoveId
+                  //of the hearts we're editing, to match the move[] that's used for localstoragedb
+                  const indexToUpdate = move[moveKey]?.findIndex(
+                    (c) =>
+                      !!(
+                        (c as Position).positionId === movementId ||
+                        (c as Transition).transitionId === movementId ||
+                        (c as Hold).holdId === movementId
+                      ),
+                  )
 
-                //if can find id match, then try to update, else throw validation error
-                if (indexToUpdate !== -1) {
-                  const updatedMove: Move = {
-                    ...move,
-                    [moveKey]: (move[moveKey] || []).map((a, i) =>
-                      (i === indexToUpdate) ? {
-                        ...a,
-                        slowRating: Number(e.target.id),
-                      } : a
-                    )
-                  }
+                  //if can find id match, then try to update, else throw validation error
+                  if (indexToUpdate !== -1) {
+                    const updatedMove: Move = {
+                      ...move,
+                      [moveKey]: (move[moveKey] || []).map((a, i) =>
+                        i === indexToUpdate
+                          ? {
+                              ...a,
+                              slowRating: Number(e.target.id),
+                            }
+                          : a,
+                      ),
+                    }
 
-                  //-----------------------updates display----------------------------
+                    //-----------------------updates display----------------------------
 
-                  //updates view, otherwise user has to refresh to get updates from localstorageDB data
-                  setMove(updatedMove)
+                    //updates view, otherwise user has to refresh to get updates from localstorageDB data
+                    setMove(updatedMove)
 
-                  //------------------------updates db--------------------------------
+                    //------------------------updates db--------------------------------
 
-                  //expression for if Move[] matches has a match provided moveid
-                  const matchCriteria = (a: Move) => a.moveId === move.moveId
+                    //expression for if Move[] matches has a match provided moveid
+                    const matchCriteria = (a: Move) => a.moveId === move.moveId
 
-                  //all the moves from localstorage
-                  const globalMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+                    //all the moves from localstorage
+                    const globalMoves =
+                      getLocalStorageGlobal[lsUserLearning](
+                        accessToLocalStorage,
+                      )
 
-                  //validation if local moveId exists in global moveId
-                  if (globalMoves.find(matchCriteria)) {
-                    //updates localstorage on click
-                    updateLocalStorageGlobal[lsUserLearning](globalMoves.map(
-                      (ogMove: Move) => (matchCriteria(ogMove)) ? updatedMove : ogMove
-                    ), accessToLocalStorage)
+                    //validation if local moveId exists in global moveId
+                    if (globalMoves.find(matchCriteria)) {
+                      //updates localstorage on click
+                      updateLocalStorageGlobal[lsUserLearning](
+                        globalMoves.map((ogMove: Move) =>
+                          matchCriteria(ogMove) ? updatedMove : ogMove,
+                        ),
+                        accessToLocalStorage,
+                      )
+                    } else {
+                      //TODO have UI visible error handling
+                      console.log('cannot find moveid in localstorage')
+                    }
                   } else {
                     //TODO have UI visible error handling
-                    console.log('cannot find moveid in localstorage')
+                    console.log(
+                      'couldnt find id match of hearts to moves supplied',
+                    )
                   }
-                } else {
-                  //TODO have UI visible error handling
-                  console.log('couldnt find id match of hearts to moves supplied')
-                }
-              }}
-              checked={i === (10 - rating)}
-              type="radio"
-              className="peer -ms-5 size-5 bg-transparent
-          border-0 text-transparent cursor-pointer
-          appearance-none
+                }}
+                checked={i === 10 - rating}
+                type="radio"
+                className="peer -ms-5 size-5 cursor-pointer
+          appearance-none border-0 bg-transparent
+          text-transparent
           checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
-              id={'' + (10 - i)}
-            />
-            <label
-              className="peer-checked:text-red-500 text-gray-300 
-            pointer-events-none">
-              <svg
-                className="flex-shrink-0 size-5"
-                width="16"
-                height="16"
-                fill="currentColor"
-                viewBox="0 0 16 16">
-                <path
-                  fill-rule="evenodd"
-                  d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534
-                 4.736 3.562-3.248 8 1.314z">
-                </path>
-              </svg>
-            </label>
-          </>)
-        })}
-
+                id={'' + (10 - i)}
+              />
+              <label
+                className="pointer-events-none text-gray-300 
+            peer-checked:text-red-500"
+              >
+                <svg
+                  className="size-5 flex-shrink-0"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534
+                 4.736 3.562-3.248 8 1.314z"
+                  ></path>
+                </svg>
+              </label>
+            </>
+          )
+        })
+      }
     </div>
   )
 }
@@ -202,14 +254,12 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
 
   //render
   return (
-    <div className="pl-0.5 flex items-center">
-      <svg
-        width="15" height="15"
-        viewBox="0 0 24 24">
+    <div className="flex items-center pl-0.5">
+      <svg width="15" height="15" viewBox="0 0 24 24">
         <path d="m13 17-2 0 0-6 2 0 0 6zm-1-15c6 0 10 4 10 10s-4 10-10 10-10-4-10-10 4-10 10-10zm0 18c4 0 8-4 8-8s-4-8-8-8-8 4-8 8 4 8 8 8zm1-11-2 0 0-2 2 0 0 2z" />
       </svg>
-
-    </div>)
+    </div>
+  )
 }
 
 /**
@@ -218,7 +268,9 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
 const RenderPage = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
-  const [orderOfPosTransHolds, setOrderOfPosTransHolds] = useState<(MovementGroup)[]>([])
+  const [orderOfPosTransHolds, setOrderOfPosTransHolds] = useState<
+    MovementGroup[]
+  >([])
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
 
@@ -229,14 +281,16 @@ const RenderPage = () => {
 
   //sets the order of the movements
   useEffect(() => {
-    if (move) setOrderOfPosTransHolds(formatPosTransHolds(
-      move.positions, move.transitions, move.holds))
+    if (move)
+      setOrderOfPosTransHolds(
+        formatPosTransHolds(move.positions, move.transitions, move.holds),
+      )
   }, [move])
 
   //get learning moves
   useEffect(() => {
     const allMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-    const selectedMove = allMoves.find(obj => obj.moveId === moveId)
+    const selectedMove = allMoves.find((obj) => obj.moveId === moveId)
     setMove(selectedMove || null)
   }, [accessToLocalStorage, moveId])
 
@@ -245,75 +299,99 @@ const RenderPage = () => {
   const numberOfPositions = move?.positions?.length
   const numberOfTransitions = move?.transitions?.length
   return (
-    <section className="text-gray-600 body-font">
-      <div className="container px-5 py-24 mx-auto max-w-se">
-        <div className="flex flex-col text-center w-full mb-8">
-          <h1 className="dark:text-white sm:text-4xl text-3xl font-medium title-font mb-2 text-gray-900">
+    <section className="body-font text-gray-600">
+      <div className="container mx-auto max-w-se px-5 py-24">
+        <div className="mb-8 flex w-full flex-col text-center">
+          <h1 className="title-font mb-2 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             Learn Slow
           </h1>
-          <p className="lg:w-1/2 w-full leading-relaxed text-gray-500 text-xs">
-            Learn slow to learn fast. Recommended music around 60bpm. Do a move every beat. Feel free to skip past the hard ones and get the easy ones first.
+          <p className="w-full text-xs leading-relaxed text-gray-500 lg:w-1/2">
+            Learn slow to learn fast. Recommended music around 60bpm. Do a move
+            every beat. Feel free to skip past the hard ones and get the easy
+            ones first.
           </p>
-          <div className="lg:w-2/3 text-xs mx-auto leading-relaxed text-base">
-          </div>
+          <div className="mx-auto text-base text-xs leading-relaxed lg:w-2/3"></div>
         </div>
         <div>
-          {move && orderOfPosTransHolds && orderOfPosTransHolds.map((movement, i) => {
-            return (
-              <div className="my-6 flex flex-col items-center"
-                key={movement.displayName}>
-                <h1 className="dark:text-white capitalize text-gray-900 title-font text-lg font-medium"
-                >{movement.displayName}</h1>
-                <div className="flex mt-2 mb-4 justify-center"><div className="w-16 h-1 rounded-full bg-indigo-500 inline-flex"></div></div>
-                <div className="items-center flex flex-col text-xs">
-                  {movement.position &&
-                    //If its a position render position
-                    <div className="flex flex-col py-3">
-                      <span><RenderHearts
-                        setMove={setMove}
-                        accessToLocalStorage={accessToLocalStorage}
-                        rating={movement.position?.slowRating}
-                        move={move}
-                        currentlyEditing={'static'}
-                        movementId={movement.position.positionId} />
-                        {'Position: '}{movement.position.displayName}</span>
-                      <span className="flex"><div>{'Practice: Slow Statics'}</div><RenderTooltip type={'static'} /></span>
-                    </div>
-                  }
-                  {movement.transition &&
-                    //If its a transition render Transition
-                    <div className="flex flex-col py-3">
-                      <span><RenderHearts
-                        setMove={setMove}
-                        accessToLocalStorage={accessToLocalStorage}
-                        rating={movement.transition?.slowRating}
-                        move={move}
-                        currentlyEditing={'transition'}
-                        movementId={movement.transition.transitionId}
-                      />
-                        {'Transition: '}{movement.transition.displayName}</span>
-                      <div>{'Practice: Slow Transitions'}</div>
-                    </div>
-                  }
-                  {movement.hold &&
-                    //If its a hold render hold
-                    <div className="flex flex-col pt-3">
-                      <span><RenderHearts
-                        setMove={setMove}
-                        accessToLocalStorage={accessToLocalStorage}
-                        move={move}
-                        currentlyEditing={'hold'}
-                        movementId={movement.hold.holdId}
-                        rating={movement.hold.slowRating} />{'Holds: '}{movement.hold.displayName}</span>
-                      <div>{'Practice: Slow Holds'}</div>
-                    </div>
-                  }
+          {move &&
+            orderOfPosTransHolds &&
+            orderOfPosTransHolds.map((movement, i) => {
+              return (
+                <div
+                  className="my-6 flex flex-col items-center"
+                  key={movement.displayName}
+                >
+                  <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
+                    {movement.displayName}
+                  </h1>
+                  <div className="mb-4 mt-2 flex justify-center">
+                    <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
+                  </div>
+                  <div className="flex flex-col items-center text-xs">
+                    {movement.position && (
+                      //If its a position render position
+                      <div className="flex flex-col py-3">
+                        <span>
+                          <RenderHearts
+                            setMove={setMove}
+                            accessToLocalStorage={accessToLocalStorage}
+                            rating={movement.position?.slowRating}
+                            move={move}
+                            currentlyEditing={'static'}
+                            movementId={movement.position.positionId}
+                          />
+                          {'Position: '}
+                          {movement.position.displayName}
+                        </span>
+                        <span className="flex">
+                          <div>{'Practice: Slow Statics'}</div>
+                          <RenderTooltip type={'static'} />
+                        </span>
+                      </div>
+                    )}
+                    {movement.transition && (
+                      //If its a transition render Transition
+                      <div className="flex flex-col py-3">
+                        <span>
+                          <RenderHearts
+                            setMove={setMove}
+                            accessToLocalStorage={accessToLocalStorage}
+                            rating={movement.transition?.slowRating}
+                            move={move}
+                            currentlyEditing={'transition'}
+                            movementId={movement.transition.transitionId}
+                          />
+                          {'Transition: '}
+                          {movement.transition.displayName}
+                        </span>
+                        <div>{'Practice: Slow Transitions'}</div>
+                      </div>
+                    )}
+                    {movement.hold && (
+                      //If its a hold render hold
+                      <div className="flex flex-col pt-3">
+                        <span>
+                          <RenderHearts
+                            setMove={setMove}
+                            accessToLocalStorage={accessToLocalStorage}
+                            move={move}
+                            currentlyEditing={'hold'}
+                            movementId={movement.hold.holdId}
+                            rating={movement.hold.slowRating}
+                          />
+                          {'Holds: '}
+                          {movement.hold.displayName}
+                        </span>
+                        <div>{'Practice: Slow Holds'}</div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>)
-          })}
+              )
+            })}
         </div>
       </div>
-    </section >
+    </section>
   )
 }
 

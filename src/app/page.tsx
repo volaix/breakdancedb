@@ -1,7 +1,7 @@
-"use client"
+'use client'
 // @format
-import Header from "./Header"
-import { useState, useEffect } from "react"
+import Header from './Header'
+import { useState, useEffect } from 'react'
 import {
   Flow,
   lsFlows,
@@ -9,9 +9,8 @@ import {
   safeJsonParse,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from "./lib"
-import Image from "next/image"
-
+} from './lib'
+import Image from 'next/image'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]) =>
@@ -22,18 +21,18 @@ type Learning = Flow | null
 //------------------------components-------------------------------
 /**
  * Renders an Image with some text below for each one of the flows
- * @param 
- * @returns 
+ * @param
+ * @returns
  */
 const Move = ({ move }: { move: string }) => {
   return (
     <>
       {move && (
-        <div className="bg-slate-300 dark:bg-gray-900 w-full py-3 flex flex-col items-center">
+        <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
           <Image
             width="600"
             height="400"
-            className="w-full w-5/6"
+            className="w-5/6 w-full"
             alt="move name"
             src={'https://dummyimage.com/600x400/000/fff'}
           />
@@ -64,7 +63,7 @@ export default function Home() {
   //Populate existing moves
   useEffect(() => {
     if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
-      setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ""))
+      setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ''))
     }
   }, [accessToLocalStorage])
 
@@ -90,16 +89,17 @@ export default function Home() {
     //validation for if there is a flow displayed
     if (learning) {
       //gets existing flows, adds learning at the end
-      const newFlows: Flow[] = [...safeJsonParse<Flow[], []>(
-        localStorage.getItem(lsFlows) || "",
-        []), learning]
+      const newFlows: Flow[] = [
+        ...safeJsonParse<Flow[], []>(localStorage.getItem(lsFlows) || '', []),
+        learning,
+      ]
       updateLocalStorageGlobal[lsFlows](newFlows, accessToLocalStorage)
     } else {
       console.log('cannot find move currently being learned')
     }
 
     setLearningToRandom(userMoves)
-    //FEATURE: celebration UI element. 
+    //FEATURE: celebration UI element.
     //FEATURE:  popup on 5 star rating for each move multi select
     //FEATURE: have refresh UI feeling
   }
@@ -126,9 +126,9 @@ export default function Home() {
         <div className="mt-10">
           {displayMoves && (
             <>
-              <Move move={learning["entryMove"]} />
-              <Move move={learning["keyMove"]} />
-              <Move move={learning["exitMove"]} />
+              <Move move={learning['entryMove']} />
+              <Move move={learning['keyMove']} />
+              <Move move={learning['exitMove']} />
             </>
           )}
           {displayMoves || (

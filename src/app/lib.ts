@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { v4 as makeId, v4, validate } from "uuid"
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { v4 as makeId, v4, validate } from 'uuid'
 
 /**
  * Brands a type by intersecting it with a type with a brand property based on
@@ -20,17 +20,15 @@ export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
  */
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-
 /**
- * 
+ *
  * This function is responsible for handling parsing errors. If an error occurs during parsing, it will return undefined. Otherwise, it will return the parsed JSON value along with its corresponding data type.
  * @param
  * @returns parsed JSON
  */
 export const safeJsonParse = <T, F>(toJsonParse: string, fallback: F) => {
   try {
-    const jsonValue: T = JSON.parse(
-      toJsonParse)
+    const jsonValue: T = JSON.parse(toJsonParse)
     return jsonValue
   } catch {
     return fallback as F
@@ -70,14 +68,14 @@ export const makePositionId = (): PositionId => {
 export const makeTransitionId = (): TransitionId => {
   return v4() as TransitionId
 }
-export type MoveId = Brand<string, "MoveId">
+export type MoveId = Brand<string, 'MoveId'>
 export interface MoveExecution {
   memorised: boolean
   slow: boolean
   normal: boolean
   fast: boolean
 }
-export type PositionId = Brand<string, "PositionId">
+export type PositionId = Brand<string, 'PositionId'>
 
 export type Position = {
   positionId: PositionId
@@ -88,8 +86,7 @@ export type Position = {
   fast: boolean
 }
 
-
-export type TransitionId = Brand<string, "TransitionId">
+export type TransitionId = Brand<string, 'TransitionId'>
 
 /**
  * Transition object used in localstorage data structure
@@ -130,16 +127,14 @@ export const getUserLearning = (): Move[] => {
   if (localStorage.getItem(lsUserLearning) === null) {
     return []
   }
-  return JSON.parse(localStorage.getItem(lsUserLearning) || "") || []
+  return JSON.parse(localStorage.getItem(lsUserLearning) || '') || []
 }
-
-
 
 // ----------- Local Storage Keys -----------------
 
-export const lsFlows = "flows"
-export const lsUserMoves = "userMoves"
-export const lsUserLearning = "userLearning"
+export const lsFlows = 'flows'
+export const lsUserMoves = 'userMoves'
+export const lsUserLearning = 'userLearning'
 export type LocalStorageKeys = keyof LocalStorageStructure
 
 // ------------------------------------------------
@@ -152,10 +147,9 @@ export const useLocalStorage = (
   setAccessToLocalStorage: Dispatch<SetStateAction<boolean>>,
 ) => {
   useEffect(() => {
-    setAccessToLocalStorage(typeof window !== "undefined")
+    setAccessToLocalStorage(typeof window !== 'undefined')
   }, [setAccessToLocalStorage])
 }
-
 
 /**
  * Any value of Any Local Storage Keys
@@ -172,10 +166,10 @@ type FlowRecord = Record<typeof lsFlows, Flow[]>
  */
 const isFlow = (val: unknown): val is Flow => {
   //check if it's an object
-  if (typeof val === "object" && !Array.isArray(val) && val !== null) {
-    const hasEntrymove = typeof (val as Flow).entryMove === "string"
-    const hasKeyMove = typeof (val as Flow).keyMove === "string"
-    const hasExitMove = typeof (val as Flow).exitMove === "string"
+  if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
+    const hasEntrymove = typeof (val as Flow).entryMove === 'string'
+    const hasKeyMove = typeof (val as Flow).keyMove === 'string'
+    const hasExitMove = typeof (val as Flow).exitMove === 'string'
     return hasEntrymove && hasKeyMove && hasExitMove
   }
   return false
@@ -201,21 +195,22 @@ const isFlowArr = (lsValue: LocalStorageValues): lsValue is Flow[] => {
  * Checks if the passed value is a typeof moveid
  */
 const isMoveId = (val: unknown): val is MoveId =>
-  typeof val === "string" && validate(val)
+  typeof val === 'string' && validate(val)
 
 /**
  * Checks if the passed value is Move
  */
 const isMove = (val: unknown): val is Move => {
   //check if object
-  if (typeof val === "object" && !Array.isArray(val) && val !== null) {
+  if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
     let posMatchTrans = true
     //check if positions match transitions length. should be equal number of pos to trans
     if ((val as Move).positions) {
-      posMatchTrans = (val as Move).positions?.length === (val as Move).transitions?.length
+      posMatchTrans =
+        (val as Move).positions?.length === (val as Move).transitions?.length
     }
     const hasMoveId = isMoveId((val as Move).moveId)
-    const hasDisplayName = typeof (val as Move).displayName === "string"
+    const hasDisplayName = typeof (val as Move).displayName === 'string'
     return hasMoveId && hasDisplayName && posMatchTrans
   }
   return false
@@ -244,7 +239,7 @@ const isMoveArr = (lsValue: LocalStorageValues): lsValue is Move[] => {
  * @returns boolean
  */
 const isUserMoves = (val: unknown): val is string[] =>
-  Array.isArray(val) ? val.every((m) => typeof m === "string") : false
+  Array.isArray(val) ? val.every((m) => typeof m === 'string') : false
 
 /**
  *
@@ -255,7 +250,6 @@ interface LocalStorageStructure {
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
 }
-
 
 export const makeDefaultPosition = ({
   displayName,
@@ -272,9 +266,9 @@ export const makeDefaultPosition = ({
   }
 }
 /**
- * Makes default Transition 
- * @param 
- * @returns 
+ * Makes default Transition
+ * @param
+ * @returns
  */
 export const makeDefaultTransition = ({
   displayName,
@@ -309,12 +303,11 @@ export const makeTransitions = ({
   displayNames: string[]
   positions: Position[]
 }): Transitions => {
-
   /**
    * gets position id using position[] and current index
    * @param {Position[]} posArray
    * @param {number} currIndex
-   * @return positionid (a special string) 
+   * @return positionid (a special string)
    */
   const getPositionId = (posArray: Position[], currIndex: number) => {
     const isLastThing = currIndex + 1 === posArray.length
@@ -336,25 +329,23 @@ export const makeTransitions = ({
 
 /**
  * makes default Positions using array of strings
- * @param displayNames 
+ * @param displayNames
  * @returns position[]
  */
 export const makePositions = (displayNames: string[]): Position[] =>
-  displayNames.map((displayName) =>
-    makeDefaultPosition({ displayName }))
-
-
+  displayNames.map((displayName) => makeDefaultPosition({ displayName }))
 
 /**
- *  makes default names for transitions 
- * @param numberOfTransitions 
+ *  makes default names for transitions
+ * @param numberOfTransitions
  * @returns string array
  */
 export const makeDefaultTransitionNames = (
   numberOfTransitions: number,
-): string[] => Array.from(Array(numberOfTransitions)).map((_, i) => `From Pos${i + 1} to Pos${i + 2}`)
-
-
+): string[] =>
+  Array.from(Array(numberOfTransitions)).map(
+    (_, i) => `From Pos${i + 1} to Pos${i + 2}`,
+  )
 
 //-----------------------------------DB----------------------------
 /**
@@ -368,22 +359,22 @@ export const updateLocalStorageGlobal = {
   [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
     if (!accessToLocalStorage)
-
-      //validation
       if (isFlowArr(val))
+        //validation
         localStorage.setItem(lsFlows, JSON.stringify(val))
-      else { console.log('failed validation') }
+      else {
+        console.log('failed validation')
+      }
   },
   [lsUserMoves]: (val: string[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
     if (!accessToLocalStorage)
-
-      //validation
       if (isUserMoves(val)) {
+        //validation
         localStorage.setItem(lsUserMoves, JSON.stringify(val))
-      } else { console.log('failed validation') }
-
-
+      } else {
+        console.log('failed validation')
+      }
   },
   //--------------------LEARN MOVES PAGE------------
   [lsUserLearning]: (val: Move[], accessToLocalStorage: boolean) => {
@@ -398,14 +389,13 @@ export const updateLocalStorageGlobal = {
     } else {
       console.log('isMoveArr failed validation', val)
     }
-
   },
 }
 
 /**
  * Get from localstorage.
  * Should be the only usage of localStorage.getItem
- * @returns 
+ * @returns
  */
 export const getLocalStorageGlobal = {
   // [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
@@ -418,7 +408,10 @@ export const getLocalStorageGlobal = {
   // },
   [lsUserLearning]: (accessToLocalStorage: boolean): Move[] => {
     if (!accessToLocalStorage) return []
-    return safeJsonParse<Move[], []>(localStorage.getItem(lsUserLearning) || '', [])
+    return safeJsonParse<Move[], []>(
+      localStorage.getItem(lsUserLearning) || '',
+      [],
+    )
   },
 }
 

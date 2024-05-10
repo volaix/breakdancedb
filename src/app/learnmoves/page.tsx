@@ -1,7 +1,7 @@
-"use client"
-import { useState, useEffect } from "react"
-import { Move, getUserLearning, lsUserLearning } from "@/app/lib"
-import Link from "next/link"
+'use client'
+import { useState, useEffect } from 'react'
+import { Move, getUserLearning, lsUserLearning } from '@/app/lib'
+import Link from 'next/link'
 
 /**
  * is Mapped to render moves that the user is currently learning
@@ -11,7 +11,7 @@ import Link from "next/link"
 const RenderMoveBox = ({ move }: { move: Move }) => {
   return (
     <Link
-      href={{ pathname: "/learnmoves/move", query: { moveId: move.moveId } }}
+      href={{ pathname: '/learnmoves/move', query: { moveId: move.moveId } }}
     >
       <div className="p-2 ">
         <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
@@ -40,7 +40,7 @@ export default function RenderLearnMoves() {
 
   //-----------------------useeffect-----------------------------------
   useEffect(() => {
-    setAccessToLocalStorage(typeof window !== "undefined")
+    setAccessToLocalStorage(typeof window !== 'undefined')
   }, [])
 
   //get learning moves
@@ -53,7 +53,7 @@ export default function RenderLearnMoves() {
   //---------------------render------------------------------------------------
 
   return (
-    <div className="mt-20" style={{ width: "375px" }}>
+    <div className="mt-20" style={{ width: '375px' }}>
       <>
         <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
           Moves Learning
@@ -69,7 +69,6 @@ export default function RenderLearnMoves() {
       <div>
         <a
           href="/learnmoves/newmove"
-
           className="mt-5 inline-flex items-center text-sm text-indigo-400"
         >
           add new move

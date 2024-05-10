@@ -1,5 +1,5 @@
-"use client"
-import { useState, useEffect } from "react"
+'use client'
+import { useState, useEffect } from 'react'
 import {
   getUserLearning,
   useLocalStorage,
@@ -9,29 +9,29 @@ import {
   makeMoveId,
   makeDefaultMoveExec,
   Hold,
-} from "@/app/lib"
-import { useMoveStore } from "./store"
-import { makeTransitions } from "@/app/lib"
-import { makePositions } from "@/app/lib"
-import { makeDefaultTransitionNames } from "@/app/lib"
+} from '@/app/lib'
+import { useMoveStore } from './store'
+import { makeTransitions } from '@/app/lib'
+import { makePositions } from '@/app/lib'
+import { makeDefaultTransitionNames } from '@/app/lib'
 import rocks from '@/db/rocks.json'
-import { v4 } from "uuid"
-
-
+import { v4 } from 'uuid'
 
 /**
  * Renders a text input with default position name
  */
 const RenderPosition = ({ position }: { position: number }) => {
   //-----------------------state---------------------------
-  const [inputVal, setInputVal] = useState<string>(`Position-${position}-${rocks[Math.floor(Math.random() * rocks.length)]}`)
+  const [inputVal, setInputVal] = useState<string>(
+    `Position-${position}-${rocks[Math.floor(Math.random() * rocks.length)]}`,
+  )
   //----------------------render----------------------------
   return (
     <div className="flex">
       <div className="mr-2"></div>
       <div className="relative text-xs">
         {null && (
-          <label className="dark:text-gray-400 leading-7 text-sm text-gray-600">
+          <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
             Move Name
           </label>
         )}
@@ -41,7 +41,8 @@ const RenderPosition = ({ position }: { position: number }) => {
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
           name="name"
-          className="dark:text-gray-500 w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out dark:bg-gray-800 dark:bg-opacity-40 dark:border-gray-700 dark:focus:bg-gray-900 dark:focus:ring-indigo-900 dark:text-gray-100" />
+          className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:text-gray-500 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+        />
       </div>
     </div>
   )
@@ -53,11 +54,10 @@ const RenderPosition = ({ position }: { position: number }) => {
 const RenderPage = () => {
   //-----------------------state------------------------------
   const { updatePositions, moveName, positions, updateMove } = useMoveStore()
-  const [saveText, setSaveText] = useState<string>("Save")
+  const [saveText, setSaveText] = useState<string>('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [existingMoves, setExistingMoves] = useState<Move[]>([])
   const [rangeVal, setRangeVal] = useState<string>('6')
-
 
   //--------------------------hooks ----------------------
   useLocalStorage(setAccessToLocalStorage)
@@ -81,7 +81,10 @@ const RenderPage = () => {
     if (accessToLocalStorage) {
       const lsPositions = makePositions(positions.map((p) => p.displayName))
 
-      const newTransitions = makeTransitions({ displayNames: makeDefaultTransitionNames(positions.length), positions: lsPositions, })
+      const newTransitions = makeTransitions({
+        displayNames: makeDefaultTransitionNames(positions.length),
+        positions: lsPositions,
+      })
 
       //makes a new move
       const newMove: Move = {
@@ -100,8 +103,7 @@ const RenderPage = () => {
             slowRating: 0,
             holdId: v4(),
           }
-        })
-
+        }),
       }
 
       //updates localstorage with newmove
@@ -110,7 +112,7 @@ const RenderPage = () => {
         accessToLocalStorage,
       )
     }
-    setSaveText("Saved")
+    setSaveText('Saved')
     return
   }
 
@@ -121,7 +123,10 @@ const RenderPage = () => {
   //-----------------------------Render---------------------------
   return (
     <div>
-      <a href="/learnmoves" className="inline-flex items-center text-indigo-400">
+      <a
+        href="/learnmoves"
+        className="inline-flex items-center text-indigo-400"
+      >
         <svg
           className="ml-2 h-4 w-4 rotate-180"
           viewBox="0 0 24 24"
@@ -136,7 +141,7 @@ const RenderPage = () => {
         </svg>
         go back to learn moves
       </a>
-      <div className="relative text-xs px-5">
+      <div className="relative px-5 text-xs">
         <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
           Move Name
         </label>
@@ -156,12 +161,15 @@ const RenderPage = () => {
           {saveText}
         </button>
       </div>
-      <div className="shadow-lg p-6 w-full max-w-md">
+      <div className="w-full max-w-md p-6 shadow-lg">
         <div className="flex">
-          <h2 className="text-2xl font-bold mb-4">Optional</h2>
+          <h2 className="mb-4 text-2xl font-bold">Optional</h2>
         </div>
         <div className="mb-4">
-          <label htmlFor="price-range" className="block text-gray-700 font-bold mb-2">
+          <label
+            htmlFor="price-range"
+            className="mb-2 block font-bold text-gray-700"
+          >
             Move Positions
           </label>
           <input
@@ -172,10 +180,13 @@ const RenderPage = () => {
             max={max}
             value={rangeVal}
             onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
-              // updatePositions([...positions, e.target.value]) 
+              // updatePositions([...positions, e.target.value])
               setRangeVal(e.target.value)
-            }} />
-          <div className="text-xs">You can always edit positions again later</div>
+            }}
+          />
+          <div className="text-xs">
+            You can always edit positions again later
+          </div>
         </div>
         <div className="flex justify-between text-gray-500">
           <span id="minPrice">{rangeVal}</span>
