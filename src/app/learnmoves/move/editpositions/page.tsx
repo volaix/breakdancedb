@@ -12,8 +12,7 @@ import {
 } from '@/app/lib'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import LoadingFallback from '../LoadingFallback'
-
+import  LoadingFallback  from '@/app/LoadingFallback'
 
 //------------------------------components-----------------------
 

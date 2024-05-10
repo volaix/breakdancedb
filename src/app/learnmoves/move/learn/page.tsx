@@ -15,7 +15,7 @@ import {
   useLocalStorage,
 } from '@/app/lib'
 import { useSearchParams } from 'next/navigation'
-import LoadingFallback from '@/app/learnmoves/move/LoadingFallback'
+import LoadingFallback from '@/app/LoadingFallback'
 
 // ------------------------Local Types ---------------------------------
 type MovementGroup = {

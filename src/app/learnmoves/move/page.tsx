@@ -12,7 +12,7 @@ import {
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import  LoadingFallback  from './LoadingFallback'
+import  LoadingFallback  from '@/app/LoadingFallback'
 
 /**
  * Calculates % learned of move positions
