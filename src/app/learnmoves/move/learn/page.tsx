@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, SetStateAction, Dispatch } from 'react'
+import { useState, useEffect, SetStateAction, Dispatch, Suspense } from 'react'
 import {
   Hold,
   Move,
@@ -15,7 +15,7 @@ import {
   useLocalStorage,
 } from '@/app/lib'
 import { useSearchParams } from 'next/navigation'
-import { v4 } from 'uuid'
+import LoadingFallback from '@/app/learnmoves/move/LoadingFallback'
 
 // ------------------------Local Types ---------------------------------
 type MovementGroup = {
@@ -164,9 +164,9 @@ const RenderHearts = ({
                       [moveKey]: (move[moveKey] || []).map((a, i) =>
                         i === indexToUpdate
                           ? {
-                              ...a,
-                              slowRating: Number(e.target.id),
-                            }
+                            ...a,
+                            slowRating: Number(e.target.id),
+                          }
                           : a,
                       ),
                     }
@@ -265,7 +265,7 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
 /**
  * Renders the heading text, and all the moves
  */
-const RenderPage = () => {
+const RenderMoveLearn = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
   const [orderOfPosTransHolds, setOrderOfPosTransHolds] = useState<
@@ -395,4 +395,11 @@ const RenderPage = () => {
   )
 }
 
-export default RenderPage
+export default function RenderPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <RenderMoveLearn />
+    </Suspense>
+
+  )
+}

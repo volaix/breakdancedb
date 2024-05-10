@@ -9,8 +9,10 @@ import {
   lsUserLearning,
   useLocalStorage,
 } from '@/app/lib'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import  LoadingFallback  from './LoadingFallback'
 
 /**
  * Calculates % learned of move positions
@@ -148,7 +150,9 @@ const RenderTable = () => {
 const RenderPage = () => {
   return (
     <div>
-      <RenderTable />
+      <Suspense fallback={<LoadingFallback />}>
+        <RenderTable />
+      </Suspense>
     </div>
   )
 }
