@@ -1,94 +1,105 @@
 'use client'
 //@format
-import Header from '@/app/Header'
-import {lsUserMoves} from '@/app/lib'
-import {useState, useEffect} from 'react'
-import {LocalStorageStructureKeys} from '@/app/lib'
+import RenderHeader from '@/app/_components/Header'
+import { getLocalStorageGlobal, lsUserMoves, updateLocalStorageGlobal } from '@/app/_utils/lib'
+import { useState, useEffect } from 'react'
 
+//---------------------------utils---------------------------------
 const convertMoveString = (moveString: string): string[] => {
   return moveString.split('\n')
 }
 const convertMoveArray = (moveArray: string[]): string => {
   return moveArray.join('\r\n')
 }
+//-----------------------------------------------------------------
 
+/**
+ * Component that allows user to put in their moves into the database
+ * one line per move in a text file.
+ * @returns jsx
+ */
 const YourMoves = () => {
-  const [userMoves, setUserMoves] = useState('')
+  //-----------------------------state---------------------------
+  const [userMoves, setUserMoves] = useState<string>('')
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
+  //-----------------------------hooks------------------------------
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== 'undefined')
   }, [])
 
   //Populate existing moves
   useEffect(() => {
-    if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
-      setUserMoves(
-        convertMoveArray(JSON.parse(localStorage.getItem(lsUserMoves) || '')),
-      )
-    }
+    setUserMoves(
+      convertMoveArray(getLocalStorageGlobal[lsUserMoves](accessToLocalStorage)),
+    )
   }, [accessToLocalStorage])
 
-  const saveToLocalStorage = (localStorageKey: LocalStorageStructureKeys) => {
-    if (accessToLocalStorage)
-      localStorage.setItem(
-        localStorageKey,
-        JSON.stringify(convertMoveString(userMoves)),
-      )
-  }
+  //---------------------------handlers-----------------------------
   const onClickSave = () => {
-    saveToLocalStorage('userMoves')
+    updateLocalStorageGlobal[lsUserMoves](
+      convertMoveString(userMoves) as string[],
+      accessToLocalStorage,
+    )
     setSaveText('Saved')
     //TODO show modal saved to localstorage
   }
   const onClickExport = () => {
-    //TODO Export localstorage
+    //TODO Export localstorage so user can download
     //TODO Change text to exported
   }
+  const inDevelopment = true
+  //-------------------------render---------------------------------
   return (
     <div>
-      <section className=" dark:text-gray-600 text-gray-600 body-font relative">
-        <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-col text-center w-full mb-6">
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white">
+      <section className=" body-font relative text-gray-600 dark:text-gray-600">
+        <div className="container mx-auto px-5 py-24">
+          <div className="mb-6 flex w-full flex-col text-center">
+            <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
               Your Moves
             </h1>
-            <p className="dark:text-gray-400 lg:w-2/3 mx-auto leading-relaxed text-base">
+            <p className="mx-auto text-base leading-relaxed lg:w-2/3 dark:text-gray-400">
               Add and view everything here. One per line.
             </p>
           </div>
-          <div className="lg:w-1/2 md:w-2/3 mx-auto">
-            <div className="flex flex-wrap -m-2">
-              <div className="p-2 w-full">
+          <div className="mx-auto md:w-2/3 lg:w-1/2">
+            <div className="-m-2 flex flex-wrap">
+              <div className="w-full p-2">
                 <div className="relative">
-                  <label className="dark:text-gray-400 leading-7 text-sm text-gray-600">
+                  <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
                     Your Moves
                   </label>
+                  {/*TODO use react-hook-form to optimise and avoid rerenders */}
                   <textarea
                     id="moves"
                     name="message"
                     defaultValue={userMoves}
-                    onChange={e => setUserMoves(e.target.value)}
-                    className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out 
-                    dark:bg-gray-800 dark:bg-opacity-40 dark:border-gray-700 dark:focus:bg-gray-900 dark:focus:ring-indigo-900 dark:text-gray-100"></textarea>
+                    onChange={(e) => setUserMoves(e.target.value)}
+                    className="h-32 w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 
+                    dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+                  ></textarea>
                   <div className="text-xs">
                     {convertMoveString(userMoves).length + 1} moves. New move
                     created each line. No spaces please.
                   </div>
                 </div>
               </div>
-              <div className="p-2 w-full flex">
+              <div className="flex w-full p-2">
                 <button
                   onClick={onClickSave}
-                  className="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+                  className="mx-auto flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none"
+                >
                   {saveText}
                 </button>
-                <button
-                  onClick={onClickExport}
-                  className="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-                  Export
-                </button>
+                {inDevelopment || (
+                  <button
+                    onClick={onClickExport}
+                    className="mx-auto flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none"
+                  >
+                    Export
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -97,12 +108,16 @@ const YourMoves = () => {
     </div>
   )
 }
-const Page = () => {
+
+/**
+ * Renders the /yourmoves page. 
+ * @returns jsx
+ */
+export default function RenderPage() {
   return (
     <div>
-      <Header />
+      <RenderHeader />
       <YourMoves />
     </div>
   )
 }
-export default Page

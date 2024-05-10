@@ -1,9 +1,5 @@
-import Header from '@/app/Header'
+import RenderHeader from '@/app/_components/Header'
 const Page = () => {
-  return (
-    <div>
-      <Header />
-    </div>
-  )
+  return <div></div>
 }
 export default Page

@@ -27,6 +27,14 @@ APP = A power user's move database
 2. yarn dev
 3. [http://localhost:3000](http://localhost:3000)
 
+## Doing PRs
+- "yarn format" to check prettier
+- "yarn format:fix" to autofix
+- "yarn ts" for fixing ts errors
+- "yarn lint" for fixing linter errors
+- Vercel accepts deployment in PR branch - has weird stuff that linter doesnt find
+- Check for conflicts - "git merge main"
+
 
 ## Stack
 - React - nextjs
@@ -38,16 +46,17 @@ APP = A power user's move database
 1. yarn build
 2. yarn start
  
-###Algorithm Tuner Ideas
+### Algorithm Tuner Ideas
 * Difficulty of move
 * How isolated is the node
 * Ratio of transitions in, to transitions out
 * How many shapes does the move have
 
-#Stretch Goal
-* addons: hand placements, anti hooks, "opposite side" 
-* user profiles on server
- * shared data state between devices
-* shared moves matcher to practice together
-* begin to catalog every breaking movement with words and images
-* bigdata- most loved transitions, most learned but isolated moves
+# Stretch Goal
+
+- addons: hand placements, anti hooks, "opposite side"
+- user profiles on server
+- shared data state between devices
+- shared moves matcher to practice together
+- begin to catalog every breaking movement with words and images
+- bigdata- most loved transitions, most learned but isolated moves

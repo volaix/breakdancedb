@@ -1,22 +1,12 @@
-'use client'
-import Header from '@/app/Header'
-import {useState, useEffect} from 'react'
+import RenderHeader from '@/app/_components/Header'
 
 const Page = () => {
+  //FEATURE This page isn't in MVP and probably wont be developed for a long time
   // Set the value received from the local storage to a local state
-  const [favoriteNumber, setFavoriteNumber] = useState('')
-
-  useEffect(() => {
-    let value
-    // Get the value from local storage if it exists
-    value = localStorage.getItem('favoriteNumber') || ''
-    setFavoriteNumber(value)
-  }, [])
-
 
   return (
     <>
-      <Header />
+      <RenderHeader />
       <div className="mt-20">
         <ul>6 step | 24 ways in | 12 ways out</ul>
         <ul>1 step | 24 ways in | 12 ways out</ul>
@@ -33,9 +23,7 @@ const Page = () => {
       <div className="mt-5">
         <a>view as nodes</a>
       </div>
-      <div>
-        
-      </div>
+      <div></div>
     </>
   )
 }

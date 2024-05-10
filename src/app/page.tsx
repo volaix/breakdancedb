@@ -1,36 +1,73 @@
 'use client'
 // @format
-import Header from './Header'
-import Move from './Move'
-import {useState, useEffect} from 'react'
-import { Flow, lsFlows, lsUserMoves} from './lib'
+import RenderHeader from './_components/Header'
+import { useState, useEffect } from 'react'
+import {
+  Flow,
+  getLocalStorageGlobal,
+  lsFlows,
+  lsUserMoves,
+  safeJsonParse,
+  updateLocalStorageGlobal,
+  useLocalStorage,
+} from './_utils/lib'
+import Image from 'next/image'
 
+//------------------------local utils------------------------------
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
+//------------------------localtypes-------------------------------
 type Learning = Flow | null
+//------------------------components-------------------------------
+/**
+ * Renders an Image with some text below for each one of the flows
+ * @param
+ * @returns
+ */
+const RenderMove = ({ move }: { move: string }) => {
+  //----------------------------render-----------------------------
+  return (
+    <>
+      {move && (
+        <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
+          <Image
+            width="600"
+            height="400"
+            className="w-5/6 w-full"
+            alt="move name"
+            src={'https://dummyimage.com/600x400/000/fff'}
+          />
+          <div className="capitalize text-black dark:text-white">{move}</div>
+        </div>
+      )}
+    </>
+  )
+}
 
-const Home = () => {
+//----------------------------mainrender--------------------------
+/*
+ * Renders 3 moves with 3 buttons at the bottom.
+ */
+export default function Home() {
+  //-----------------------------state-----------------------------
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
-
+  //userMoves here is global moves from local storage
   const [userMoves, setUserMoves] = useState<string[]>([])
-  //learning refers to "what will be displayed"
+  //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
+  const displayMoves = learning && userMoves.length > 0
 
-  useEffect(() => {
-    setAccessToLocalStorage(typeof window !== 'undefined')
-  }, [])
+  //---------------------------hooks---------------------------------
+  //checks if has access to localstorage
+  useLocalStorage(setAccessToLocalStorage)
 
   //Populate existing moves
   useEffect(() => {
-    if (
-      accessToLocalStorage &&
-      !!localStorage.getItem(lsUserMoves)
-    ) {
-      setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ''))
-    }
+    setUserMoves(getLocalStorageGlobal[lsUserMoves](accessToLocalStorage))
   }, [accessToLocalStorage])
 
+  //sets learning to random
   const setLearningToRandom = (moves: string[]) => {
     setLearning({
       entryMove: getRandomItem(moves),
@@ -41,78 +78,85 @@ const Home = () => {
 
   //on mount setLearning
   useEffect(() => {
-    console.log('moves', userMoves)
     //TODO: Learn moves according to algorithm
     setLearningToRandom(userMoves)
   }, [userMoves])
 
-  const saveToLocalStorage = () => {
-    console.log('saving to localStorage new flow')
-    if (
-      accessToLocalStorage &&
-      !!localStorage.getItem(lsFlows) &&
-      !!learning
-    ) {
-      const currentFlows: Flow[] = JSON.parse(
-        localStorage.getItem(lsFlows) || '')
-      const newFlows: Flow[] = currentFlows &&[...currentFlows, learning]
-      localStorage.setItem(lsFlows, JSON.stringify(newFlows))
-    } else {
-      localStorage.setItem(lsFlows, JSON.stringify([learning]))
-    }
-  }
+  //-------------------------handlers--------------------------------
 
+  //update local storage when user clicks yes
   const onClickYes = () => {
-    //TODO: FUTURE have a celebration UI element
-    saveToLocalStorage()
+    //validation for if there is a flow displayed
+    if (learning) {
+      //updates localstorage with the added flow
+      updateLocalStorageGlobal[lsFlows]([
+        ...getLocalStorageGlobal[lsFlows](accessToLocalStorage),
+        learning,
+      ], accessToLocalStorage)
+    } else {
+      console.log('cannot find move currently being learned')
+    }
+
     setLearningToRandom(userMoves)
-    //TODO: FUTURE popup on 5 star rating for each move multi select
-    //TODO: FUTURE have refresh UI feeling
+    //FEATURE: celebration UI element.
+    //FEATURE:  popup on 5 star rating for each move multi select
+    //FEATURE: have refresh UI feeling
   }
   const onClickSkip = () => {
+    //FEATURE: have refresh UI feeling
     setLearningToRandom(userMoves)
   }
   const onClickNo = () => {
     setLearningToRandom(userMoves)
-    //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
-    //TODO: FUTURE have refresh UI feeling
-    //TODO: Delete entry if you have it in flows
+    //FEATURE: have refresh UI feeling
+    //FEATURE: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
+    //FEATURE: Delete entry if you have it in flows
   }
 
-  const displayMoves = learning && userMoves.length > 0
+  //FEATURE Filters for categories (not yet built)
+  //FEATURE Categories
   return (
     <main>
-      <Header />
+      <RenderHeader />
       <div
         className="z-10 
-   w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+   mt-20 flex w-full max-w-xs flex-col items-center items-center justify-between font-mono text-sm dark:text-gray-600 "
+      >
         <div className="mt-10">
           {displayMoves && (
             <>
-              <Move move={learning['entryMove']} />
-              <Move move={learning['keyMove']} />
-              <Move move={learning['exitMove']} />
+              <RenderMove move={learning['entryMove']} />
+              <RenderMove move={learning['keyMove']} />
+              <RenderMove move={learning['exitMove']} />
             </>
           )}
           {displayMoves || (
             <div>please add your moves or import move db here</div>
           )}
         </div>
-        <div className="py-5 px-2 flex justify-evenly">
+        <div className="flex justify-evenly px-2 py-5">
+          {/* FEATURE on click yes, pop up some celebration. also a rating system on how good it was overall
+          how good each move was
+          and how good each transition was
+          i.e. overall + ea move + ea trans = 7 ratings total 
+          */}
           <a
             onClick={onClickYes}
-            className="px-6 py-2 text-center text-white bg-violet-600 border border-violet-600 rounded ">
+            className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
+          >
             Yes
           </a>
 
           <a
             onClick={onClickSkip}
-            className="px-6 py-2 text-center text-violet-600 border border-violet-600 rounded">
+            className="rounded border border-violet-600 px-6 py-2 text-center text-violet-600"
+          >
             Skip
           </a>
           <a
             onClick={onClickNo}
-            className="px-6 py-2 text-center text-white bg-violet-600 border border-violet-600 rounded">
+            className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white"
+          >
             No
           </a>
         </div>
@@ -120,5 +164,3 @@ const Home = () => {
     </main>
   )
 }
-
-export default Home
