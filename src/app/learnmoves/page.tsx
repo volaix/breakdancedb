@@ -3,6 +3,11 @@ import { useState, useEffect } from "react"
 import { Move, getUserLearning, lsUserLearning } from "@/app/lib"
 import Link from "next/link"
 
+/**
+ * is Mapped to render moves that the user is currently learning
+ * @param param0 move: Move
+ * @returns jsx
+ */
 const RenderMoveBox = ({ move }: { move: Move }) => {
   return (
     <Link
@@ -25,16 +30,15 @@ const RenderMoveBox = ({ move }: { move: Move }) => {
 }
 
 /**
- * helps me learn moves
+ * Renders the /learnmoves page. Header, array of things learned, two buttons.
  * @returns jsx
- *
  */
-
-export const RenderLearnMoves = () => {
+export default function RenderLearnMoves() {
   const [accessToLocalStorage, setAccessToLocalStorage] =
     useState<boolean>(false)
   const [learning, setLearning] = useState<Move[]>([])
 
+  //-----------------------useeffect-----------------------------------
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== "undefined")
   }, [])
@@ -45,6 +49,8 @@ export const RenderLearnMoves = () => {
       setLearning(getUserLearning())
     }
   }, [accessToLocalStorage])
+
+  //---------------------render------------------------------------------------
 
   return (
     <div className="mt-20" style={{ width: "375px" }}>
@@ -84,5 +90,3 @@ export const RenderLearnMoves = () => {
     </div>
   )
 }
-
-export default RenderLearnMoves
