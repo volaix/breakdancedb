@@ -12,17 +12,25 @@ import {
   useLocalStorage,
 } from "./lib"
 
+
+//------------------------local utils------------------------------
 const getRandomItem = (items: string[]) =>
   items[Math.floor(Math.random() * items.length)]
 
+//------------------------localtypes-------------------------------
 type Learning = Flow | null
 
-const Home = () => {
+export default function Home() {
+  //-----------------------------state-----------------------------
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  //userMoves here is global moves from local storage
   const [userMoves, setUserMoves] = useState<string[]>([])
-  //learning refers to "what will be displayed"
+  //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
+  const displayMoves = learning && userMoves.length > 0
 
+  //---------------------------hooks---------------------------------
+  //checks if has access to localstorage
   useLocalStorage(setAccessToLocalStorage)
 
   //Populate existing moves
@@ -32,6 +40,7 @@ const Home = () => {
     }
   }, [accessToLocalStorage])
 
+  //sets learning to random
   const setLearningToRandom = (moves: string[]) => {
     setLearning({
       entryMove: getRandomItem(moves),
@@ -46,35 +55,37 @@ const Home = () => {
     setLearningToRandom(userMoves)
   }, [userMoves])
 
-  const updateLocalStorage = () => {
-    const currentFlows: Flow[] = safeJsonParse<Flow[], []>(
-      localStorage.getItem(lsFlows) || "",
-      [],
-    )
-    if (learning) {
-      const newFlows: Flow[] = currentFlows && [...currentFlows, learning]
-      updateLocalStorageGlobal[lsFlows](newFlows, accessToLocalStorage)
-    }
-  }
+  //-------------------------handlers--------------------------------
 
+  //update local storage when user clicks yes
   const onClickYes = () => {
-    //TODO: FUTURE have a celebration UI element
-    updateLocalStorage()
+    //validation for if there is a flow displayed
+    if (learning) {
+      //gets existing flows, adds learning at the end
+      const newFlows: Flow[] = [...safeJsonParse<Flow[], []>(
+        localStorage.getItem(lsFlows) || "",
+        []), learning]
+      updateLocalStorageGlobal[lsFlows](newFlows, accessToLocalStorage)
+    } else {
+      console.log('cannot find move currently being learned')
+    }
+
     setLearningToRandom(userMoves)
-    //TODO: FUTURE popup on 5 star rating for each move multi select
-    //TODO: FUTURE have refresh UI feeling
+    //FEATURE: celebration UI element. 
+    //FEATURE:  popup on 5 star rating for each move multi select
+    //FEATURE: have refresh UI feeling
   }
   const onClickSkip = () => {
+    //FEATURE: have refresh UI feeling
     setLearningToRandom(userMoves)
   }
   const onClickNo = () => {
     setLearningToRandom(userMoves)
-    //TODO: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
-    //TODO: FUTURE have refresh UI feeling
-    //TODO: Delete entry if you have it in flows
+    //FEATURE: have refresh UI feeling
+    //FEATURE: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
+    //FEATURE: Delete entry if you have it in flows
   }
 
-  const displayMoves = learning && userMoves.length > 0
   //FEATURE Filters for categories (not yet built)
   //FEATURE Categories
   return (
@@ -126,5 +137,3 @@ const Home = () => {
     </main>
   )
 }
-
-export default Home
