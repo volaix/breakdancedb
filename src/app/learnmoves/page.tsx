@@ -35,9 +35,6 @@ export const RenderLearnMoves = () => {
     useState<boolean>(false)
   const [learning, setLearning] = useState<Move[]>([])
 
-  console.log("learning", learning)
-
-
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== "undefined")
   }, [])

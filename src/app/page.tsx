@@ -42,7 +42,6 @@ const Home = () => {
 
   //on mount setLearning
   useEffect(() => {
-    console.log("moves", userMoves)
     //TODO: Learn moves according to algorithm
     setLearningToRandom(userMoves)
   }, [userMoves])

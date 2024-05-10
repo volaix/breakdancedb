@@ -94,7 +94,6 @@ const Completed = () => {
       setFlows(JSON.parse(localStorage.getItem(lsFlows) || ''))
     }
   }, [])
-  console.log('flows', flows)
 
   //TODO: Shows flows, transitions, moves, combos, and organises them by frequency or date accessed
   return (

@@ -5,8 +5,6 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 
-
-
 /**
  * Calculates % learned of move positions
  */
@@ -14,7 +12,7 @@ const calcPercentageOfPositions = (positions: Position[]): string => {
   const percentOfEachPiece = 100 / (positions.length * 3)
   let totalPercent = 0
   for (let pos = 0; pos < positions.length; pos++) {
-    if (positions[pos].slow) {
+    if (positions[pos].slowRating) {
       totalPercent += percentOfEachPiece
     } else if (positions[pos].normal) {
       totalPercent += percentOfEachPiece
@@ -41,7 +39,7 @@ const calcPercentageOfTransition = (transition: Transition[]): string => {
 
   let totalPercent = 0
   for (let pos = 0; pos < transition.length; pos++) {
-    if (transition[pos].slow) {
+    if (transition[pos].slowRating) {
       totalPercent += percentOfEachPiece
     } else if (transition[pos].normal) {
       totalPercent += percentOfEachPiece

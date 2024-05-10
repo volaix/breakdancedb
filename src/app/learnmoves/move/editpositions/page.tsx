@@ -34,11 +34,10 @@ const makeDefaultPosition = (): Position => {
     positionId: makePositionId(),
     displayName: `new-position`,
     imgUrl: null,
-    slow: false,
+    slowRating: 0,
     normal: false,
     fast: false
   }
-
 }
 
 /**
