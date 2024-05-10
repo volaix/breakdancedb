@@ -8,11 +8,11 @@ import {
   makeMoveId,
   Hold,
   getLocalStorageGlobal,
-} from '@/app/_components/lib'
+} from '@/app/_utils/lib'
 import { useMoveStore } from './store'
-import { makeTransitions } from '@/app/_components/lib'
-import { makePositions } from '@/app/_components/lib'
-import { makeDefaultTransitionNames } from '@/app/_components/lib'
+import { makeTransitions } from '@/app/_utils/lib'
+import { makePositions } from '@/app/_utils/lib'
+import { makeDefaultTransitionNames } from '@/app/_utils/lib'
 import rocks from '@/db/rocks.json'
 import { v4 } from 'uuid'
 

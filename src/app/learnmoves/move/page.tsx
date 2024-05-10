@@ -8,7 +8,7 @@ import {
   getLocalStorageGlobal,
   lsUserLearning,
   useLocalStorage,
-} from '@/app/_components/lib'
+} from '@/app/_utils/lib'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'

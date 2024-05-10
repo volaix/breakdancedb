@@ -9,7 +9,7 @@ import {
   makePositionId,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from '@/app/_components/lib'
+} from '@/app/_utils/lib'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'

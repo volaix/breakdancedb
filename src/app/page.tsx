@@ -10,7 +10,7 @@ import {
   safeJsonParse,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from './_components/lib'
+} from './_utils/lib'
 import Image from 'next/image'
 
 //------------------------local utils------------------------------
