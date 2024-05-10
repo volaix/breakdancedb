@@ -8,7 +8,7 @@ import { useState } from 'react'
  * Hamburger menu, top left, text mid, profile pic top right.
  * @returns
  */
-export default function Header() {
+export default function RenderHeader() {
   //-----------------state------------------------------------
   const [isNavOpen, setIsNavOpen] = useState(false)
   const inDevelopment = true

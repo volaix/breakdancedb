@@ -1,10 +1,12 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { v4 as makeId, v4, validate } from 'uuid'
+import { v4, validate } from 'uuid'
 
+//-------------------------TYPE HELPERS-----------------------
 /**
  * Brands a type by intersecting it with a type with a brand property based on
  * the provided brand string.
  * First Type passed is "your special string"
+  eg used like: type PositionId = Brand<string, 'PositionId'>
  */
 export type Brand<T, Brand extends string> = T & {
   readonly [B in Brand as `__${B}_brand`]: never
@@ -20,13 +22,26 @@ export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>
  */
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
+
+/**
+ * Helper that gets value of key in globalstorage
+e.g. type lsUserMovesValue = lsValueByKey<typeof lsUserMoves>
+ */
+type lsValueByKey<T extends keyof LocalStorageStructure> = LocalStorageStructure[T]
+type lsValueMove = lsValueByKey<typeof lsUserMoves>
+type lsValueLearn = lsValueByKey<typeof lsUserLearning>
+type lsValueFlow = lsValueByKey<typeof lsFlows>
+
+//-------------------------------------------------------------
 /**
  *
  * This function is responsible for handling parsing errors. If an error occurs during parsing, it will return undefined. Otherwise, it will return the parsed JSON value along with its corresponding data type.
- * @param
+ * @param toJsonParse requires a JSON string
  * @returns parsed JSON
  */
-export const safeJsonParse = <T, F>(toJsonParse: string, fallback: F) => {
+export const safeJsonParse = <T, F>(toJsonParse: string | null, fallback: F) => {
+  //handling if toJsonParse is null
+  if (!toJsonParse) return fallback as F
   try {
     const jsonValue: T = JSON.parse(toJsonParse)
     return jsonValue
@@ -34,7 +49,9 @@ export const safeJsonParse = <T, F>(toJsonParse: string, fallback: F) => {
     return fallback as F
   }
 }
-
+/**
+ * Hold type. Used to display holds and is found in globaldb (localstorage)
+ */
 export type Hold = {
   fromPosition: PositionId
   toPosition: PositionId
@@ -44,15 +61,10 @@ export type Hold = {
   holdId: string
 }
 
-export const makeDefaultMoveExec = (): MoveExecution => {
-  return {
-    memorised: true,
-    slow: true,
-    normal: true,
-    fast: false,
-  }
-}
-
+/**
+ * Flow Type. Undeveloped and ratings will be added to it in future.
+For now is just a record of RNG moves strung together.
+ */
 export type Flow = {
   entryMove: string
   keyMove: string
@@ -69,6 +81,7 @@ export const makeTransitionId = (): TransitionId => {
   return v4() as TransitionId
 }
 export type MoveId = Brand<string, 'MoveId'>
+
 export interface MoveExecution {
   memorised: boolean
   slow: boolean
@@ -77,6 +90,9 @@ export interface MoveExecution {
 }
 export type PositionId = Brand<string, 'PositionId'>
 
+/**
+ * Position object used in localstorage data structure. Usually found in an arrays.
+ */
 export type Position = {
   positionId: PositionId
   displayName: string
@@ -118,17 +134,6 @@ export interface Move {
 }
 
 export type MovementKeys = 'positions' | 'transitions' | 'holds'
-
-/**
- *
- * Refactor all localstorage.getitem
- */
-export const getUserLearning = (): Move[] => {
-  if (localStorage.getItem(lsUserLearning) === null) {
-    return []
-  }
-  return JSON.parse(localStorage.getItem(lsUserLearning) || '') || []
-}
 
 // ----------- Local Storage Keys -----------------
 
@@ -250,6 +255,7 @@ interface LocalStorageStructure {
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
 }
+
 
 export const makeDefaultPosition = ({
   displayName,
@@ -392,24 +398,44 @@ export const updateLocalStorageGlobal = {
   },
 }
 
+const isErrorInGetLocalStorage = ({ accessToLocalStorage }: { accessToLocalStorage: boolean }): boolean => {
+  if (!accessToLocalStorage) {
+    console.log('no access to local storage')
+    return true
+  }
+  return false
+}
+
 /**
- * Get from localstorage.
- * Should be the only usage of localStorage.getItem
+ * Object that has methods that Get from localstorage.
+ * For consistency, should be the only usage of localStorage.getItem
+In future this will probably be moved to BE when online functionality needs to happen.
  * @returns
  */
 export const getLocalStorageGlobal = {
-  // [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
-  //   if (!accessToLocalStorage) return
-  //   isFlowArr(val) && localStorage.getItemItem(lsFlows, JSON.stringify(val))
-  // },
-  // [lsUserMoves]: (val: string[], accessToLocalStorage: boolean) => {
-  //   if (!accessToLocalStorage) return
-  //   isUserMoves(val) && localStorage.getItemItem(lsUserMoves, JSON.stringify(val))
-  // },
-  [lsUserLearning]: (accessToLocalStorage: boolean): Move[] => {
-    if (!accessToLocalStorage) return []
-    return safeJsonParse<Move[], []>(
-      localStorage.getItem(lsUserLearning) || '',
+  [lsFlows]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueFlow => {
+    //error handling
+    if (isErrorInGetLocalStorage({ accessToLocalStorage })) return defaultReturn
+    //gets from localstorage
+    return safeJsonParse<lsValueFlow, typeof defaultReturn>(localStorage.getItem(lsFlows), defaultReturn)
+  },
+  [lsUserMoves]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueMove =>
+    //validation and error handling
+    isErrorInGetLocalStorage({ accessToLocalStorage }) ?
+      defaultReturn
+      //gets from localstorage
+      : safeJsonParse<lsValueMove, typeof defaultReturn>(
+        localStorage.getItem(lsUserMoves),
+        defaultReturn
+      )
+  ,
+  [lsUserLearning]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueLearn => {
+    //validation and error handling
+    if (isErrorInGetLocalStorage({ accessToLocalStorage })) return defaultReturn
+
+    //safely gets from localStorage
+    return safeJsonParse<lsValueLearn, typeof defaultReturn>(
+      localStorage.getItem(lsUserLearning),
       [],
     )
   },

@@ -1,4 +1,4 @@
-import Header from '@/app/Header'
+import RenderHeader from '@/app/Header'
 
 export default function RootLayout({
   children,
@@ -7,7 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <div>
-      <Header />
+      <RenderHeader />
       <div className="body-font w-xs container relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
         {children}
       </div>

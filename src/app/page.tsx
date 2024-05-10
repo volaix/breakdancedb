@@ -1,9 +1,10 @@
 'use client'
 // @format
-import Header from './Header'
+import RenderHeader from './Header'
 import { useState, useEffect } from 'react'
 import {
   Flow,
+  getLocalStorageGlobal,
   lsFlows,
   lsUserMoves,
   safeJsonParse,
@@ -24,7 +25,8 @@ type Learning = Flow | null
  * @param
  * @returns
  */
-const Move = ({ move }: { move: string }) => {
+const RenderMove = ({ move }: { move: string }) => {
+  //----------------------------render-----------------------------
   return (
     <>
       {move && (
@@ -62,9 +64,7 @@ export default function Home() {
 
   //Populate existing moves
   useEffect(() => {
-    if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
-      setUserMoves(JSON.parse(localStorage.getItem(lsUserMoves) || ''))
-    }
+    setUserMoves(getLocalStorageGlobal[lsUserMoves](accessToLocalStorage))
   }, [accessToLocalStorage])
 
   //sets learning to random
@@ -88,12 +88,11 @@ export default function Home() {
   const onClickYes = () => {
     //validation for if there is a flow displayed
     if (learning) {
-      //gets existing flows, adds learning at the end
-      const newFlows: Flow[] = [
-        ...safeJsonParse<Flow[], []>(localStorage.getItem(lsFlows) || '', []),
+      //updates localstorage with the added flow
+      updateLocalStorageGlobal[lsFlows]([
+        ...getLocalStorageGlobal[lsFlows](accessToLocalStorage),
         learning,
-      ]
-      updateLocalStorageGlobal[lsFlows](newFlows, accessToLocalStorage)
+      ], accessToLocalStorage)
     } else {
       console.log('cannot find move currently being learned')
     }
@@ -118,7 +117,7 @@ export default function Home() {
   //FEATURE Categories
   return (
     <main>
-      <Header />
+      <RenderHeader />
       <div
         className="z-10 
    mt-20 flex w-full max-w-xs flex-col items-center items-center justify-between font-mono text-sm dark:text-gray-600 "
@@ -126,9 +125,9 @@ export default function Home() {
         <div className="mt-10">
           {displayMoves && (
             <>
-              <Move move={learning['entryMove']} />
-              <Move move={learning['keyMove']} />
-              <Move move={learning['exitMove']} />
+              <RenderMove move={learning['entryMove']} />
+              <RenderMove move={learning['keyMove']} />
+              <RenderMove move={learning['exitMove']} />
             </>
           )}
           {displayMoves || (

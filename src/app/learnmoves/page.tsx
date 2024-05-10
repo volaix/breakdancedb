@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Move, getUserLearning, lsUserLearning } from '@/app/lib'
+import { Move, getLocalStorageGlobal, lsUserLearning } from '@/app/lib'
 import Link from 'next/link'
 
 /**
@@ -46,7 +46,7 @@ export default function RenderLearnMoves() {
   //get learning moves
   useEffect(() => {
     if (accessToLocalStorage) {
-      setLearning(getUserLearning())
+      setLearning(getLocalStorageGlobal[lsUserLearning](accessToLocalStorage))
     }
   }, [accessToLocalStorage])
 

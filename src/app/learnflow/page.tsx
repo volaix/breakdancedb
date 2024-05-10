@@ -1,4 +1,4 @@
-import Header from '@/app/Header'
+import RenderHeader from '@/app/Header'
 const Page = () => {
   return <div></div>
 }

@@ -1,14 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
 import {
-  getUserLearning,
   useLocalStorage,
   Move,
   lsUserLearning,
   updateLocalStorageGlobal,
   makeMoveId,
-  makeDefaultMoveExec,
   Hold,
+  getLocalStorageGlobal,
 } from '@/app/lib'
 import { useMoveStore } from './store'
 import { makeTransitions } from '@/app/lib'
@@ -60,12 +59,12 @@ const RenderPage = () => {
   const [rangeVal, setRangeVal] = useState<string>('6')
 
   //--------------------------hooks ----------------------
+  //checks if local storage is avail
   useLocalStorage(setAccessToLocalStorage)
 
+  //sets existing moves with what's learning in localstorage
   useEffect(() => {
-    if (accessToLocalStorage) {
-      setExistingMoves(getUserLearning())
-    }
+    setExistingMoves(getLocalStorageGlobal[lsUserLearning](accessToLocalStorage))
   }, [accessToLocalStorage])
 
   //When RangeVal updates, update positions in the shared state*/
@@ -90,7 +89,12 @@ const RenderPage = () => {
       const newMove: Move = {
         displayName: moveName,
         positions: lsPositions,
-        moveExecution: makeDefaultMoveExec(),
+        moveExecution: {
+          memorised: true,
+          slow: true,
+          normal: true,
+          fast: false,
+        },
         moveId: makeMoveId(),
         transitions: newTransitions,
         holds: lsPositions.map((a, i): Hold => {

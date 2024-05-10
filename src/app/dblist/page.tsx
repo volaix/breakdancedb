@@ -1,4 +1,4 @@
-import Header from '@/app/Header'
+import RenderHeader from '@/app/Header'
 import moveListExample from '@/db/moveListExample.json'
 import Image from 'next/image'
 
@@ -24,7 +24,7 @@ export default function Page() {
   //TODO use localstorage
   return (
     <>
-      <Header />
+      <RenderHeader />
       <div className="mt-20 flex	flex-wrap justify-start bg-gray-200 p-1">
         {moveListExample.map((move) => {
           return <DbEntry key={move} move={move} />

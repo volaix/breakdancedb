@@ -1,13 +1,19 @@
 'use client'
 //@format
-import Header from '@/app/Header'
+import RenderHeader from '@/app/Header'
 import { useState, useEffect } from 'react'
-import { Flow, lsFlows } from '@/app/lib'
+import { Flow, getLocalStorageGlobal, lsFlows, useLocalStorage } from '@/app/lib'
 
+/**
+ * renders the flow box that displays 3 lines of text (the flow learned)
+ * @param param0 Flow
+ * @returns jsx
+ */
 const FlowBox = ({ flow }: { flow: Flow }) => {
   //todo: only display unique flows
   //todo: make delete button functional
   //todo: make hierarchy in text
+  //-----------------------------render-----------------------------------
   return (
     <div className="w-1/3 p-2">
       <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-800 bg-opacity-40 px-3 pb-6 pt-5 text-center">
@@ -82,17 +88,27 @@ const FlowBox = ({ flow }: { flow: Flow }) => {
   )
 }
 
-type Flows = Flow[] | null
-const Completed = () => {
-  const [flows, setFlows] = useState<Flows>(null)
-  useEffect(() => {
-    let hasLocalStorageFlows: boolean = false
-    let accessToLocalStorage = typeof window !== 'undefined'
-    if (accessToLocalStorage && !!localStorage.getItem(lsFlows)) {
-      setFlows(JSON.parse(localStorage.getItem(lsFlows) || ''))
-    }
-  }, [])
+/**
+ * Renders all the completed flows the user has done. In future this will essentially be
+ * a "history page"
+ * @returns jsx
+ */
+const RenderCompletedMoves = () => {
+  //------------------------------state---------------------------------
+  const [flows, setFlows] = useState<Flow[] | null>(null)
+  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
+  //-----------------------------hooks-------------------------------
+  //checks if has access to localstorage
+  useLocalStorage(setAccessToLocalStorage)
+
+
+  //updates flows using localstorage
+  useEffect(() => {
+    setFlows(getLocalStorageGlobal[lsFlows](accessToLocalStorage))
+  }, [accessToLocalStorage])
+
+  //-----------------------------render---------------------------------
   //TODO: Shows flows, transitions, moves, combos, and organises them by frequency or date accessed
   return (
     <div className="h-screen bg-white dark:bg-gray-900">
@@ -118,12 +134,16 @@ const Completed = () => {
     </div>
   )
 }
-const Page = () => {
+
+/**
+ * Renders the /completed page. 
+ * @returns jsx
+ */
+export default function RenderPage() {
   return (
     <div>
-      <Header />
-      <Completed />
+      <RenderHeader />
+      <RenderCompletedMoves />
     </div>
   )
 }
-export default Page

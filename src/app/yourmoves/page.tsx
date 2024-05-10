@@ -1,34 +1,42 @@
 'use client'
 //@format
-import Header from '@/app/Header'
-import { lsUserMoves, updateLocalStorageGlobal } from '@/app/lib'
+import RenderHeader from '@/app/Header'
+import { getLocalStorageGlobal, lsUserMoves, updateLocalStorageGlobal } from '@/app/lib'
 import { useState, useEffect } from 'react'
 
+//---------------------------utils---------------------------------
 const convertMoveString = (moveString: string): string[] => {
   return moveString.split('\n')
 }
 const convertMoveArray = (moveArray: string[]): string => {
   return moveArray.join('\r\n')
 }
+//-----------------------------------------------------------------
 
+/**
+ * Component that allows user to put in their moves into the database
+ * one line per move in a text file.
+ * @returns jsx
+ */
 const YourMoves = () => {
+  //-----------------------------state---------------------------
   const [userMoves, setUserMoves] = useState<string>('')
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
+  //-----------------------------hooks------------------------------
   useEffect(() => {
     setAccessToLocalStorage(typeof window !== 'undefined')
   }, [])
 
   //Populate existing moves
   useEffect(() => {
-    if (accessToLocalStorage && !!localStorage.getItem(lsUserMoves)) {
-      setUserMoves(
-        convertMoveArray(JSON.parse(localStorage.getItem(lsUserMoves) || '')),
-      )
-    }
+    setUserMoves(
+      convertMoveArray(getLocalStorageGlobal[lsUserMoves](accessToLocalStorage)),
+    )
   }, [accessToLocalStorage])
 
+  //---------------------------handlers-----------------------------
   const onClickSave = () => {
     updateLocalStorageGlobal[lsUserMoves](
       convertMoveString(userMoves) as string[],
@@ -42,6 +50,7 @@ const YourMoves = () => {
     //TODO Change text to exported
   }
   const inDevelopment = true
+  //-------------------------render---------------------------------
   return (
     <div>
       <section className=" body-font relative text-gray-600 dark:text-gray-600">
@@ -98,12 +107,16 @@ const YourMoves = () => {
     </div>
   )
 }
-const Page = () => {
+
+/**
+ * Renders the /yourmoves page. 
+ * @returns jsx
+ */
+export default function RenderPage() {
   return (
     <div>
-      <Header />
+      <RenderHeader />
       <YourMoves />
     </div>
   )
 }
-export default Page
