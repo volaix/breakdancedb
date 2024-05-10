@@ -1,4 +1,4 @@
-import RenderHeader from '@/app/Header'
+import RenderHeader from '@/app/_components/Header'
 
 export default function RootLayout({
   children,

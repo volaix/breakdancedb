@@ -1,5 +1,5 @@
 'use client'
-import { Position, makeDefaultPosition } from '@/app/lib'
+import { Position, makeDefaultPosition } from '@/app/_components/lib'
 import { create } from 'zustand'
 import rocks from '@/db/rocks.json'
 

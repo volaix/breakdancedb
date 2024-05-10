@@ -13,9 +13,9 @@ import {
   lsUserLearning,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from '@/app/lib'
+} from '@/app/_components/lib'
 import { useSearchParams } from 'next/navigation'
-import LoadingFallback from '@/app/LoadingFallback'
+import LoadingFallback from '@/app/_components/LoadingFallback'
 
 // ------------------------Local Types ---------------------------------
 type MovementGroup = {

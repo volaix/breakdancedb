@@ -1,6 +1,6 @@
 'use client'
 // @format
-import RenderHeader from './Header'
+import RenderHeader from './_components/Header'
 import { useState, useEffect } from 'react'
 import {
   Flow,
@@ -10,7 +10,7 @@ import {
   safeJsonParse,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from './lib'
+} from './_components/lib'
 import Image from 'next/image'
 
 //------------------------local utils------------------------------

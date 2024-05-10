@@ -8,11 +8,11 @@ import {
   getLocalStorageGlobal,
   lsUserLearning,
   useLocalStorage,
-} from '@/app/lib'
+} from '@/app/_components/lib'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import LoadingFallback from '@/app/LoadingFallback'
+import LoadingFallback from '@/app/_components/LoadingFallback'
 
 /**
  * Calculates % learned of move positions

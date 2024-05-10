@@ -1,4 +1,4 @@
-import RenderHeader from '@/app/Header'
+import RenderHeader from '@/app/_components/Header'
 
 const Page = () => {
   //FEATURE This page isn't in MVP and probably wont be developed for a long time

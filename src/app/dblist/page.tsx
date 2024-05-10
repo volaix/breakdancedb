@@ -1,4 +1,4 @@
-import RenderHeader from '@/app/Header'
+import RenderHeader from '@/app/_components/Header'
 import moveListExample from '@/db/moveListExample.json'
 import Image from 'next/image'
 

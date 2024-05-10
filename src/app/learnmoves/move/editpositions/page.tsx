@@ -9,10 +9,10 @@ import {
   makePositionId,
   updateLocalStorageGlobal,
   useLocalStorage,
-} from '@/app/lib'
+} from '@/app/_components/lib'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import LoadingFallback from '@/app/LoadingFallback'
+import LoadingFallback from '@/app/_components/LoadingFallback'
 
 //------------------------------components-----------------------
 

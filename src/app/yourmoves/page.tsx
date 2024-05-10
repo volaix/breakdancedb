@@ -1,7 +1,7 @@
 'use client'
 //@format
-import RenderHeader from '@/app/Header'
-import { getLocalStorageGlobal, lsUserMoves, updateLocalStorageGlobal } from '@/app/lib'
+import RenderHeader from '@/app/_components/Header'
+import { getLocalStorageGlobal, lsUserMoves, updateLocalStorageGlobal } from '@/app/_components/lib'
 import { useState, useEffect } from 'react'
 
 //---------------------------utils---------------------------------
@@ -70,6 +70,7 @@ const YourMoves = () => {
                   <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
                     Your Moves
                   </label>
+                  {/*TODO use react-hook-form to optimise and avoid rerenders */}
                   <textarea
                     id="moves"
                     name="message"

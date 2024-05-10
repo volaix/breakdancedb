@@ -1,8 +1,8 @@
 'use client'
 //@format
-import RenderHeader from '@/app/Header'
+import RenderHeader from '@/app/_components/Header'
 import { useState, useEffect } from 'react'
-import { Flow, getLocalStorageGlobal, lsFlows, useLocalStorage } from '@/app/lib'
+import { Flow, getLocalStorageGlobal, lsFlows, useLocalStorage } from '@/app/_components/lib'
 
 /**
  * renders the flow box that displays 3 lines of text (the flow learned)
