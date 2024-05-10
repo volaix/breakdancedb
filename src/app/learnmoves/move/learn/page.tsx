@@ -164,9 +164,9 @@ const RenderHearts = ({
                       [moveKey]: (move[moveKey] || []).map((a, i) =>
                         i === indexToUpdate
                           ? {
-                            ...a,
-                            slowRating: Number(e.target.id),
-                          }
+                              ...a,
+                              slowRating: Number(e.target.id),
+                            }
                           : a,
                       ),
                     }
@@ -400,6 +400,5 @@ export default function RenderPage() {
     <Suspense fallback={<LoadingFallback />}>
       <RenderMoveLearn />
     </Suspense>
-
   )
 }

@@ -12,12 +12,12 @@ import {
 } from '@/app/lib'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import  LoadingFallback  from '@/app/LoadingFallback'
+import LoadingFallback from '@/app/LoadingFallback'
 
 //------------------------------components-----------------------
 
 /**
- * 
+ *
  * Render a delete button
  * @returns jsx
  */
@@ -46,7 +46,7 @@ const RenderRedDeleteButton = ({
 /**
  * renders an edit button. used for each position render.
  * @param param onclick
- * @returns 
+ * @returns
  */
 const RenderEditButton = ({
   onClick,
@@ -66,7 +66,7 @@ const RenderEditButton = ({
 /**
  * renders an add button. used for each position render.
  * @param param onclick
- * @returns 
+ * @returns
  */
 const RenderAddButton = ({
   onClick,
@@ -205,56 +205,56 @@ const RenderPositions = () => {
               {
                 //if positions exist show positions
                 move?.positions &&
-                move?.positions.map((a, index) => {
-                  return (
-                    <a key={a.positionId}>
-                      {
-                        // if editing, hide move display name and show input
-                        !editing[index] ? (
-                          a.displayName
-                        ) : (
-                          <input
-                            value={a.displayName}
-                            onChange={
-                              //onChange, update displayName inside Position
-                              (e) => {
-                                if (move) {
-                                  const updatedPositions: Position[] =
-                                    move.positions?.toSpliced(index, 1, {
-                                      ...move.positions[index],
-                                      displayName: e.target.value,
-                                    }) || []
-                                  setMove({
-                                    ...move,
-                                    positions: updatedPositions,
-                                  })
+                  move?.positions.map((a, index) => {
+                    return (
+                      <a key={a.positionId}>
+                        {
+                          // if editing, hide move display name and show input
+                          !editing[index] ? (
+                            a.displayName
+                          ) : (
+                            <input
+                              value={a.displayName}
+                              onChange={
+                                //onChange, update displayName inside Position
+                                (e) => {
+                                  if (move) {
+                                    const updatedPositions: Position[] =
+                                      move.positions?.toSpliced(index, 1, {
+                                        ...move.positions[index],
+                                        displayName: e.target.value,
+                                      }) || []
+                                    setMove({
+                                      ...move,
+                                      positions: updatedPositions,
+                                    })
+                                  }
                                 }
                               }
-                            }
-                            type="text"
-                          />
-                        )
-                      }
-                      {
-                        // disable ability to delete or add moves when currently editing.
-                        !editing[index] && (
-                          <div className="flex">
-                            <RenderAddButton
-                              onClick={onClickAdd(index + 1)}
+                              type="text"
                             />
-                            <RenderEditButton onClick={onClickEdit(index)} />
-                            <RenderRedDeleteButton
-                              onClick={onClickDelete(index)}
-                            />
-                          </div>
-                        )
-                      }
-                      {editing[index] && (
-                        <RenderEditButton onClick={onClickEdit(index)} />
-                      )}
-                    </a>
-                  )
-                })
+                          )
+                        }
+                        {
+                          // disable ability to delete or add moves when currently editing.
+                          !editing[index] && (
+                            <div className="flex">
+                              <RenderAddButton
+                                onClick={onClickAdd(index + 1)}
+                              />
+                              <RenderEditButton onClick={onClickEdit(index)} />
+                              <RenderRedDeleteButton
+                                onClick={onClickDelete(index)}
+                              />
+                            </div>
+                          )
+                        }
+                        {editing[index] && (
+                          <RenderEditButton onClick={onClickEdit(index)} />
+                        )}
+                      </a>
+                    )
+                  })
               }
               {
                 //if there are no moves, add new move
@@ -299,7 +299,7 @@ const RenderPositions = () => {
 //--------------------------------------------------------------------------------------------------------
 
 /**
- * 
+ *
  * Render the move/editpositions page
  */
 export default function RenderPage() {
