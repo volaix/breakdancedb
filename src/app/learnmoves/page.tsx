@@ -1,12 +1,13 @@
-"use client";
-import Header from "@/app/Header";
-import { useState, useEffect } from "react";
-import { Move, getUserLearning, lsUserLearning } from "@/app/lib";
-import Link from "next/link";
+"use client"
+import { useState, useEffect } from "react"
+import { Move, getUserLearning, lsUserLearning } from "@/app/lib"
+import Link from "next/link"
 
 const RenderMoveBox = ({ move }: { move: Move }) => {
   return (
-    <Link href={`/learnmoves/${move.moveId}`}>
+    <Link
+      href={{ pathname: "/learnmoves/move", query: { moveId: move.moveId } }}
+    >
       <div className="p-2 ">
         <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
           <h2 className="title-font mb-1 text-[7px] font-medium tracking-widest text-gray-400 dark:text-gray-500">
@@ -20,8 +21,8 @@ const RenderMoveBox = ({ move }: { move: Move }) => {
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
 /**
  * helps me learn moves
@@ -31,22 +32,22 @@ const RenderMoveBox = ({ move }: { move: Move }) => {
 
 export const RenderLearnMoves = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] =
-    useState<boolean>(false);
-  const [learning, setLearning] = useState<Move[]>([]);
+    useState<boolean>(false)
+  const [learning, setLearning] = useState<Move[]>([])
 
-  console.log("learning", learning);
+  console.log("learning", learning)
 
 
   useEffect(() => {
-    setAccessToLocalStorage(typeof window !== "undefined");
-  }, []);
+    setAccessToLocalStorage(typeof window !== "undefined")
+  }, [])
 
   //get learning moves
   useEffect(() => {
     if (accessToLocalStorage) {
-      setLearning(getUserLearning());
+      setLearning(getUserLearning())
     }
-  }, [accessToLocalStorage]);
+  }, [accessToLocalStorage])
 
   return (
     <div className="mt-20" style={{ width: "375px" }}>
@@ -59,12 +60,13 @@ export const RenderLearnMoves = () => {
       <div className="flex w-1/3 w-full flex-wrap">
         {learning.length > 0 &&
           learning.map((move) => {
-            return <RenderMoveBox key={move.moveId} move={move} />;
+            return <RenderMoveBox key={move.moveId} move={move} />
           })}
       </div>
       <div>
         <a
           href="/learnmoves/newmove"
+
           className="mt-5 inline-flex items-center text-sm text-indigo-400"
         >
           add new move
@@ -83,7 +85,7 @@ export const RenderLearnMoves = () => {
         </a>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default RenderLearnMoves;
+export default RenderLearnMoves
