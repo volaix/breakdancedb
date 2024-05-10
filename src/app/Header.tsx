@@ -9,8 +9,11 @@ import { useState } from 'react'
  * @returns 
  */
 export default function Header() {
+  //-----------------state------------------------------------
   const [isNavOpen, setIsNavOpen] = useState(false)
   const inDevelopment = true
+
+  //-----------------render----------------------------------------
   return (
     <div
       className="z-10 fixed left-0 top-0 flex w-full justify-center
@@ -111,7 +114,6 @@ export default function Header() {
       }
     `}</style>
         </div>
-
       </div>
       <div className="fixed right-2 top-3">
         <Image
