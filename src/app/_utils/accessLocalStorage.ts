@@ -15,14 +15,14 @@ import { Move } from './localStorageTypes'
  * Delete all others.
  * @returns void
  */
-
 export const updateLocalStorageGlobal = {
+  //------------------updates "flows" key in localstorage------------
   [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
     if (!accessToLocalStorage) {
-      return;
+      return
     }
-    
+
     if (isFlowArr(val)) {
       //validation
       localStorage.setItem(lsFlows, JSON.stringify(val))
@@ -30,10 +30,11 @@ export const updateLocalStorageGlobal = {
       console.log('failed validation')
     }
   },
+  //------------------updates "userMoves" key in localstorage------------
   [lsUserMoves]: (val: string[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
     if (!accessToLocalStorage) {
-      return;
+      return
     }
 
     if (isUserMoves(val)) {
@@ -43,12 +44,13 @@ export const updateLocalStorageGlobal = {
       console.log('failed validation')
     }
   },
-  //--------------------LEARN MOVES PAGE------------
+  //------------------updates "userLearning" key in localstorage------------
+  //most used in /learnmoves
   [lsUserLearning]: (val: Move[], accessToLocalStorage: boolean) => {
     console.log('updating')
     //quit early if localstorage unaccessible
     if (!accessToLocalStorage) {
-      return;
+      return
     }
 
     console.log('validating')
@@ -62,7 +64,7 @@ export const updateLocalStorageGlobal = {
     }
   },
 }
-const isErrorInGetLocalStorage = ({ accessToLocalStorage }: { accessToLocalStorage: boolean} ): boolean => {
+const isErrorInGetLocalStorage = ({ accessToLocalStorage }: { accessToLocalStorage: boolean }): boolean => {
   if (!accessToLocalStorage) {
     console.log('no access to local storage')
     return true
