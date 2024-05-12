@@ -19,29 +19,37 @@ import { Move } from './localStorageTypes'
 export const updateLocalStorageGlobal = {
   [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
-    if (!accessToLocalStorage)
-      if (isFlowArr(val))
-        //validation
-        localStorage.setItem(lsFlows, JSON.stringify(val))
-      else {
-        console.log('failed validation')
-      }
+    if (!accessToLocalStorage) {
+      return;
+    }
+    
+    if (isFlowArr(val)) {
+      //validation
+      localStorage.setItem(lsFlows, JSON.stringify(val))
+    } else {
+      console.log('failed validation')
+    }
   },
   [lsUserMoves]: (val: string[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible
-    if (!accessToLocalStorage)
-      if (isUserMoves(val)) {
-        //validation
-        localStorage.setItem(lsUserMoves, JSON.stringify(val))
-      } else {
-        console.log('failed validation')
-      }
+    if (!accessToLocalStorage) {
+      return;
+    }
+
+    if (isUserMoves(val)) {
+      //validation
+      localStorage.setItem(lsUserMoves, JSON.stringify(val))
+    } else {
+      console.log('failed validation')
+    }
   },
   //--------------------LEARN MOVES PAGE------------
   [lsUserLearning]: (val: Move[], accessToLocalStorage: boolean) => {
     console.log('updating')
     //quit early if localstorage unaccessible
-    if (!accessToLocalStorage) return
+    if (!accessToLocalStorage) {
+      return;
+    }
 
     console.log('validating')
     //validation
