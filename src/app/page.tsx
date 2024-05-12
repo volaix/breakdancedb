@@ -3,14 +3,15 @@
 import RenderHeader from './_components/Header'
 import { useState, useEffect } from 'react'
 import {
-  Flow,
-  getLocalStorageGlobal,
-  lsFlows,
-  lsUserMoves,
   safeJsonParse,
-  updateLocalStorageGlobal,
   useLocalStorage,
 } from './_utils/lib'
+import {
+  lsFlows,
+  lsUserMoves
+} from './_utils/localStorageTypes'
+import { Flow } from './_utils/localStorageTypes'
+import { getLocalStorageGlobal, updateLocalStorageGlobal } from './_utils/accessLocalStorage'
 import Image from 'next/image'
 
 //------------------------local utils------------------------------
