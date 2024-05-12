@@ -9,7 +9,6 @@ Roadmap: https://trello.com/invite/b/io1dH18G/ATTI3b20ecf6d8200e4485972068f0d98e
 3. FLOW LVL. transitions into flow. Focus on dance.
 4. COMBO LVL. flow into performance
 5. NODE VIEW for isolation
-6. BONUS MAKE MOVES. rng images with custom weights. (eagle view)
 
 - algorithm auto select moves for optimised learning
 - node view and data to see what moves are most used/less used
@@ -26,9 +25,6 @@ Roadmap: https://trello.com/invite/b/io1dH18G/ATTI3b20ecf6d8200e4485972068f0d98e
 
 <img width="687" alt="image" src="https://github.com/volaix/breakdancedb/assets/16506248/a74a0760-47de-4a3b-bec2-30e0b7be46a8">
 
-### 6. BONUS MAKE MOVE VIEW goal:
-
-<img width="306" alt="image" src="https://github.com/volaix/breakdancedb/assets/16506248/e33b41b0-93e0-4274-939c-add8e219c6fb">
 
 ## Getting Started
 
@@ -57,16 +53,9 @@ Roadmap: https://trello.com/invite/b/io1dH18G/ATTI3b20ecf6d8200e4485972068f0d98e
 1. yarn build
 2. yarn start
 
-### Algorithm Tuner Ideas
-
-- Difficulty of move
-- How isolated is the node
-- Ratio of transitions in, to transitions out
-- How many shapes does the move have
-
 # Stretch Goal
 
-- addons: hand placements, anti hooks, "opposite side"
+- addon tags: hand placements, anti hooks, "opposite side"
 - user profiles on server
 - shared data state between devices
 - shared moves matcher to practice together
