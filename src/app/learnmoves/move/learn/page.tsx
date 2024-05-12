@@ -249,6 +249,7 @@ const RenderMoveLearn = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>()
+  const inDevelopment = true
 
   // -------------------------------------USE EFFECT---------------------------
 
@@ -275,6 +276,7 @@ const RenderMoveLearn = () => {
   //-------------------------------handlers------------------------------
   //After editing movement names, submitting changes to localstorage
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log('running onsubmit with', data)
 
     //var for movements with display names
     const newMovements: MovementGroup[] = localMovements.map((a, i) => {
@@ -341,26 +343,29 @@ const RenderMoveLearn = () => {
                         {movement.displayName}
                       </h1>
                       <div className=''>
-                        <RenderEditButton onClick={() => {
+                        {inDevelopment || <RenderEditButton onClick={() => {
                           //change displayname to input 
                           console.log('open input')
-                        }} />
+                        }} />}
                       </div>
                     </>
                     }
                     {isEditing && <>
                       <form onSubmit={handleSubmit(onSubmit)}>
-                        <input
+                        <DefaultStyledInput
+                          registerName={`${i}`}
                           defaultValue={movement.displayName}
-                          {...register(`${i}`)}
+                          register={register}
+                        // {...register(`${i}`)}
                         />
+                        {/* <input /> */}
                         <div className=''>
-                          <RenderEditButton onClick={() => {
+                          {inDevelopment || <RenderEditButton onClick={() => {
                             //change displayname to input 
                             // setValue("example", "luo")
-                          }} />
+                          }} />}
                         </div>
-                        <input type="submit" />
+                        <input value="Update MovementGroup Name" type="submit" />
                       </form>
                     </>
                     }
