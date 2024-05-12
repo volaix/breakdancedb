@@ -1,18 +1,18 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import {
-  Move,
-  Position,
-  PositionId,
-  getLocalStorageGlobal,
-  lsUserLearning,
-  makePositionId,
-  updateLocalStorageGlobal,
   useLocalStorage,
 } from '@/app/_utils/lib'
+import { makePositionId } from '@/app/_utils/lsMakers'
+import { lsUserLearning } from '@/app/_utils/localStorageTypes'
+import { Position } from '@/app/_utils/localStorageTypes'
+import { PositionId } from '@/app/_utils/localStorageTypes'
+import { getLocalStorageGlobal, updateLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'
+import { RenderEditButton } from '../../_components/RenderEditButton'
 
 //------------------------------components-----------------------
 
@@ -43,26 +43,6 @@ const RenderRedDeleteButton = ({
     </div>
   )
 }
-/**
- * renders an edit button. used for each position render.
- * @param param onclick
- * @returns
- */
-const RenderEditButton = ({
-  onClick,
-}: {
-  onClick: React.MouseEventHandler<HTMLDivElement>
-}) => {
-  return (
-    <div onClick={onClick}>
-      <svg height="20px" width="20px" viewBox="0 0 122.88 121.51">
-        <title>edit</title>
-        <path d="M28.66,1.64H58.88L44.46,16.71H28.66a13.52,13.52,0,0,0-9.59,4l0,0a13.52,13.52,0,0,0-4,9.59v76.14H91.21a13.5,13.5,0,0,0,9.59-4l0,0a13.5,13.5,0,0,0,4-9.59V77.3l15.07-15.74V92.85a28.6,28.6,0,0,1-8.41,20.22l0,.05a28.58,28.58,0,0,1-20.2,8.39H11.5a11.47,11.47,0,0,1-8.1-3.37l0,0A11.52,11.52,0,0,1,0,110V30.3A28.58,28.58,0,0,1,8.41,10.09L8.46,10a28.58,28.58,0,0,1,20.2-8.4ZM73,76.47l-29.42,6,4.25-31.31L73,76.47ZM57.13,41.68,96.3.91A2.74,2.74,0,0,1,99.69.38l22.48,21.76a2.39,2.39,0,0,1-.19,3.57L82.28,67,57.13,41.68Z" />
-      </svg>
-    </div>
-  )
-}
-
 /**
  * renders an add button. used for each position render.
  * @param param onclick
