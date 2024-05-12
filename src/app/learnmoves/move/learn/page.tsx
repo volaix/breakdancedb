@@ -402,6 +402,7 @@ const RenderMoveLearn = () => {
                                 setIsEditing({ [i]: true })
                               }}
                             />
+                            {/* Render add button here. Onclick makes another movement. */}
                           </div>
                         </>
                       )
