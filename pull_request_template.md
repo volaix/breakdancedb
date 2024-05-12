@@ -1,4 +1,6 @@
 ### Checklist for opinionated, typed, linted, deployed, and mergable code.
+`yarn format && yarn format:fix && yarn ts && yarn lint`
+
 - [ ] "yarn format" to check prettier 🔍
 - [ ] "yarn format:fix" to autofix 💃
 - [ ] "yarn ts" for fixing ts errors 🎉
