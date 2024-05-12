@@ -25,7 +25,6 @@ Roadmap: https://trello.com/invite/b/io1dH18G/ATTI3b20ecf6d8200e4485972068f0d98e
 
 <img width="687" alt="image" src="https://github.com/volaix/breakdancedb/assets/16506248/a74a0760-47de-4a3b-bec2-30e0b7be46a8">
 
-
 ## Getting Started
 
 1. yarn install
