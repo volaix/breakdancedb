@@ -437,6 +437,24 @@ const RenderMoveLearn = () => {
                     <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
                   </div>
                   <div className="flex flex-col items-center text-xs">
+                    {transition && (
+                      //If its a transition render Transition
+                      <div className="flex flex-col py-3">
+                        <span>
+                          <RenderHearts
+                            setMove={setMove}
+                            accessToLocalStorage={accessToLocalStorage}
+                            rating={transition?.slowRating}
+                            move={move}
+                            currentlyEditing={'transition'}
+                            movementGroup={movement}
+                          />
+                          {'Transition: '}
+                          {transition.displayName}
+                        </span>
+                        <div>{'Practice: Slow Transitions'}</div>
+                      </div>
+                    )}
                     {position && (
                       //If its a position render position
                       <div className="flex flex-col py-3">
@@ -456,24 +474,6 @@ const RenderMoveLearn = () => {
                           <div>{'Practice: Slow Statics'}</div>
                           <RenderTooltip type={'static'} />
                         </span>
-                      </div>
-                    )}
-                    {transition && (
-                      //If its a transition render Transition
-                      <div className="flex flex-col py-3">
-                        <span>
-                          <RenderHearts
-                            setMove={setMove}
-                            accessToLocalStorage={accessToLocalStorage}
-                            rating={transition?.slowRating}
-                            move={move}
-                            currentlyEditing={'transition'}
-                            movementGroup={movement}
-                          />
-                          {'Transition: '}
-                          {transition.displayName}
-                        </span>
-                        <div>{'Practice: Slow Transitions'}</div>
                       </div>
                     )}
                   </div>
