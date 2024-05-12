@@ -237,7 +237,9 @@ const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
-  const [isEditing, setIsEditing] = useState(true)
+
+  //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
+  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(null)
   const [localMovements, setLocalMovements] = useState<
     MovementGroup[]
   >([])
@@ -338,36 +340,41 @@ const RenderMoveLearn = () => {
                   key={movement.displayName}
                 >
                   <div className='flex'>
-                    {isEditing || <>
-                      <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
-                        {movement.displayName}
-                      </h1>
-                      <div className=''>
-                        {inDevelopment || <RenderEditButton onClick={() => {
-                          //change displayname to input 
-                          console.log('open input')
-                        }} />}
-                      </div>
-                    </>
-                    }
-                    {isEditing && <>
-                      <form onSubmit={handleSubmit(onSubmit)}>
-                        <DefaultStyledInput
-                          registerName={`${i}`}
-                          defaultValue={movement.displayName}
-                          register={register}
-                        // {...register(`${i}`)}
-                        />
-                        {/* <input /> */}
-                        <div className=''>
-                          {inDevelopment || <RenderEditButton onClick={() => {
+                    {
+                      //if user is not editing, show the edit button 
+                      (isEditing !== null && isEditing[i]) || <>
+                        <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
+                          {movement.displayName}
+                        </h1>
+                        <div className='w-2 ml-1'>
+                          {<RenderEditButton onClick={() => {
                             //change displayname to input 
-                            // setValue("example", "luo")
+                            console.log('open input')
+                            setIsEditing({ [i]: true })
                           }} />}
                         </div>
-                        <input value="Update MovementGroup Name" type="submit" />
-                      </form>
-                    </>
+                      </>
+                    }
+                    {//if user is editing, edit button can save
+                      isEditing !== null && isEditing[i] && <>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                          <DefaultStyledInput
+                            registerName={`${i}`}
+                            defaultValue={movement.displayName}
+                            register={register}
+                          />
+                          <button type='submit'>
+                            <div className='w-2 ml-1' >
+                              {<RenderEditButton onClick={() => {
+                                console.log('was clicked is ok')
+                                //change displayname to input 
+                                // setValue("example", "luo")
+                              }} />}
+                            </div>
+                          </button>
+                          {/* <input value="Update MovementGroup Name" type="submit" /> */}
+                        </form>
+                      </>
                     }
                   </div>
                   <div className="mb-4 mt-2 flex justify-center">
