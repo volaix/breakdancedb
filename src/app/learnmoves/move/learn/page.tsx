@@ -233,7 +233,7 @@ const RenderHearts = ({
 /** Renders Tooltips depending on what is being hovered */
 const RenderTooltip = ({ type }: { type: MovementType }) => {
   return <></>
-  //FEATURE Have tooltips explain what statics, transitions, and holds are
+  //FEATURE Have tooltips explain what statics and transitions are
 
   //text of the tooltip
   const text = getText(type)
@@ -276,7 +276,7 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => {}, [setIsEditing])
+  useEffect(() => { }, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
@@ -312,18 +312,18 @@ const RenderMoveLearn = () => {
       const newMovements: MovementGroup[] = localMovements.map((a, i) => {
         return {
           ...a,
-          displayName: data[`${i}`],
+          displayName: data[`${i}`] || localMovements[i].displayName,
         }
       })
       //gets current localstorage
-      const current =
+      const lsCurrent =
         getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
       //finds the current move inside the db
-      const selectedMove = current.findIndex((obj) => obj.moveId === moveId)
+      const selectedMove = lsCurrent.findIndex((obj) => obj.moveId === moveId)
 
       if (selectedMove > -1) {
-        const updatedMove = {
-          ...current[selectedMove],
+        const updatedMove: Move = {
+          ...lsCurrent[selectedMove],
           movements: newMovements,
         }
 
@@ -332,7 +332,7 @@ const RenderMoveLearn = () => {
 
         //updates local storage, while replacing the current move with what's been changed locally
         updateLocalStorageGlobal[lsUserLearning](
-          current.toSpliced(selectedMove, 1, updatedMove),
+          lsCurrent.toSpliced(selectedMove, 1, updatedMove),
           accessToLocalStorage,
         )
       } else {
