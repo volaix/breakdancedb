@@ -1,18 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useLocalStorage } from '@/app/_utils/lib'
+import { makeMoveId } from '@/app/_utils/lsMakers'
+import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import {
-  useLocalStorage,
-  Move,
-  lsUserLearning,
   updateLocalStorageGlobal,
-  makeMoveId,
-  Hold,
   getLocalStorageGlobal,
-} from '@/app/_utils/lib'
+} from '@/app/_utils/accessLocalStorage'
+import { Move } from '@/app/_utils/localStorageTypes'
 import { useMoveStore } from './store'
-import { makeTransitions } from '@/app/_utils/lib'
-import { makePositions } from '@/app/_utils/lib'
-import { makeDefaultTransitionNames } from '@/app/_utils/lib'
+import { makeTransitions } from '@/app/_utils/lsMakers'
+import { makePositions } from '@/app/_utils/lsMakers'
+import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
 import { v4 } from 'uuid'
 
@@ -64,7 +63,9 @@ const RenderPage = () => {
 
   //sets existing moves with what's learning in localstorage
   useEffect(() => {
-    setExistingMoves(getLocalStorageGlobal[lsUserLearning](accessToLocalStorage))
+    setExistingMoves(
+      getLocalStorageGlobal[lsUserLearning](accessToLocalStorage),
+    )
   }, [accessToLocalStorage])
 
   //When RangeVal updates, update positions in the shared state*/
@@ -88,6 +89,7 @@ const RenderPage = () => {
       //makes a new move
       const newMove: Move = {
         displayName: moveName,
+        moveId: makeMoveId(),
         positions: lsPositions,
         moveExecution: {
           memorised: true,
@@ -95,19 +97,7 @@ const RenderPage = () => {
           normal: true,
           fast: false,
         },
-        moveId: makeMoveId(),
         transitions: newTransitions,
-        holds: lsPositions.map((a, i): Hold => {
-          //the only place where holdIds are made
-          return {
-            fromPosition: lsPositions[i].positionId,
-            toPosition: a.positionId,
-            transition: newTransitions[i].transitionId,
-            displayName: `Pos${i + 1}-> Trans${i + 1} -> Pos${i + 2}`,
-            slowRating: 0,
-            holdId: v4(),
-          }
-        }),
       }
 
       //updates localstorage with newmove

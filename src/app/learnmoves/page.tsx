@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Move, getLocalStorageGlobal, lsUserLearning } from '@/app/_utils/lib'
+import { lsUserLearning } from '../_utils/localStorageTypes'
+import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
+import { Move } from '../_utils/localStorageTypes'
 import Link from 'next/link'
 
 /**

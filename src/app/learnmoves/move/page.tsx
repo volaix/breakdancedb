@@ -1,14 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react'
-import {
-  Move,
-  MoveExecution,
-  Position,
-  Transition,
-  getLocalStorageGlobal,
-  lsUserLearning,
-  useLocalStorage,
-} from '@/app/_utils/lib'
+import { useLocalStorage } from '@/app/_utils/lib'
+import { lsUserLearning } from '@/app/_utils/localStorageTypes'
+import { Position, Transition } from '@/app/_utils/localStorageTypes'
+import { MoveExecution } from '@/app/_utils/localStorageTypes'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import { Move } from '@/app/_utils/localStorageTypes'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -83,11 +80,15 @@ const calcPercentageOfMoveSpeeds = (
 }
 
 const RenderTable = () => {
+  //-----------------------------state--------------------------
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
+  const numberOfPositions = move?.positions?.length
+  const numberOfTransitions = move?.transitions?.length
 
+  //----------------------------hooks----------------------------
   useLocalStorage(setAccessToLocalStorage)
 
   //get learning moves
@@ -97,8 +98,7 @@ const RenderTable = () => {
     setMove(selectedMove || null)
   }, [accessToLocalStorage, moveId])
 
-  const numberOfPositions = move?.positions?.length
-  const numberOfTransitions = move?.transitions?.length
+  //--------------------------render--------------------------
   return (
     <section className="body-font text-gray-600">
       <div className="container mx-auto max-w-se px-5 py-24">
