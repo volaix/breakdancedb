@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
-import { Hold } from '@/app/_utils/localStorageTypes'
 import {
   updateLocalStorageGlobal,
   getLocalStorageGlobal,
@@ -90,6 +89,7 @@ const RenderPage = () => {
       //makes a new move
       const newMove: Move = {
         displayName: moveName,
+        moveId: makeMoveId(),
         positions: lsPositions,
         moveExecution: {
           memorised: true,
@@ -97,19 +97,7 @@ const RenderPage = () => {
           normal: true,
           fast: false,
         },
-        moveId: makeMoveId(),
         transitions: newTransitions,
-        holds: lsPositions.map((a, i): Hold => {
-          //the only place where holdIds are made
-          return {
-            fromPosition: lsPositions[i].positionId,
-            toPosition: a.positionId,
-            transition: newTransitions[i].transitionId,
-            displayName: `Pos${i + 1}-> Trans${i + 1} -> Pos${i + 2}`,
-            slowRating: 0,
-            holdId: v4(),
-          }
-        }),
       }
 
       //updates localstorage with newmove
