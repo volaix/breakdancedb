@@ -54,9 +54,9 @@ const getUpdatedMove = (
   //TODO Refactor this, below logic seems duplicated
   if (key === 'positions') {
     const index = move[key]?.findIndex((a) => {
-      a.positionId === movementGroup.positionId
+      return a.positionId === movementGroup.positionId
     })
-    if (index && index > -1 && move.positions) {
+    if (index !== undefined && index > -1 && move.positions) {
       return {
         ...move,
         [key]: move[key]?.toSpliced(index, 1, {
@@ -64,12 +64,14 @@ const getUpdatedMove = (
           slowRating,
         }),
       }
+    } else {
+      console.log('ERROR: Could not find positionId in movementGroup')
     }
   } else if (key === 'transitions') {
     const index = move[key]?.findIndex((a) => {
-      a.transitionId === movementGroup.transitionId
+      return a.transitionId === movementGroup.transitionId
     })
-    if (index && index > -1 && move.transitions) {
+    if (index !== undefined && index > -1 && move.transitions) {
       return {
         ...move,
         [key]: move[key]?.toSpliced(index, 1, {
@@ -77,6 +79,8 @@ const getUpdatedMove = (
           slowRating,
         }),
       }
+    } else {
+      console.log('ERROR: Could not find positionId in movementGroup')
     }
   }
   return move
@@ -276,7 +280,7 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => {}, [setIsEditing])
+  useEffect(() => { }, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
