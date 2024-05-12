@@ -6,7 +6,6 @@ import { Flow } from './localStorageTypes'
 
 import { Move } from './localStorageTypes'
 
-
 //-----------------------------------DB----------------------------
 /**
  *
@@ -64,7 +63,11 @@ export const updateLocalStorageGlobal = {
     }
   },
 }
-const isErrorInGetLocalStorage = ({ accessToLocalStorage }: { accessToLocalStorage: boolean }): boolean => {
+const isErrorInGetLocalStorage = ({
+  accessToLocalStorage,
+}: {
+  accessToLocalStorage: boolean
+}): boolean => {
   if (!accessToLocalStorage) {
     console.log('no access to local storage')
     return true
@@ -79,30 +82,42 @@ In future this will probably be moved to BE when online functionality needs to h
  */
 
 export const getLocalStorageGlobal = {
-  [lsFlows]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueFlow => {
+  [lsFlows]: (
+    accessToLocalStorage: boolean,
+    defaultReturn = [],
+  ): lsValueFlow => {
     //error handling
     if (isErrorInGetLocalStorage({ accessToLocalStorage })) return defaultReturn
     //gets from localstorage
-    return safeJsonParse<lsValueFlow, typeof defaultReturn>(localStorage.getItem(lsFlows), defaultReturn)
+    return safeJsonParse<lsValueFlow, typeof defaultReturn>(
+      localStorage.getItem(lsFlows),
+      defaultReturn,
+    )
   },
-  [lsUserMoves]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueMove =>
+  [lsUserMoves]: (
+    accessToLocalStorage: boolean,
+    defaultReturn = [],
+  ): lsValueMove =>
     //validation and error handling
-    isErrorInGetLocalStorage({ accessToLocalStorage }) ?
-      defaultReturn
-      //gets from localstorage
-      : safeJsonParse<lsValueMove, typeof defaultReturn>(
-        localStorage.getItem(lsUserMoves),
-        defaultReturn
-      ),
+    isErrorInGetLocalStorage({ accessToLocalStorage })
+      ? defaultReturn
+      : //gets from localstorage
+        safeJsonParse<lsValueMove, typeof defaultReturn>(
+          localStorage.getItem(lsUserMoves),
+          defaultReturn,
+        ),
 
-  [lsUserLearning]: (accessToLocalStorage: boolean, defaultReturn = []): lsValueLearn => {
+  [lsUserLearning]: (
+    accessToLocalStorage: boolean,
+    defaultReturn = [],
+  ): lsValueLearn => {
     //validation and error handling
     if (isErrorInGetLocalStorage({ accessToLocalStorage })) return defaultReturn
 
     //safely gets from localStorage
     return safeJsonParse<lsValueLearn, typeof defaultReturn>(
       localStorage.getItem(lsUserLearning),
-      []
+      [],
     )
   },
 }

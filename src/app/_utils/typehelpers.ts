@@ -1,5 +1,9 @@
-import { LocalStorageStructure, lsUserMoves, lsUserLearning, lsFlows } from './localStorageTypes'
-
+import {
+  LocalStorageStructure,
+  lsUserMoves,
+  lsUserLearning,
+  lsFlows,
+} from './localStorageTypes'
 
 //-------------------------TYPE HELPERS-----------------------
 /**
@@ -25,7 +29,8 @@ type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
  * Helper that gets value of key in globalstorage
 e.g. type lsUserMovesValue = lsValueByKey<typeof lsUserMoves>
  */
-type lsValueByKey<T extends keyof LocalStorageStructure> = LocalStorageStructure[T]
+type lsValueByKey<T extends keyof LocalStorageStructure> =
+  LocalStorageStructure[T]
 export type lsValueMove = lsValueByKey<typeof lsUserMoves>
 export type lsValueLearn = lsValueByKey<typeof lsUserLearning>
 export type lsValueFlow = lsValueByKey<typeof lsFlows>

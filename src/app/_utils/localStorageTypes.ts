@@ -15,7 +15,6 @@ export interface LocalStorageStructure {
 
 //------------Local Storage Values ------------------
 
-
 /**
  * Flow Type. Undeveloped and ratings will be added to it in future.
 For now is just a record of RNG moves strung together.
@@ -48,7 +47,6 @@ export type MovementGroup = {
   positionId?: PositionId
   transitionId?: TransitionId
 }
-
 
 /**
  * Used to show move execution. Possibly depreciating.
@@ -100,4 +98,3 @@ export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export type LocalStorageKeys = keyof LocalStorageStructure
-

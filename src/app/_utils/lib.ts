@@ -7,7 +7,10 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
  * @param toJsonParse requires a JSON string
  * @returns parsed JSON
  */
-export const safeJsonParse = <T, F>(toJsonParse: string | null, fallback: F) => {
+export const safeJsonParse = <T, F>(
+  toJsonParse: string | null,
+  fallback: F,
+) => {
   //handling if toJsonParse is null
   if (!toJsonParse) return fallback as F
   try {
@@ -30,5 +33,3 @@ export const useLocalStorage = (
     setAccessToLocalStorage(typeof window !== 'undefined')
   }, [setAccessToLocalStorage])
 }
-
-

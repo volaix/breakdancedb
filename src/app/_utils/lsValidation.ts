@@ -2,7 +2,6 @@ import { LocalStorageValues } from './localStorageTypes'
 import { validate } from 'uuid'
 import { Flow, MoveId, Move } from './localStorageTypes'
 
-
 /**
  * Checks if localStorageValue is a Flow[]
  */
@@ -22,7 +21,8 @@ export const isFlowArr = (lsValue: LocalStorageValues): lsValue is Flow[] => {
 /**
  * Checks if the passed value is a typeof moveid
  */
-const isMoveId = (val: unknown): val is MoveId => typeof val === 'string' && validate(val)
+const isMoveId = (val: unknown): val is MoveId =>
+  typeof val === 'string' && validate(val)
 
 /**
  * Checks if the passed value is Move
@@ -65,7 +65,8 @@ export const isMoveArr = (lsValue: LocalStorageValues): lsValue is Move[] => {
  * @param
  * @returns boolean
  */
-export const isUserMoves = (val: unknown): val is string[] => Array.isArray(val) ? val.every((m) => typeof m === 'string') : false/**
+export const isUserMoves = (val: unknown): val is string[] =>
+  Array.isArray(val) ? val.every((m) => typeof m === 'string') : false /**
 
  * Checks if the passed value is Flow
  */
@@ -79,4 +80,3 @@ export const isFlow = (val: unknown): val is Flow => {
   }
   return false
 }
-

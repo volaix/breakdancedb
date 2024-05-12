@@ -105,7 +105,6 @@ const RenderCompletedMoves = () => {
   //checks if has access to localstorage
   useLocalStorage(setAccessToLocalStorage)
 
-
   //updates flows using localstorage
   useEffect(() => {
     setFlows(getLocalStorageGlobal[lsFlows](accessToLocalStorage))
@@ -139,7 +138,7 @@ const RenderCompletedMoves = () => {
 }
 
 /**
- * Renders the /completed page. 
+ * Renders the /completed page.
  * @returns jsx
  */
 export default function RenderPage() {

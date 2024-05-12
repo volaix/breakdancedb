@@ -1,27 +1,29 @@
 'use client'
 import { useState, useEffect, SetStateAction, Dispatch, Suspense } from 'react'
+import { useLocalStorage } from '@/app/_utils/lib'
 import {
-  useLocalStorage,
-} from '@/app/_utils/lib'
-import { MovementGroup, MovementId, lsUserLearning } from '@/app/_utils/localStorageTypes'
-import {
-  Position,
-  Transition
+  MovementGroup,
+  MovementId,
+  lsUserLearning,
 } from '@/app/_utils/localStorageTypes'
-import { getLocalStorageGlobal, updateLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import { Position, Transition } from '@/app/_utils/localStorageTypes'
+import {
+  getLocalStorageGlobal,
+  updateLocalStorageGlobal,
+} from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
 import { RenderEditButton } from '@/app/learnmoves/_components/RenderEditButton'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
 
 // ------------------------Local Types ---------------------------------
 //input types for react-hook-form
 type Inputs = {
-  [key: `${number}`]: string //displayName 
+  [key: `${number}`]: string //displayName
 }
 
 type MovementType = 'static' | 'transition'
@@ -32,10 +34,11 @@ type MovementKeys = 'positions' | 'transitions'
  * @param move Move
  * @returns Move
  */
-const getUpdatedMove = (move: Move,
+const getUpdatedMove = (
+  move: Move,
   currentlyEditing: MovementType,
   movementGroup: MovementGroup,
-  slowRating: number
+  slowRating: number,
 ): Move => {
   //determines what key to use when accessing Move
   let key: MovementKeys
@@ -50,32 +53,49 @@ const getUpdatedMove = (move: Move,
 
   //TODO Refactor this, below logic seems duplicated
   if (key === 'positions') {
-    const index = move[key]?.findIndex((a) => { a.positionId === movementGroup.positionId })
+    const index = move[key]?.findIndex((a) => {
+      a.positionId === movementGroup.positionId
+    })
     if (index && index > -1 && move.positions) {
       return {
         ...move,
-        [key]: move[key]?.toSpliced(index, 1, { ...move.positions[index], slowRating })
+        [key]: move[key]?.toSpliced(index, 1, {
+          ...move.positions[index],
+          slowRating,
+        }),
       }
     }
   } else if (key === 'transitions') {
-    const index = move[key]?.findIndex((a) => { a.transitionId === movementGroup.transitionId })
+    const index = move[key]?.findIndex((a) => {
+      a.transitionId === movementGroup.transitionId
+    })
     if (index && index > -1 && move.transitions) {
       return {
         ...move,
-        [key]: move[key]?.toSpliced(index, 1, { ...move.transitions[index], slowRating })
+        [key]: move[key]?.toSpliced(index, 1, {
+          ...move.transitions[index],
+          slowRating,
+        }),
       }
     }
   }
   return move
 }
 
-const getPositionAndTransition = (movementGroup: MovementGroup, move: Move): {
+const getPositionAndTransition = (
+  movementGroup: MovementGroup,
+  move: Move,
+): {
   position?: Position
   transition?: Transition
 } => {
   return {
-    position: move.positions?.find((a) => a.positionId === movementGroup.positionId),
-    transition: move.transitions?.find((a) => a.transitionId === movementGroup.transitionId)
+    position: move.positions?.find(
+      (a) => a.positionId === movementGroup.positionId,
+    ),
+    transition: move.transitions?.find(
+      (a) => a.transitionId === movementGroup.transitionId,
+    ),
   }
 }
 
@@ -140,9 +160,12 @@ const RenderHearts = ({
                 onChange={(e) => {
                   //-----------------------makes the updated move------------------
                   console.log('making updated move')
-                  const updatedMove = getUpdatedMove(move,
+                  const updatedMove = getUpdatedMove(
+                    move,
                     currentlyEditing,
-                    movementGroup, Number(e.target.id))
+                    movementGroup,
+                    Number(e.target.id),
+                  )
 
                   console.log('updatedMove: ', updatedMove)
                   //-----------------------updates display----------------------------
@@ -157,9 +180,7 @@ const RenderHearts = ({
 
                   //all the moves from localstorage
                   const globalMoves =
-                    getLocalStorageGlobal[lsUserLearning](
-                      accessToLocalStorage,
-                    )
+                    getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
 
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
@@ -236,7 +257,9 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
   //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
-  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(null)
+  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(
+    null,
+  )
 
   const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
@@ -245,7 +268,7 @@ const RenderMoveLearn = () => {
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
   const router = useRouter()
-  const { register, handleSubmit, } = useForm<Inputs>()
+  const { register, handleSubmit } = useForm<Inputs>()
 
   // -------------------------------------USE EFFECT---------------------------
 
@@ -253,15 +276,15 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => {
-  }, [setIsEditing])
+  useEffect(() => {}, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
     if (move) {
       setLocalMovements(
-        move?.movements?.length ? move.movements :
-          makeDefaultMovementGroupArr(move.positions, move.transitions,),
+        move?.movements?.length
+          ? move.movements
+          : makeDefaultMovementGroupArr(move.positions, move.transitions),
       )
     }
   }, [move])
@@ -289,18 +312,19 @@ const RenderMoveLearn = () => {
       const newMovements: MovementGroup[] = localMovements.map((a, i) => {
         return {
           ...a,
-          displayName: data[`${i}`]
+          displayName: data[`${i}`],
         }
       })
       //gets current localstorage
-      const current = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+      const current =
+        getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
       //finds the current move inside the db
       const selectedMove = current.findIndex((obj) => obj.moveId === moveId)
 
       if (selectedMove > -1) {
         const updatedMove = {
           ...current[selectedMove],
-          movements: newMovements
+          movements: newMovements,
         }
 
         //update locally to view, if skip it wont rerender
@@ -308,9 +332,9 @@ const RenderMoveLearn = () => {
 
         //updates local storage, while replacing the current move with what's been changed locally
         updateLocalStorageGlobal[lsUserLearning](
-          current.toSpliced(selectedMove, 1,updatedMove)
-          , accessToLocalStorage)
-
+          current.toSpliced(selectedMove, 1, updatedMove),
+          accessToLocalStorage,
+        )
       } else {
         console.log('could not match moveId with localstorage')
       }
@@ -318,20 +342,26 @@ const RenderMoveLearn = () => {
     }
   }
 
-
   //------------------------------RENDER--------------------------------
 
   return (
     <section className="body-font text-gray-600">
       <div className="container mx-auto max-w-se px-5 py-24">
         <div className="mb-8 flex w-full flex-col text-center">
-          <button className="fixed top-16" type="button" onClick={() => router.back()}>
+          <button
+            className="fixed top-16"
+            type="button"
+            onClick={() => router.back()}
+          >
             {`<- Go back`}
           </button>
           <h1 className="title-font mb-2 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             Learn Slow
           </h1>
-          <p className="w-full text-xs leading-relaxed text-gray-500 lg:w-1/2">{'Move Name: '}{move?.displayName}</p>
+          <p className="w-full text-xs leading-relaxed text-gray-500 lg:w-1/2">
+            {'Move Name: '}
+            {move?.displayName}
+          </p>
           <p className="w-full text-xs leading-relaxed text-gray-500 lg:w-1/2">
             Learn slow to learn fast. Recommended music around 60bpm. Do a move
             every beat. Feel free to skip past the hard ones and get the easy
@@ -343,48 +373,64 @@ const RenderMoveLearn = () => {
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
-              const { position, transition } = getPositionAndTransition(movement, move)
+              const { position, transition } = getPositionAndTransition(
+                movement,
+                move,
+              )
               return (
                 <div
                   className="my-6 flex flex-col items-center"
                   key={movement.displayName}
                 >
-                  <div className='flex'>
+                  <div className="flex">
                     {
-                      //if user is not editing, show the edit button 
-                      (isEditing !== null && isEditing[i]) || <>
-                        <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
-                          {movement.displayName}
-                        </h1>
-                        <div className='w-2 ml-1'>
-                          {<RenderEditButton onClick={() => {
-                            //change displayname to input 
-                            console.log('open input')
-                            setIsEditing({ [i]: true })
-                          }} />}
-                        </div>
-                      </>
+                      //if user is not editing, show the edit button
+                      (isEditing !== null && isEditing[i]) || (
+                        <>
+                          <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
+                            {movement.displayName}
+                          </h1>
+                          <div className="ml-1 w-2">
+                            {
+                              <RenderEditButton
+                                onClick={() => {
+                                  //change displayname to input
+                                  console.log('open input')
+                                  setIsEditing({ [i]: true })
+                                }}
+                              />
+                            }
+                          </div>
+                        </>
+                      )
                     }
-                    {//if user is editing, edit button can save
-                      isEditing !== null && isEditing[i] && <>
-                        <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
-                          <DefaultStyledInput
-                            registerName={`${i}`}
-                            defaultValue={movement.displayName}
-                            register={register}
-                          />
-                          <button type='submit'>
-                            <div className='w-2 ml-1' >
-                              {<RenderEditButton onClick={() => {
-                                console.log('was clicked is ok')
-                                // setIsEditing({ [i]: true })
-                                //change displayname to input 
-                                // setValue("example", "luo")
-                              }} />}
-                            </div>
-                          </button>
-                        </form>
-                      </>
+                    {
+                      //if user is editing, edit button can save
+                      isEditing !== null && isEditing[i] && (
+                        <>
+                          <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
+                            <DefaultStyledInput
+                              registerName={`${i}`}
+                              defaultValue={movement.displayName}
+                              register={register}
+                            />
+                            <button type="submit">
+                              <div className="ml-1 w-2">
+                                {
+                                  <RenderEditButton
+                                    onClick={() => {
+                                      console.log('was clicked is ok')
+                                      // setIsEditing({ [i]: true })
+                                      //change displayname to input
+                                      // setValue("example", "luo")
+                                    }}
+                                  />
+                                }
+                              </div>
+                            </button>
+                          </form>
+                        </>
+                      )
                     }
                   </div>
                   <div className="mb-4 mt-2 flex justify-center">

@@ -1,10 +1,14 @@
 import { v4 } from 'uuid'
 import {
-  MoveId, PositionId,
-  TransitionId, Position, Transition, Transitions,
-  MovementGroup, MovementId
+  MoveId,
+  PositionId,
+  TransitionId,
+  Position,
+  Transition,
+  Transitions,
+  MovementGroup,
+  MovementId,
 } from './localStorageTypes'
-
 
 // ------------------------makers-----------------------------
 
@@ -48,7 +52,9 @@ export const makeDefaultPosition = ({
  * @returns
  */
 export const makeDefaultTransition = ({
-  displayName, from, to,
+  displayName,
+  from,
+  to,
 }: {
   displayName: string
   from: PositionId
@@ -72,7 +78,8 @@ export const makeDefaultTransition = ({
  */
 
 export const makeTransitions = ({
-  displayNames, positions,
+  displayNames,
+  positions,
 }: {
   displayNames: string[]
   positions: Position[]
@@ -106,7 +113,8 @@ export const makeTransitions = ({
  * @returns position[]
  */
 
-export const makePositions = (displayNames: string[]): Position[] => displayNames.map((displayName) => makeDefaultPosition({ displayName }))
+export const makePositions = (displayNames: string[]): Position[] =>
+  displayNames.map((displayName) => makeDefaultPosition({ displayName }))
 /**
  *  makes default names for transitions
  * @param numberOfTransitions
@@ -114,10 +122,11 @@ export const makePositions = (displayNames: string[]): Position[] => displayName
  */
 
 export const makeDefaultTransitionNames = (
-  numberOfTransitions: number
-): string[] => Array.from(Array(numberOfTransitions)).map(
-  (_, i) => `From Pos${i + 1} to Pos${i + 2}`
-)
+  numberOfTransitions: number,
+): string[] =>
+  Array.from(Array(numberOfTransitions)).map(
+    (_, i) => `From Pos${i + 1} to Pos${i + 2}`,
+  )
 
 /**
  * Reorders positions and transitions into the correct display order for learnmoves/move/learn page
@@ -140,7 +149,7 @@ export const makeDefaultMovementGroupArr = (
     {
       displayName: 'First-Movement',
       positionId: positions[0].positionId,
-      movementId: makeMovementId()
+      movementId: makeMovementId(),
     },
     {
       movementId: makeMovementId(),
@@ -150,7 +159,7 @@ export const makeDefaultMovementGroupArr = (
   ]
   //get rid of the first and last of positions as these are manually made in base arr.
   const removedFirstAndLast = positions.filter(
-    (a, i) => !(i === positions.length || i === 0)
+    (a, i) => !(i === positions.length || i === 0),
   )
 
   //insert a formatted Movement[] inside baseArr
@@ -165,7 +174,6 @@ export const makeDefaultMovementGroupArr = (
         positionId: a.positionId,
         transitionId: transitions[i].transitionId,
       }
-    })
+    }),
   )
 }
-

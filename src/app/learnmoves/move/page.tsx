@@ -1,13 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import {
-  useLocalStorage,
-} from '@/app/_utils/lib'
+import { useLocalStorage } from '@/app/_utils/lib'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
-import {
-  Position,
-  Transition
-} from '@/app/_utils/localStorageTypes'
+import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { MoveExecution } from '@/app/_utils/localStorageTypes'
 import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
