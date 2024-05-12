@@ -63,7 +63,7 @@ const YourMoves = () => {
         <div className="container mx-auto px-5 py-24">
           <div className="mb-6 flex w-full flex-col text-center">
             <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
-              Your Moves
+              Your Footworks
             </h1>
             <p className="mx-auto text-base leading-relaxed lg:w-2/3 dark:text-gray-400">
               Add and view everything here. One per line.
