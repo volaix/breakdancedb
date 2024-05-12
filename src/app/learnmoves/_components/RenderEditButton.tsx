@@ -11,6 +11,7 @@ export const RenderEditButton = ({
 }) => {
   return (
     <svg
+      className="dark:fill-gray-500"
       onClick={onClick}
       width="100%"
       height="100%"
