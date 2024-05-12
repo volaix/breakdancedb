@@ -56,7 +56,7 @@ export const updateLocalStorageGlobal = {
     if (isMoveArr(val)) {
       console.log('passed validation and setting in local storage')
       localStorage.setItem(lsUserLearning, JSON.stringify(val))
-      console.log('has set in local storage')
+      console.log('successfully data in localstorage')
     } else {
       console.log('isMoveArr failed validation', val)
     }
