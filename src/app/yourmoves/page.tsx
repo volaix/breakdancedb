@@ -1,7 +1,8 @@
 'use client'
 //@format
 import RenderHeader from '@/app/_components/Header'
-import { getLocalStorageGlobal, lsUserMoves, updateLocalStorageGlobal } from '@/app/_utils/lib'
+import { lsUserMoves } from '../_utils/localStorageTypes'
+import { getLocalStorageGlobal, updateLocalStorageGlobal } from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
 
 //---------------------------utils---------------------------------

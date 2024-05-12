@@ -2,7 +2,10 @@
 //@format
 import RenderHeader from '@/app/_components/Header'
 import { useState, useEffect } from 'react'
-import { Flow, getLocalStorageGlobal, lsFlows, useLocalStorage } from '@/app/_utils/lib'
+import { useLocalStorage } from '@/app/_utils/lib'
+import { lsFlows } from '../_utils/localStorageTypes'
+import { Flow } from '../_utils/localStorageTypes'
+import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
 
 /**
  * renders the flow box that displays 3 lines of text (the flow learned)
