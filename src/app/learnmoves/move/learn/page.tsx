@@ -276,7 +276,7 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => { }, [setIsEditing])
+  useEffect(() => {}, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
