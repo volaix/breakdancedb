@@ -235,28 +235,26 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
  */
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
+  //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
+  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(null)
+
+  const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
 
-  //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
-  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(null)
-  const [localMovements, setLocalMovements] = useState<
-    MovementGroup[]
-  >([])
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
   const router = useRouter()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Inputs>()
-  const inDevelopment = true
+  const { register, handleSubmit, } = useForm<Inputs>()
 
   // -------------------------------------USE EFFECT---------------------------
 
   //makes sure has access to local storage
   useLocalStorage(setAccessToLocalStorage)
+
+  //Hook to update after localstorage has been set
+  useEffect(() => {
+  }, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
@@ -276,40 +274,52 @@ const RenderMoveLearn = () => {
   }, [accessToLocalStorage, moveId])
 
   //-------------------------------handlers------------------------------
-  //After editing movement names, submitting changes to localstorage
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log('running onsubmit with', data)
 
-    //var for movements with display names
-    const newMovements: MovementGroup[] = localMovements.map((a, i) => {
-      return {
-        ...a,
-        displayName: data[`${i}`]
+  /**
+   * To run when submitting the edit button.
+   * After editing movement names, submitting changes to localstorage
+   * @param i is index
+   */
+  //
+  const onSubmitNewMoveName = (i: number): SubmitHandler<Inputs> => {
+    return (data) => {
+      console.log('running onsubmit with', data)
+
+      //var for movements with display names
+      const newMovements: MovementGroup[] = localMovements.map((a, i) => {
+        return {
+          ...a,
+          displayName: data[`${i}`]
+        }
+      })
+      //gets current localstorage
+      const current = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+      //finds the current move inside the db
+      const selectedMove = current.findIndex((obj) => obj.moveId === moveId)
+
+      if (selectedMove > -1) {
+        const updatedMove = {
+          ...current[selectedMove],
+          movements: newMovements
+        }
+
+        //update locally to view, if skip it wont rerender
+        setMove(updatedMove)
+
+        //updates local storage, while replacing the current move with what's been changed locally
+        updateLocalStorageGlobal[lsUserLearning](
+          current.toSpliced(selectedMove, 1,updatedMove)
+          , accessToLocalStorage)
+
+      } else {
+        console.log('could not match moveId with localstorage')
       }
-    })
-    //gets current localstorage
-    const current = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-    //finds the current move inside the db
-    const selectedMove = current.findIndex((obj) => obj.moveId === moveId)
-
-    if (selectedMove > -1) {
-      //updates local storage, while replacing the current move with what's been changed locally
-      console.log('        current.toSpliced(selectedMove, 1, current[selectedMove]): ', current.toSpliced(selectedMove, 1, current[selectedMove]))
-      updateLocalStorageGlobal[lsUserLearning](
-        current.toSpliced(selectedMove, 1,
-          {
-            ...current[selectedMove],
-            movements: newMovements
-          })
-        , accessToLocalStorage)
-
-    } else {
-      console.log('could not match moveId with localstorage')
+      setIsEditing({ [i]: false })
     }
   }
 
+
   //------------------------------RENDER--------------------------------
-  // console.log(watch("example")) // watch input value by passing the name of it
 
   return (
     <section className="body-font text-gray-600">
@@ -357,7 +367,7 @@ const RenderMoveLearn = () => {
                     }
                     {//if user is editing, edit button can save
                       isEditing !== null && isEditing[i] && <>
-                        <form onSubmit={handleSubmit(onSubmit)}>
+                        <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
                           <DefaultStyledInput
                             registerName={`${i}`}
                             defaultValue={movement.displayName}
@@ -367,12 +377,12 @@ const RenderMoveLearn = () => {
                             <div className='w-2 ml-1' >
                               {<RenderEditButton onClick={() => {
                                 console.log('was clicked is ok')
+                                // setIsEditing({ [i]: true })
                                 //change displayname to input 
                                 // setValue("example", "luo")
                               }} />}
                             </div>
                           </button>
-                          {/* <input value="Update MovementGroup Name" type="submit" /> */}
                         </form>
                       </>
                     }
