@@ -2,17 +2,16 @@
 import { useState, useEffect } from 'react'
 import {
   useLocalStorage,
-  Move,
-  lsUserLearning,
-  updateLocalStorageGlobal,
-  makeMoveId,
-  Hold,
-  getLocalStorageGlobal,
 } from '@/app/_utils/lib'
+import { makeMoveId } from '@/app/_utils/lsMakers'
+import { lsUserLearning } from '@/app/_utils/localStorageTypes'
+import { Hold } from '@/app/_utils/localStorageTypes'
+import { updateLocalStorageGlobal, getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import { Move } from '@/app/_utils/localStorageTypes'
 import { useMoveStore } from './store'
-import { makeTransitions } from '@/app/_utils/lib'
-import { makePositions } from '@/app/_utils/lib'
-import { makeDefaultTransitionNames } from '@/app/_utils/lib'
+import { makeTransitions } from '@/app/_utils/lsMakers'
+import { makePositions } from '@/app/_utils/lsMakers'
+import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
 import { v4 } from 'uuid'
 
