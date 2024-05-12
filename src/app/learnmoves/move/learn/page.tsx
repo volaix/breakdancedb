@@ -395,15 +395,13 @@ const RenderMoveLearn = () => {
                             {movement.displayName}
                           </h1>
                           <div className="ml-1 w-2">
-                            {
-                              <RenderEditButton
-                                onClick={() => {
-                                  //change displayname to input
-                                  console.log('open input')
-                                  setIsEditing({ [i]: true })
-                                }}
-                              />
-                            }
+                            <RenderEditButton
+                              onClick={() => {
+                                //change displayname to input
+                                console.log('open input')
+                                setIsEditing({ [i]: true })
+                              }}
+                            />
                           </div>
                         </>
                       )
