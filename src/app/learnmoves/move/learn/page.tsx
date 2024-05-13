@@ -22,7 +22,7 @@ import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
-import { RenderEditButton } from '../../_components/Svgs'
+import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import {
@@ -296,11 +296,13 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => {}, [setIsEditing])
+  useEffect(() => { }, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
     if (move) {
+      console.log('move useeffect ran')
+      console.log('move: localmovements should be updating to is', move.movements)
       setLocalMovements(
         move?.movements?.length
           ? move.movements
@@ -308,6 +310,8 @@ const RenderMoveLearn = () => {
       )
     }
   }, [move])
+
+  useEffect(() => console.log('setlocalmovements useeffect ran'), [setLocalMovements])
 
   //get learning moves
   useEffect(() => {
@@ -362,6 +366,37 @@ const RenderMoveLearn = () => {
     }
   }
 
+  const onClickDeleteMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    if (move) {
+      //---------deletes in a pseudo object-----------
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      console.log('currMovementGroupIndex: ', currMovementGroupIndex)
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        console.log('withnot deleted move: ', move.movements)
+        const deletedMvmt = [ ...move.movements?.toSpliced(currMovementGroupIndex, 1) || []] 
+        const withDeletedMove = {
+          ...move,
+          movements: deletedMvmt,
+        }
+        console.log('withDeletedMove: ', withDeletedMove.movements)
+        //-------------updates local+db------------
+        console.log('attempting to update local/db')
+        setMove(withDeletedMove)
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
+    }
+  }
+
+  /**
+   * onclick handler for user trying to add a new movement. makes a movement below the current.
+   * returns void
+   */
   const onClickAddMovement: MouseEventHandler<SVGSVGElement> = (e) => {
     console.log('trying to add a new movement')
     if (move) {
@@ -375,7 +410,7 @@ const RenderMoveLearn = () => {
         const insertedNewMove = {
           ...move,
           movements: move.movements?.toSpliced(currMovementGroupIndex + 1, 0, {
-            displayName: 'new-movement',
+            displayName: 'new-movement-b',
             movementId: makeMovementId(),
             positionId: makePositionId(),
             transitionId: makeTransitionId(),
@@ -429,11 +464,11 @@ const RenderMoveLearn = () => {
                 }),
                 //doesn't make a transitionobj for the first pos, as nothing to transition from
                 transition = i !== 0 &&
-                  makeDefaultTransition({
-                    displayName: 'new-transition',
-                    from: localMovements[i - 1].positionId || makePositionId(),
-                    to: position.positionId,
-                  }),
+                makeDefaultTransition({
+                  displayName: 'new-transition',
+                  from: localMovements[i - 1].positionId || makePositionId(),
+                  to: position.positionId,
+                }),
               } = getPositionAndTransition(movement, move)
               return (
                 <div
@@ -462,6 +497,13 @@ const RenderMoveLearn = () => {
                               <RenderAddButton
                                 id={movement.movementId}
                                 onClick={onClickAddMovement}
+                              />
+                            </div>
+                            <div className="ml-2 w-2">
+                              {/* MARK */}
+                              <RenderRedDeleteButton
+                                id={movement.movementId}
+                                onClick={onClickDeleteMovement}
                               />
                             </div>
                           </div>
