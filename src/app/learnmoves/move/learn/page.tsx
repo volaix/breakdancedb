@@ -301,8 +301,6 @@ const RenderMoveLearn = () => {
   //sets the order of the movements
   useEffect(() => {
     if (move) {
-      console.log('move useeffect ran')
-      console.log('move: localmovements should be updating to is', move.movements)
       setLocalMovements(
         move?.movements?.length
           ? move.movements
@@ -311,7 +309,6 @@ const RenderMoveLearn = () => {
     }
   }, [move])
 
-  useEffect(() => console.log('setlocalmovements useeffect ran'), [setLocalMovements])
 
   //get learning moves
   useEffect(() => {
@@ -369,22 +366,29 @@ const RenderMoveLearn = () => {
   const onClickDeleteMovement: MouseEventHandler<SVGSVGElement> = (e) => {
     if (move) {
       //---------deletes in a pseudo object-----------
+      //find index to delete
       const currMovementGroupIndex = move.movements?.findIndex(
-        (a) => a.movementId === (e.target as SVGSVGElement).id,
-      )
-
-      console.log('currMovementGroupIndex: ', currMovementGroupIndex)
+        (a) => a.movementId === (e.target as SVGSVGElement).id,)
+        //if the index exists
       if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
-        console.log('withnot deleted move: ', move.movements)
-        const deletedMvmt = [ ...move.movements?.toSpliced(currMovementGroupIndex, 1) || []] 
+        //delete it in a new obj
+        const deletedMvmt = [...move.movements?.toSpliced(currMovementGroupIndex, 1) || []]
+        //update larger structure with new obj
         const withDeletedMove = {
           ...move,
           movements: deletedMvmt,
         }
-        console.log('withDeletedMove: ', withDeletedMove.movements)
         //-------------updates local+db------------
-        console.log('attempting to update local/db')
+        //local
         setMove(withDeletedMove)
+        //db
+        updateLocalStorageGlobal[lsUserLearning](
+          //gets localstorage learning 
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+          //updates the specific move with our deleted one
+            .toSpliced(currMovementGroupIndex, 1, withDeletedMove),
+          accessToLocalStorage,
+        )
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
       }
@@ -418,6 +422,14 @@ const RenderMoveLearn = () => {
         }
         //-------------updates local+db------------
         setMove(insertedNewMove)
+
+        //db
+        updateLocalStorageGlobal[lsUserLearning](
+          //gets localstorage learning and updates the specific move with our deleted one
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+            .toSpliced(currMovementGroupIndex, 1,),
+          accessToLocalStorage,
+        )
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
       }
