@@ -11,7 +11,7 @@ export const RenderAddButton = ({
 }) => (
   <svg
     onClick={onClick}
-    className="stroke-indigo-400"
+    className="stroke-indigo-400 dark:fill-gray-500"
     height="20px"
     width="20px"
     viewBox="0 0 122.88 122.88"
