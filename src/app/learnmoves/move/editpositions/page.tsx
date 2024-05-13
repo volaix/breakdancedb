@@ -52,21 +52,18 @@ const RenderRedDeleteButton = ({
 const RenderAddButton = ({
   onClick,
 }: {
-  onClick: React.MouseEventHandler<HTMLDivElement>
+  onClick: React.MouseEventHandler<SVGSVGElement>
 }) => (
-  <div onClick={onClick}>
-    <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
-      <svg
-        className="stroke-indigo-400"
-        height="20px"
-        width="20px"
-        viewBox="0 0 122.88 122.88"
-      >
-        <title>add</title>
-        <path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z" />
-      </svg>
-    </span>
-  </div>
+  <svg
+    onClick={onClick}
+    className="stroke-indigo-400"
+    height="20px"
+    width="20px"
+    viewBox="0 0 122.88 122.88"
+  >
+    <path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z" />
+  </svg>
+
 )
 
 /**
@@ -186,56 +183,56 @@ const RenderPositions = () => {
               {
                 //if positions exist show positions
                 move?.positions &&
-                  move?.positions.map((a, index) => {
-                    return (
-                      <a key={a.positionId}>
-                        {
-                          // if editing, hide move display name and show input
-                          !editing[index] ? (
-                            a.displayName
-                          ) : (
-                            <input
-                              value={a.displayName}
-                              onChange={
-                                //onChange, update displayName inside Position
-                                (e) => {
-                                  if (move) {
-                                    const updatedPositions: Position[] =
-                                      move.positions?.toSpliced(index, 1, {
-                                        ...move.positions[index],
-                                        displayName: e.target.value,
-                                      }) || []
-                                    setMove({
-                                      ...move,
-                                      positions: updatedPositions,
-                                    })
-                                  }
+                move?.positions.map((a, index) => {
+                  return (
+                    <a key={a.positionId}>
+                      {
+                        // if editing, hide move display name and show input
+                        !editing[index] ? (
+                          a.displayName
+                        ) : (
+                          <input
+                            value={a.displayName}
+                            onChange={
+                              //onChange, update displayName inside Position
+                              (e) => {
+                                if (move) {
+                                  const updatedPositions: Position[] =
+                                    move.positions?.toSpliced(index, 1, {
+                                      ...move.positions[index],
+                                      displayName: e.target.value,
+                                    }) || []
+                                  setMove({
+                                    ...move,
+                                    positions: updatedPositions,
+                                  })
                                 }
                               }
-                              type="text"
+                            }
+                            type="text"
+                          />
+                        )
+                      }
+                      {
+                        // disable ability to delete or add moves when currently editing.
+                        !editing[index] && (
+                          <div className="flex">
+                            <RenderAddButton
+                              onClick={onClickAdd(index + 1)}
                             />
-                          )
-                        }
-                        {
-                          // disable ability to delete or add moves when currently editing.
-                          !editing[index] && (
-                            <div className="flex">
-                              <RenderAddButton
-                                onClick={onClickAdd(index + 1)}
-                              />
-                              <RenderEditButton onClick={onClickEdit(index)} />
-                              <RenderRedDeleteButton
-                                onClick={onClickDelete(index)}
-                              />
-                            </div>
-                          )
-                        }
-                        {editing[index] && (
-                          <RenderEditButton onClick={onClickEdit(index)} />
-                        )}
-                      </a>
-                    )
-                  })
+                            <RenderEditButton onClick={onClickEdit(index)} />
+                            <RenderRedDeleteButton
+                              onClick={onClickDelete(index)}
+                            />
+                          </div>
+                        )
+                      }
+                      {editing[index] && (
+                        <RenderEditButton onClick={onClickEdit(index)} />
+                      )}
+                    </a>
+                  )
+                })
               }
               {
                 //if there are no moves, add new move
