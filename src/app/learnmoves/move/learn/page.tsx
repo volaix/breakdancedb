@@ -1,5 +1,12 @@
 'use client'
-import { useState, useEffect, SetStateAction, Dispatch, Suspense } from 'react'
+import {
+  useState,
+  useEffect,
+  SetStateAction,
+  Dispatch,
+  Suspense,
+  MouseEventHandler,
+} from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import {
   MovementGroup,
@@ -15,10 +22,18 @@ import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
-import { RenderEditButton } from '@/app/learnmoves/_components/RenderEditButton'
+import { RenderEditButton } from '../../_components/Svgs'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
+import {
+  makeDefaultMovementGroupArr,
+  makeDefaultPosition,
+  makeDefaultTransition,
+  makeMovementId,
+  makePositionId,
+  makeTransitionId,
+} from '@/app/_utils/lsMakers'
+import { RenderAddButton } from '../../_components/Svgs'
 
 // ------------------------Local Types ---------------------------------
 //input types for react-hook-form
@@ -40,7 +55,7 @@ const getUpdatedMove = (
   movementGroup: MovementGroup,
   slowRating: number,
 ): Move => {
-  //determines what key to use when accessing Move
+  //  determines what key to use when accessing Move
   let key: MovementKeys
   switch (currentlyEditing) {
     case 'static':
@@ -51,7 +66,7 @@ const getUpdatedMove = (
       break
   }
 
-  //TODO Refactor this, below logic seems duplicated
+  //TODO refactor this almost duplicated code. RN lacking typescript ability to have the key
   if (key === 'positions') {
     const index = move[key]?.findIndex((a) => {
       return a.positionId === movementGroup.positionId
@@ -175,6 +190,7 @@ const RenderHearts = ({
                   //-----------------------updates display----------------------------
 
                   //updates view, otherwise user has to refresh to get updates from localstorageDB data
+                  // setLocalMovements(updatedMove)
                   setMove(updatedMove)
 
                   //------------------------updates db--------------------------------
@@ -280,7 +296,7 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => { }, [setIsEditing])
+  useEffect(() => {}, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
@@ -346,6 +362,35 @@ const RenderMoveLearn = () => {
     }
   }
 
+  const onClickAddMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    console.log('trying to add a new movement')
+    if (move) {
+      //---------makes new move-----------
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      console.log('currMovementGroupIndex: ', currMovementGroupIndex)
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        const insertedNewMove = {
+          ...move,
+          movements: move.movements?.toSpliced(currMovementGroupIndex + 1, 0, {
+            displayName: 'new-movement',
+            movementId: makeMovementId(),
+            positionId: makePositionId(),
+            transitionId: makeTransitionId(),
+          }),
+        }
+        //-------------updates local+db------------
+        setMove(insertedNewMove)
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
+    }
+  }
+
   //------------------------------RENDER--------------------------------
 
   return (
@@ -377,10 +422,19 @@ const RenderMoveLearn = () => {
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
-              const { position, transition } = getPositionAndTransition(
-                movement,
-                move,
-              )
+              const {
+                //makes a default position if none found to handle edge cases
+                position = makeDefaultPosition({
+                  displayName: 'new-position',
+                }),
+                //doesn't make a transitionobj for the first pos, as nothing to transition from
+                transition = i !== 0 &&
+                  makeDefaultTransition({
+                    displayName: 'new-transition',
+                    from: localMovements[i - 1].positionId || makePositionId(),
+                    to: position.positionId,
+                  }),
+              } = getPositionAndTransition(movement, move)
               return (
                 <div
                   className="my-6 flex flex-col items-center"
@@ -388,20 +442,28 @@ const RenderMoveLearn = () => {
                 >
                   <div className="flex">
                     {
+                      //--------------MOVEMENT GROUP TITLE-------
                       //if user is not editing, show the edit button
                       (isEditing !== null && isEditing[i]) || (
                         <>
                           <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
                             {movement.displayName}
                           </h1>
-                          <div className="ml-1 w-2">
-                            <RenderEditButton
-                              onClick={() => {
-                                //change displayname to input
-                                console.log('open input')
-                                setIsEditing({ [i]: true })
-                              }}
-                            />
+                          <div className="ml-2 flex items-center">
+                            <div className="w-2">
+                              <RenderEditButton
+                                onClick={() => {
+                                  setIsEditing({ [i]: true })
+                                }}
+                              />
+                            </div>
+                            <div className="ml-2 w-2">
+                              {/* MARK */}
+                              <RenderAddButton
+                                id={movement.movementId}
+                                onClick={onClickAddMovement}
+                              />
+                            </div>
                           </div>
                         </>
                       )
@@ -418,16 +480,7 @@ const RenderMoveLearn = () => {
                             />
                             <button type="submit">
                               <div className="ml-1 w-2">
-                                {
-                                  <RenderEditButton
-                                    onClick={() => {
-                                      console.log('was clicked is ok')
-                                      // setIsEditing({ [i]: true })
-                                      //change displayname to input
-                                      // setValue("example", "luo")
-                                    }}
-                                  />
-                                }
+                                <RenderEditButton />
                               </div>
                             </button>
                           </form>
@@ -438,6 +491,7 @@ const RenderMoveLearn = () => {
                   <div className="mb-4 mt-2 flex justify-center">
                     <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
                   </div>
+                  {/*---------------Hearts, Positions, Transitions----- */}
                   <div className="flex flex-col items-center text-xs">
                     {transition && (
                       //If its a transition render Transition
