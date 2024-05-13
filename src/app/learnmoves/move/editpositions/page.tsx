@@ -4,7 +4,6 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { makePositionId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
-import { PositionId } from '@/app/_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
   updateLocalStorageGlobal,
@@ -13,38 +12,11 @@ import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'
-import { RenderEditButton } from '../../_components/Svgs'
-import { RenderAddButton } from '../../_components/Svgs'
+import { RenderEditButton, RenderAddButton, RenderRedDeleteButton } from '../../_components/Svgs'
 
 //------------------------------components-----------------------
 
-/**
- *
- * Render a delete button
- * @returns jsx
- */
-const RenderRedDeleteButton = ({
-  onClick,
-}: {
-  onClick: React.MouseEventHandler<HTMLDivElement>
-}) => {
-  return (
-    <div onClick={onClick}>
-      <svg height="20px" width="20px" viewBox="0 0 496.158 496.158">
-        <path
-          fill="#E04F5F"
-          d="M0,248.085C0,111.063,111.069,0.003,248.075,0.003c137.013,0,248.083,111.061,248.083,248.082
-	c0,137.002-111.07,248.07-248.083,248.07C111.069,496.155,0,385.087,0,248.085z"
-        />
-        <path
-          fill="#FFFFFF"
-          d="M383.546,206.286H112.612c-3.976,0-7.199,3.225-7.199,7.2v69.187c0,3.976,3.224,7.199,7.199,7.199
-	h270.934c3.976,0,7.199-3.224,7.199-7.199v-69.187C390.745,209.511,387.521,206.286,383.546,206.286z"
-        />
-      </svg>
-    </div>
-  )
-}
+
 /**
  * Renders all the positions including add, edit, and delete buttons.
  * Edits a singular Move
@@ -162,56 +134,58 @@ const RenderPositions = () => {
               {
                 //if positions exist show positions
                 move?.positions &&
-                  move?.positions.map((a, index) => {
-                    return (
-                      <a key={a.positionId}>
-                        {
-                          // if editing, hide move display name and show input
-                          !editing[index] ? (
-                            a.displayName
-                          ) : (
-                            <input
-                              value={a.displayName}
-                              onChange={
-                                //onChange, update displayName inside Position
-                                (e) => {
-                                  if (move) {
-                                    const updatedPositions: Position[] =
-                                      move.positions?.toSpliced(index, 1, {
-                                        ...move.positions[index],
-                                        displayName: e.target.value,
-                                      }) || []
-                                    setMove({
-                                      ...move,
-                                      positions: updatedPositions,
-                                    })
-                                  }
+                move?.positions.map((a, index) => {
+                  return (
+                    <a key={a.positionId}>
+                      {
+                        // if editing, hide move display name and show input
+                        !editing[index] ? (
+                          a.displayName
+                        ) : (
+                          <input
+                            value={a.displayName}
+                            onChange={
+                              //onChange, update displayName inside Position
+                              (e) => {
+                                if (move) {
+                                  const updatedPositions: Position[] =
+                                    move.positions?.toSpliced(index, 1, {
+                                      ...move.positions[index],
+                                      displayName: e.target.value,
+                                    }) || []
+                                  setMove({
+                                    ...move,
+                                    positions: updatedPositions,
+                                  })
                                 }
                               }
-                              type="text"
+                            }
+                            type="text"
+                          />
+                        )
+                      }
+                      {
+                        // disable ability to delete or add moves when currently editing.
+                        !editing[index] && (
+                          <div className="flex">
+                            <RenderAddButton
+                              onClick={onClickAdd(index + 1)}
                             />
-                          )
-                        }
-                        {
-                          // disable ability to delete or add moves when currently editing.
-                          !editing[index] && (
-                            <div className="flex">
-                              <RenderAddButton
-                                onClick={onClickAdd(index + 1)}
-                              />
-                              <RenderEditButton onClick={onClickEdit(index)} />
-                              <RenderRedDeleteButton
-                                onClick={onClickDelete(index)}
-                              />
+                            <RenderEditButton onClick={onClickEdit(index)} />
+                            <div
+                              onClick={onClickDelete(index)}
+                            >
+                              <RenderRedDeleteButton />
                             </div>
-                          )
-                        }
-                        {editing[index] && (
-                          <RenderEditButton onClick={onClickEdit(index)} />
-                        )}
-                      </a>
-                    )
-                  })
+                          </div>
+                        )
+                      }
+                      {editing[index] && (
+                        <RenderEditButton onClick={onClickEdit(index)} />
+                      )}
+                    </a>
+                  )
+                })
               }
               {
                 //if there are no moves, add new move

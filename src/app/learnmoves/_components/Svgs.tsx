@@ -1,4 +1,40 @@
 /**
+ *
+ * Render a delete button
+ * @returns jsx
+ */
+export const RenderRedDeleteButton = ({
+  onClick,
+  id,
+}: {
+  onClick?: React.MouseEventHandler<SVGSVGElement>
+  id?: string
+}) => {
+  return (
+    <svg
+      id={id}
+      className="dark:fill-gray-500"
+      onClick={onClick}
+      height="100%"
+      width="100%"
+      viewBox="0 0 496.158 496.158">
+      <path
+        pointerEvents={'none'}
+        fill="#E04F5F"
+        d="M0,248.085C0,111.063,111.069,0.003,248.075,0.003c137.013,0,248.083,111.061,248.083,248.082
+	c0,137.002-111.07,248.07-248.083,248.07C111.069,496.155,0,385.087,0,248.085z"
+      />
+      <path
+        pointerEvents={'none'}
+        fill="#FFFFFF"
+        d="M383.546,206.286H112.612c-3.976,0-7.199,3.225-7.199,7.2v69.187c0,3.976,3.224,7.199,7.199,7.199
+	h270.934c3.976,0,7.199-3.224,7.199-7.199v-69.187C390.745,209.511,387.521,206.286,383.546,206.286z"
+      />
+    </svg>
+  )
+}
+
+/**
  * renders an add button. used for each position render.
  * @param param onclick
  * @returns
@@ -13,7 +49,7 @@ export const RenderAddButton = ({
   <svg
     onClick={onClick}
     id={id}
-    className="stroke-indigo-400 dark:fill-gray-500"
+    className="dark:fill-gray-500"
     height="100%"
     width="100%"
     viewBox="0 0 122.88 122.88"
