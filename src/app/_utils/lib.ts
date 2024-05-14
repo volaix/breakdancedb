@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import rocks from '@/db/rocks.json'
 
 //---------------JS HELPERS-------------------
 /**
@@ -20,6 +21,12 @@ export const safeJsonParse = <T, F>(
     return fallback as F
   }
 }
+
+
+/**
+ * Makes a random rock name
+ */
+export const randomNameGen = (): string => `${rocks[Math.floor(Math.random() * rocks.length)]}`
 
 // -------------REACT CUSTOM HOOKS--------------------------
 /**

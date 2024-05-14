@@ -32,7 +32,7 @@ export interface Move {
   displayName: string
   displayImg?: string
   movements?: MovementGroup[]
-  positions?: Position[]
+  positions?: Position[] //13MAY24: decided to keep this as arr instead obj as in future displaying positions in order with the imgs might be relevant
   transitions?: Transitions
   moveExecution?: MoveExecution
 }

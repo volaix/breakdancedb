@@ -10,7 +10,6 @@ import {
 import { useLocalStorage } from '@/app/_utils/lib'
 import {
   MovementGroup,
-  MovementId,
   lsUserLearning,
 } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
@@ -54,6 +53,7 @@ const getUpdatedMove = (
   currentlyEditing: MovementType,
   movementGroup: MovementGroup,
   slowRating: number,
+  movements: MovementGroup[]
 ): Move => {
   //  determines what key to use when accessing Move
   let key: MovementKeys
@@ -81,6 +81,13 @@ const getUpdatedMove = (
       }
     } else {
       console.log('ERROR: Could not find positionId in movementGroup')
+      //return move with a default position anyway
+      return {
+        ...move,
+        positions: move.positions?.toSpliced(move.positions.length, 0,
+          makeDefaultPosition({ slowRating, displayName: 'newPos', positionId: movementGroup.positionId })
+        )
+      }
     }
   } else if (key === 'transitions') {
     const index = move[key]?.findIndex((a) => {
@@ -95,7 +102,21 @@ const getUpdatedMove = (
         }),
       }
     } else {
-      console.log('ERROR: Could not find positionId in movementGroup')
+      console.log('ERROR: Could not find transitionId in movementGroup')
+      //return move with a default position anyway
+      const mvmtIndex = movements.findIndex((a) => a.positionId === movementGroup.positionId)
+      return {
+        ...move,
+        transitions: move.transitions?.toSpliced(move.transitions.length, 0,
+          makeDefaultTransition({
+            slowRating, 
+            displayName: 'newTrans',
+            transitionId: movementGroup.transitionId,
+            to: movementGroup.positionId || makePositionId(),
+            from: movements[mvmtIndex - 1].positionId || makePositionId(),
+          })
+        )
+      }
     }
   }
   return move
@@ -145,8 +166,10 @@ const RenderHearts = ({
   currentlyEditing,
   movementGroup,
   setMove,
+  movements,
 }: {
   movementGroup: MovementGroup
+  movements: MovementGroup[]
   rating: number
   move: Move
   accessToLocalStorage: boolean
@@ -184,6 +207,7 @@ const RenderHearts = ({
                     currentlyEditing,
                     movementGroup,
                     Number(e.target.id),
+                    movements,
                   )
 
                   console.log('updatedMove: ', updatedMove)
@@ -369,7 +393,7 @@ const RenderMoveLearn = () => {
       //find index to delete
       const currMovementGroupIndex = move.movements?.findIndex(
         (a) => a.movementId === (e.target as SVGSVGElement).id,)
-        //if the index exists
+      //if the index exists
       if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
         //delete it in a new obj
         const deletedMvmt = [...move.movements?.toSpliced(currMovementGroupIndex, 1) || []]
@@ -385,7 +409,7 @@ const RenderMoveLearn = () => {
         updateLocalStorageGlobal[lsUserLearning](
           //gets localstorage learning 
           getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-          //updates the specific move with our deleted one
+            //updates the specific move with our deleted one
             .toSpliced(currMovementGroupIndex, 1, withDeletedMove),
           accessToLocalStorage,
         )
@@ -552,6 +576,7 @@ const RenderMoveLearn = () => {
                       <div className="flex flex-col py-3">
                         <span>
                           <RenderHearts
+                            movements={localMovements}
                             setMove={setMove}
                             accessToLocalStorage={accessToLocalStorage}
                             rating={transition?.slowRating}
@@ -570,6 +595,7 @@ const RenderMoveLearn = () => {
                       <div className="flex flex-col py-3">
                         <span>
                           <RenderHearts
+                            movements={localMovements}
                             setMove={setMove}
                             accessToLocalStorage={accessToLocalStorage}
                             rating={position?.slowRating}
