@@ -455,7 +455,6 @@ const RenderMoveLearn = () => {
         (a) => a.movementId === (e.target as SVGSVGElement).id,
       )
 
-      console.log('currMovementGroupIndex: ', currMovementGroupIndex)
       if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
         const insertedNewMove = {
           ...move,
