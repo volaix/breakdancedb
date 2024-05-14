@@ -214,7 +214,7 @@ const RenderPositions = () => {
               )
             }}
             href={{
-              pathname: '/learnmoves/move',
+              pathname: '/learnmoves/data',
               query: { moveId: move.moveId },
             }}
           >

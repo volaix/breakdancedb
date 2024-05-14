@@ -38,7 +38,7 @@ export interface Move {
 }
 
 /**
- * Used to display movement groups in /learnmoves/move/learn
+ * Used to display movement groups in /learnmoves/data/learn
  */
 export type MovementGroup = {
   movementId: MovementId

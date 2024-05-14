@@ -129,7 +129,7 @@ const RenderTable = () => {
             <Link
               className="py-2"
               href={{
-                pathname: '/learnmoves/move/learn',
+                pathname: '/learnmoves/data/learn',
                 query: { moveId: move.moveId, speed: 'slow' },
               }}
             >
@@ -141,7 +141,7 @@ const RenderTable = () => {
           {move && (
             <Link
               href={{
-                pathname: '/learnmoves/move/editpositions',
+                pathname: '/learnmoves/data/editpositions',
                 query: { moveId: move.moveId },
               }}
             >

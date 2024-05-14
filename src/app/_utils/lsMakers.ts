@@ -138,7 +138,7 @@ export const makeDefaultTransitionNames = (
   )
 
 /**
- * Reorders positions and transitions into the correct display order for learnmoves/move/learn page
+ * Reorders positions and transitions into the correct display order for learnmoves/data/learn page
  * @param positions Position[]
  * @param transitions Transition[]
  * @returns [] of Position, Transition
