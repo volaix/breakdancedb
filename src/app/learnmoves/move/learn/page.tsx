@@ -15,7 +15,7 @@ import {
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
@@ -109,9 +109,9 @@ const getUpdatedMove = (
         ...move,
         transitions: move.transitions?.toSpliced(move.transitions.length, 0,
           makeDefaultTransition({
-            slowRating, 
+            slowRating,
             displayName: 'newTrans',
-            transitionId: movementGroup.transitionId,
+            transitionId: movementGroup.transitionId || makeTransitionId(),
             to: movementGroup.positionId || makePositionId(),
             from: movements[mvmtIndex - 1].positionId || makePositionId(),
           })
@@ -229,7 +229,7 @@ const RenderHearts = ({
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
                     //updates localstorage on click
-                    updateLocalStorageGlobal[lsUserLearning](
+                    setLocalStorageGlobal[lsUserLearning](
                       globalMoves.map((ogMove: Move) =>
                         matchCriteria(ogMove) ? updatedMove : ogMove,
                       ),
@@ -325,13 +325,29 @@ const RenderMoveLearn = () => {
   //sets the order of the movements
   useEffect(() => {
     if (move) {
-      setLocalMovements(
-        move?.movements?.length
-          ? move.movements
-          : makeDefaultMovementGroupArr(move.positions, move.transitions),
-      )
+      if (move?.movements?.length) {
+        //set local movements
+        setLocalMovements(move.movements)
+      } else {
+        const defaultMvmtGroupArr = makeDefaultMovementGroupArr(move.positions, move.transitions)
+        //set local movements
+        setLocalMovements(defaultMvmtGroupArr)
+        //----------update DB -----------------
+        //get the current move[]
+        const lsMoveArr = getLocalStorageGlobal.userLearning(accessToLocalStorage)
+        //index of move that we need to add movements[] to
+        const mvIndex = lsMoveArr.findIndex((a) => a.moveId === move.moveId)
+        //makes a move obj with new mvmts[]
+        const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, {
+          ...move,
+          movements: defaultMvmtGroupArr,
+        })
+        //sets the move[]
+        setLocalStorageGlobal.userLearning(updatedMvmtArr , accessToLocalStorage)
+        //----------------------------------
+      }
     }
-  }, [move])
+  }, [accessToLocalStorage, move])
 
 
   //get learning moves
@@ -376,7 +392,7 @@ const RenderMoveLearn = () => {
         setMove(updatedMove)
 
         //updates local storage, while replacing the current move with what's been changed locally
-        updateLocalStorageGlobal[lsUserLearning](
+        setLocalStorageGlobal[lsUserLearning](
           lsCurrent.toSpliced(selectedMove, 1, updatedMove),
           accessToLocalStorage,
         )
@@ -406,7 +422,7 @@ const RenderMoveLearn = () => {
         //local
         setMove(withDeletedMove)
         //db
-        updateLocalStorageGlobal[lsUserLearning](
+        setLocalStorageGlobal[lsUserLearning](
           //gets localstorage learning 
           getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
             //updates the specific move with our deleted one
@@ -448,7 +464,7 @@ const RenderMoveLearn = () => {
         setMove(insertedNewMove)
 
         //db
-        updateLocalStorageGlobal[lsUserLearning](
+        setLocalStorageGlobal[lsUserLearning](
           //gets localstorage learning and updates the specific move with our deleted one
           getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
             .toSpliced(currMovementGroupIndex, 1,),
@@ -493,9 +509,12 @@ const RenderMoveLearn = () => {
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
+
+              //gets position and transition referred to by movementGroup obj
               const {
-                //makes a default position if none found to handle edge cases
-                position = makeDefaultPosition({
+                //-----makes a defaults if none found to handle edge cases----
+                //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
+                position = i !== localMovements.length && makeDefaultPosition({
                   displayName: 'new-position',
                 }),
                 //doesn't make a transitionobj for the first pos, as nothing to transition from
@@ -503,9 +522,11 @@ const RenderMoveLearn = () => {
                 makeDefaultTransition({
                   displayName: 'new-transition',
                   from: localMovements[i - 1].positionId || makePositionId(),
-                  to: position.positionId,
+                  to: position ? position.positionId : makePositionId(),
+                  transitionId: makeTransitionId()
                 }),
               } = getPositionAndTransition(movement, move)
+              //---------------------------------------------------------------
               return (
                 <div
                   className="my-6 flex flex-col items-center"
