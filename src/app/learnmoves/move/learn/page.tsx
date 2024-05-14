@@ -336,19 +336,18 @@ const RenderMoveLearn = () => {
         const lsMoveArr = getLocalStorageGlobal.userLearning(accessToLocalStorage)
         //index of move that we need to add movements[] to
         const mvIndex = lsMoveArr.findIndex((a) => a.moveId === move.moveId)
-        //make move obj with new mvmts
+        //makes a move obj with new mvmts[]
         const newMoveObj = {
           ...move,
           movements: defaultMvmtGroupArr,
         }
-        //makes a move obj with new mvmts[]
+        // const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
         const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
         //---------sets---------
-        //update local
+        //update db first, after move is set, it will rerender
+        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
         //set local move, and localmovements will be updated on rerender
         setMove(newMoveObj)
-        //update
-        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
         //----------------------------------
       }
     }
@@ -419,22 +418,31 @@ const RenderMoveLearn = () => {
       if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
         //delete it in a new obj
         const deletedMvmt = [...move.movements?.toSpliced(currMovementGroupIndex, 1) || []]
+        console.log('deletedMvmt: ', deletedMvmt)
         //update larger structure with new obj
         const withDeletedMove = {
           ...move,
           movements: deletedMvmt,
         }
+        console.log('withDeletedMove: ', withDeletedMove)
         //-------------updates local+db------------
         //local
         setMove(withDeletedMove)
         //db
-        setLocalStorageGlobal[lsUserLearning](
-          //gets localstorage learning 
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-            //updates the specific move with our deleted one
-            .toSpliced(currMovementGroupIndex, 1, withDeletedMove),
-          accessToLocalStorage,
-        )
+
+        const lsLearningMovesArr = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+        const moveIndex = lsLearningMovesArr.findIndex((a) => a.moveId === move.moveId)
+        if (moveIndex !== undefined && moveIndex > -1) {
+          setLocalStorageGlobal[lsUserLearning](
+            //gets localstorage learning
+            lsLearningMovesArr
+              //updates the specific move with our deleted one
+              .toSpliced(moveIndex, 1, withDeletedMove),
+            accessToLocalStorage,)
+        } else {
+          console.log('ERROR: cannot find the current moveid compared to localstorage learning moveArr')
+        }
+
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
       }
