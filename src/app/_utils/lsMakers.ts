@@ -60,13 +60,13 @@ export const makeDefaultTransition = ({
   from,
   to,
   slowRating = 0,
-  transitionId = makeTransitionId(),
+  transitionId,
 }: {
   displayName: string
   from: PositionId
   to: PositionId
   slowRating?: number
-  transitionId?: TransitionId
+  transitionId: TransitionId
 }): Transition => {
   return {
     displayName,
@@ -112,6 +112,7 @@ export const makeTransitions = ({
       displayName: displayNames[index],
       from: position.positionId,
       to: getPositionId(posArray, index),
+      transitionId: makeTransitionId(),
     })
   })
 }

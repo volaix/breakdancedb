@@ -6,7 +6,7 @@ import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
@@ -208,7 +208,7 @@ const RenderPositions = () => {
                 }
                 return a
               })
-              updateLocalStorageGlobal[lsUserLearning](
+              setLocalStorageGlobal[lsUserLearning](
                 updatedMoves,
                 accessToLocalStorage,
               )

@@ -14,7 +14,7 @@ import { Move } from './localStorageTypes'
  * Delete all others.
  * @returns void
  */
-export const updateLocalStorageGlobal = {
+export const setLocalStorageGlobal = {
   //------------------updates "flows" key in localstorage------------
   [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
     //quit early if localstorage unaccessible

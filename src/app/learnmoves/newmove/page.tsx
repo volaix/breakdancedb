@@ -4,7 +4,7 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import {
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
   getLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
@@ -101,7 +101,7 @@ const RenderPage = () => {
       }
 
       //updates localstorage with newmove
-      updateLocalStorageGlobal[lsUserLearning](
+      setLocalStorageGlobal[lsUserLearning](
         [...existingMoves, newMove],
         accessToLocalStorage,
       )
