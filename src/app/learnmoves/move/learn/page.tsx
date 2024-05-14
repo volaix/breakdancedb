@@ -330,20 +330,25 @@ const RenderMoveLearn = () => {
         setLocalMovements(move.movements)
       } else {
         const defaultMvmtGroupArr = makeDefaultMovementGroupArr(move.positions, move.transitions)
-        //set local movements
-        setLocalMovements(defaultMvmtGroupArr)
         //----------update DB -----------------
+        //--------make defaults----------
         //get the current move[]
         const lsMoveArr = getLocalStorageGlobal.userLearning(accessToLocalStorage)
         //index of move that we need to add movements[] to
         const mvIndex = lsMoveArr.findIndex((a) => a.moveId === move.moveId)
-        //makes a move obj with new mvmts[]
-        const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, {
+        //make move obj with new mvmts
+        const newMoveObj = {
           ...move,
           movements: defaultMvmtGroupArr,
-        })
-        //sets the move[]
-        setLocalStorageGlobal.userLearning(updatedMvmtArr , accessToLocalStorage)
+        }
+        //makes a move obj with new mvmts[]
+        const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
+        //---------sets---------
+        //update local
+        //set local move, and localmovements will be updated on rerender
+        setMove(newMoveObj)
+        //update
+        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
         //----------------------------------
       }
     }
@@ -409,6 +414,7 @@ const RenderMoveLearn = () => {
       //find index to delete
       const currMovementGroupIndex = move.movements?.findIndex(
         (a) => a.movementId === (e.target as SVGSVGElement).id,)
+
       //if the index exists
       if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
         //delete it in a new obj
