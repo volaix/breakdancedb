@@ -13,7 +13,7 @@ import { makeTransitions } from '@/app/_utils/lsMakers'
 import { makePositions } from '@/app/_utils/lsMakers'
 import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
-import { v4 } from 'uuid'
+import { useRouter } from 'next/navigation'
 
 /**
  * Renders a text input with default position name
@@ -56,6 +56,7 @@ const RenderPage = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [existingMoves, setExistingMoves] = useState<Move[]>([])
   const [rangeVal, setRangeVal] = useState<string>('6')
+  const router = useRouter()
 
   //--------------------------hooks ----------------------
   //checks if local storage is avail
@@ -107,6 +108,7 @@ const RenderPage = () => {
       )
     }
     setSaveText('Saved')
+    router.back()
     return
   }
 
