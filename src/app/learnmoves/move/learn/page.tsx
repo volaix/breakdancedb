@@ -548,12 +548,13 @@ const RenderMoveLearn = () => {
                   <div className="flex">
                     {
                       //--------------MOVEMENT GROUP TITLE-------
-                      //if user is not editing, show the edit button
+                      //if user is not editing, show delete and add button
                       (isEditing !== null && isEditing[i]) || (
                         <>
                           <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
                             {movement.displayName}
                           </h1>
+                          {/* ----------MODIFICATION BUTTONS-----*/}
                           <div className="ml-2 flex items-center">
                             <div className="w-2">
                               <RenderEditButton
@@ -563,25 +564,27 @@ const RenderMoveLearn = () => {
                               />
                             </div>
                             <div className="ml-2 w-2">
-                              {/* MARK */}
                               <RenderAddButton
                                 id={movement.movementId}
                                 onClick={onClickAddMovement}
                               />
                             </div>
-                            <div className="ml-2 w-2">
-                              {/* MARK */}
-                              <RenderRedDeleteButton
-                                id={movement.movementId}
-                                onClick={onClickDeleteMovement}
-                              />
-                            </div>
+                            {//if there's more than one mvmt left, show delete button
+                              localMovements.length > 1 &&
+                              <div className="ml-2 w-2">
+                                <RenderRedDeleteButton
+                                  id={movement.movementId}
+                                  onClick={onClickDeleteMovement}
+                                />
+                              </div>
+                            }
                           </div>
                         </>
                       )
                     }
                     {
-                      //if user is editing, edit button can save
+                      // ---------------EDIT INPUT------------
+                      //if user is editing, edit button can save. dont show delete and add button.
                       isEditing !== null && isEditing[i] && (
                         <>
                           <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
@@ -603,7 +606,7 @@ const RenderMoveLearn = () => {
                   <div className="mb-4 mt-2 flex justify-center">
                     <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
                   </div>
-                  {/*---------------Hearts, Positions, Transitions----- */}
+                  {/*---------------TRANSITIONS w/ HEARTS & POSITIONS w/ HEARTS----- */}
                   <div className="flex flex-col items-center text-xs">
                     {transition && (
                       //If its a transition render Transition
