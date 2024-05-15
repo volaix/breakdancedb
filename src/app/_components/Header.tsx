@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
 
 /**
@@ -23,9 +24,12 @@ export default function RenderHeader() {
    lg:rounded-xl lg:border lg:bg-slate-200  lg:p-4
    dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
     >
-      <a className="font-mono font-bold" href="/">
+      <Link
+        className="font-mono font-bold"
+        href={{ pathname: '/' }}
+      >
         breakdanceDB
-      </a>
+      </Link>
 
       <div className="fixed left-2 top-3">
         <div className="fixed flex w-4/5 items-center justify-between">
