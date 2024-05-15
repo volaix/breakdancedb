@@ -17,7 +17,8 @@ export const RenderRedDeleteButton = ({
       onClick={onClick}
       height="100%"
       width="100%"
-      viewBox="0 0 496.158 496.158">
+      viewBox="0 0 496.158 496.158"
+    >
       <path
         pointerEvents={'none'}
         fill="#E04F5F"

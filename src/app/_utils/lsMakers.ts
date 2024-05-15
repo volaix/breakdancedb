@@ -34,7 +34,7 @@ export const makeMovementId = (): MovementId => {
 export const makeDefaultPosition = ({
   displayName,
   positionId = makePositionId(),
-  slowRating = 0
+  slowRating = 0,
 }: {
   displayName: string
   positionId?: PositionId

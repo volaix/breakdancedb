@@ -22,11 +22,11 @@ export const safeJsonParse = <T, F>(
   }
 }
 
-
 /**
  * Makes a random rock name
  */
-export const randomNameGen = (): string => `${rocks[Math.floor(Math.random() * rocks.length)]}`
+export const randomNameGen = (): string =>
+  `${rocks[Math.floor(Math.random() * rocks.length)]}`
 
 // -------------REACT CUSTOM HOOKS--------------------------
 /**

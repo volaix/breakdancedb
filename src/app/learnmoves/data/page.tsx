@@ -107,10 +107,7 @@ const RenderTable = () => {
             className="fixed top-16 text-xs"
             href={{ pathname: '/learnmoves/' }}
           >
-            <button
-            >
-              {`<- Back to moves`}
-            </button>
+            <button>{`<- Back to moves`}</button>
           </Link>
           <h1 className="title-font mb-2 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             {move?.displayName}
