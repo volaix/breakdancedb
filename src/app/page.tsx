@@ -13,7 +13,6 @@ import React from 'react'
 import RenderHero from './RenderHero'
 import RenderStep from './RenderSteps'
 
-
 export default function RenderHome() {
   return (
     <div>

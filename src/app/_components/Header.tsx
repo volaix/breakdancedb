@@ -24,10 +24,7 @@ export default function RenderHeader() {
    lg:rounded-xl lg:border lg:bg-slate-200  lg:p-4
    dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
     >
-      <Link
-        className="font-mono font-bold"
-        href={{ pathname: '/' }}
-      >
+      <Link className="font-mono font-bold" href={{ pathname: '/' }}>
         breakdanceDB
       </Link>
 

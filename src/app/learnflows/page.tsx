@@ -44,7 +44,6 @@ const RenderMove = ({ move }: { move: string }) => {
   )
 }
 
-
 //----------------------------mainrender--------------------------
 /*
  * Renders 3 moves with 3 buttons at the bottom.
