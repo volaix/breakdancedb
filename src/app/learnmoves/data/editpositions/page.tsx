@@ -4,70 +4,21 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { makePositionId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
-import { PositionId } from '@/app/_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'
-import { RenderEditButton } from '../../_components/RenderEditButton'
+import {
+  RenderEditButton,
+  RenderAddButton,
+  RenderRedDeleteButton,
+} from '../../_components/Svgs'
 
 //------------------------------components-----------------------
-
-/**
- *
- * Render a delete button
- * @returns jsx
- */
-const RenderRedDeleteButton = ({
-  onClick,
-}: {
-  onClick: React.MouseEventHandler<HTMLDivElement>
-}) => {
-  return (
-    <div onClick={onClick}>
-      <svg height="20px" width="20px" viewBox="0 0 496.158 496.158">
-        <path
-          fill="#E04F5F"
-          d="M0,248.085C0,111.063,111.069,0.003,248.075,0.003c137.013,0,248.083,111.061,248.083,248.082
-	c0,137.002-111.07,248.07-248.083,248.07C111.069,496.155,0,385.087,0,248.085z"
-        />
-        <path
-          fill="#FFFFFF"
-          d="M383.546,206.286H112.612c-3.976,0-7.199,3.225-7.199,7.2v69.187c0,3.976,3.224,7.199,7.199,7.199
-	h270.934c3.976,0,7.199-3.224,7.199-7.199v-69.187C390.745,209.511,387.521,206.286,383.546,206.286z"
-        />
-      </svg>
-    </div>
-  )
-}
-/**
- * renders an add button. used for each position render.
- * @param param onclick
- * @returns
- */
-const RenderAddButton = ({
-  onClick,
-}: {
-  onClick: React.MouseEventHandler<HTMLDivElement>
-}) => (
-  <div onClick={onClick}>
-    <span className="mr-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
-      <svg
-        className="stroke-indigo-400"
-        height="20px"
-        width="20px"
-        viewBox="0 0 122.88 122.88"
-      >
-        <title>add</title>
-        <path d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z" />
-      </svg>
-    </span>
-  </div>
-)
 
 /**
  * Renders all the positions including add, edit, and delete buttons.
@@ -224,9 +175,9 @@ const RenderPositions = () => {
                                 onClick={onClickAdd(index + 1)}
                               />
                               <RenderEditButton onClick={onClickEdit(index)} />
-                              <RenderRedDeleteButton
-                                onClick={onClickDelete(index)}
-                              />
+                              <div onClick={onClickDelete(index)}>
+                                <RenderRedDeleteButton />
+                              </div>
                             </div>
                           )
                         }
@@ -258,13 +209,13 @@ const RenderPositions = () => {
                 }
                 return a
               })
-              updateLocalStorageGlobal[lsUserLearning](
+              setLocalStorageGlobal[lsUserLearning](
                 updatedMoves,
                 accessToLocalStorage,
               )
             }}
             href={{
-              pathname: '/learnmoves/move',
+              pathname: '/learnmoves/data',
               query: { moveId: move.moveId },
             }}
           >

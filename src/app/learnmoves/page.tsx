@@ -13,7 +13,7 @@ import Link from 'next/link'
 const RenderMoveBox = ({ move }: { move: Move }) => {
   return (
     <Link
-      href={{ pathname: '/learnmoves/move', query: { moveId: move.moveId } }}
+      href={{ pathname: '/learnmoves/data', query: { moveId: move.moveId } }}
     >
       <div className="p-2 ">
         <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">

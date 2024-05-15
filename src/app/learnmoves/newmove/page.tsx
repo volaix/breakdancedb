@@ -4,7 +4,7 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import {
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
   getLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
@@ -13,7 +13,7 @@ import { makeTransitions } from '@/app/_utils/lsMakers'
 import { makePositions } from '@/app/_utils/lsMakers'
 import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
-import { v4 } from 'uuid'
+import { useRouter } from 'next/navigation'
 
 /**
  * Renders a text input with default position name
@@ -56,6 +56,7 @@ const RenderPage = () => {
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [existingMoves, setExistingMoves] = useState<Move[]>([])
   const [rangeVal, setRangeVal] = useState<string>('6')
+  const router = useRouter()
 
   //--------------------------hooks ----------------------
   //checks if local storage is avail
@@ -101,12 +102,13 @@ const RenderPage = () => {
       }
 
       //updates localstorage with newmove
-      updateLocalStorageGlobal[lsUserLearning](
+      setLocalStorageGlobal[lsUserLearning](
         [...existingMoves, newMove],
         accessToLocalStorage,
       )
     }
     setSaveText('Saved')
+    router.back()
     return
   }
 

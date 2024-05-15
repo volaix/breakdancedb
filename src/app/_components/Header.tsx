@@ -62,7 +62,7 @@ export default function RenderHeader() {
                 </div>
                 <ul className="flex	min-h-[250px] flex-col items-center justify-between text-black">
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">Learn New Footworks</a>
+                    <a href="/learnmoves">Learn Moves</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">

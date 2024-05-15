@@ -1,24 +1,35 @@
 'use client'
-import { useState, useEffect, SetStateAction, Dispatch, Suspense } from 'react'
-import { useLocalStorage } from '@/app/_utils/lib'
 import {
-  MovementGroup,
-  MovementId,
-  lsUserLearning,
-} from '@/app/_utils/localStorageTypes'
+  useState,
+  useEffect,
+  SetStateAction,
+  Dispatch,
+  Suspense,
+  MouseEventHandler,
+} from 'react'
+import { useLocalStorage } from '@/app/_utils/lib'
+import { MovementGroup, lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
-import { RenderEditButton } from '@/app/learnmoves/_components/RenderEditButton'
+import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
+import {
+  makeDefaultMovementGroupArr,
+  makeDefaultPosition,
+  makeDefaultTransition,
+  makeMovementId,
+  makePositionId,
+  makeTransitionId,
+} from '@/app/_utils/lsMakers'
+import { RenderAddButton } from '../../_components/Svgs'
 
 // ------------------------Local Types ---------------------------------
 //input types for react-hook-form
@@ -39,8 +50,9 @@ const getUpdatedMove = (
   currentlyEditing: MovementType,
   movementGroup: MovementGroup,
   slowRating: number,
+  movements: MovementGroup[],
 ): Move => {
-  //determines what key to use when accessing Move
+  //  determines what key to use when accessing Move
   let key: MovementKeys
   switch (currentlyEditing) {
     case 'static':
@@ -51,7 +63,7 @@ const getUpdatedMove = (
       break
   }
 
-  //TODO Refactor this, below logic seems duplicated
+  //TODO refactor this almost duplicated code. RN lacking typescript ability to have the key
   if (key === 'positions') {
     const index = move[key]?.findIndex((a) => {
       return a.positionId === movementGroup.positionId
@@ -66,6 +78,19 @@ const getUpdatedMove = (
       }
     } else {
       console.log('ERROR: Could not find positionId in movementGroup')
+      //return move with a default position anyway
+      return {
+        ...move,
+        positions: move.positions?.toSpliced(
+          move.positions.length,
+          0,
+          makeDefaultPosition({
+            slowRating,
+            displayName: 'newPos',
+            positionId: movementGroup.positionId,
+          }),
+        ),
+      }
     }
   } else if (key === 'transitions') {
     const index = move[key]?.findIndex((a) => {
@@ -80,7 +105,25 @@ const getUpdatedMove = (
         }),
       }
     } else {
-      console.log('ERROR: Could not find positionId in movementGroup')
+      console.log('ERROR: Could not find transitionId in movementGroup')
+      //return move with a default position anyway
+      const mvmtIndex = movements.findIndex(
+        (a) => a.positionId === movementGroup.positionId,
+      )
+      return {
+        ...move,
+        transitions: move.transitions?.toSpliced(
+          move.transitions.length,
+          0,
+          makeDefaultTransition({
+            slowRating,
+            displayName: 'newTrans',
+            transitionId: movementGroup.transitionId || makeTransitionId(),
+            to: movementGroup.positionId || makePositionId(),
+            from: movements[mvmtIndex - 1].positionId || makePositionId(),
+          }),
+        ),
+      }
     }
   }
   return move
@@ -130,8 +173,10 @@ const RenderHearts = ({
   currentlyEditing,
   movementGroup,
   setMove,
+  movements,
 }: {
   movementGroup: MovementGroup
+  movements: MovementGroup[]
   rating: number
   move: Move
   accessToLocalStorage: boolean
@@ -169,12 +214,14 @@ const RenderHearts = ({
                     currentlyEditing,
                     movementGroup,
                     Number(e.target.id),
+                    movements,
                   )
 
                   console.log('updatedMove: ', updatedMove)
                   //-----------------------updates display----------------------------
 
                   //updates view, otherwise user has to refresh to get updates from localstorageDB data
+                  // setLocalMovements(updatedMove)
                   setMove(updatedMove)
 
                   //------------------------updates db--------------------------------
@@ -189,7 +236,7 @@ const RenderHearts = ({
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
                     //updates localstorage on click
-                    updateLocalStorageGlobal[lsUserLearning](
+                    setLocalStorageGlobal[lsUserLearning](
                       globalMoves.map((ogMove: Move) =>
                         matchCriteria(ogMove) ? updatedMove : ogMove,
                       ),
@@ -280,18 +327,42 @@ const RenderMoveLearn = () => {
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => { }, [setIsEditing])
+  useEffect(() => {}, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
     if (move) {
-      setLocalMovements(
-        move?.movements?.length
-          ? move.movements
-          : makeDefaultMovementGroupArr(move.positions, move.transitions),
-      )
+      if (move?.movements?.length) {
+        //set local movements
+        setLocalMovements(move.movements)
+      } else {
+        const defaultMvmtGroupArr = makeDefaultMovementGroupArr(
+          move.positions,
+          move.transitions,
+        )
+        //----------update DB -----------------
+        //--------make defaults----------
+        //get the current move[]
+        const lsMoveArr =
+          getLocalStorageGlobal.userLearning(accessToLocalStorage)
+        //index of move that we need to add movements[] to
+        const mvIndex = lsMoveArr.findIndex((a) => a.moveId === move.moveId)
+        //makes a move obj with new mvmts[]
+        const newMoveObj = {
+          ...move,
+          movements: defaultMvmtGroupArr,
+        }
+        // const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
+        const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
+        //---------sets---------
+        //update db first, after move is set, it will rerender
+        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
+        //set local move, and localmovements will be updated on rerender
+        setMove(newMoveObj)
+        //----------------------------------
+      }
     }
-  }, [move])
+  }, [accessToLocalStorage, move])
 
   //get learning moves
   useEffect(() => {
@@ -335,7 +406,7 @@ const RenderMoveLearn = () => {
         setMove(updatedMove)
 
         //updates local storage, while replacing the current move with what's been changed locally
-        updateLocalStorageGlobal[lsUserLearning](
+        setLocalStorageGlobal[lsUserLearning](
           lsCurrent.toSpliced(selectedMove, 1, updatedMove),
           accessToLocalStorage,
         )
@@ -343,6 +414,100 @@ const RenderMoveLearn = () => {
         console.log('could not match moveId with localstorage')
       }
       setIsEditing({ [i]: false })
+    }
+  }
+
+  const onClickDeleteMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    if (move) {
+      //---------deletes in a pseudo object-----------
+      //find index to delete
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      //if the index exists
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        //delete it in a new obj
+        const deletedMvmt = [
+          ...(move.movements?.toSpliced(currMovementGroupIndex, 1) || []),
+        ]
+        console.log('deletedMvmt: ', deletedMvmt)
+        //update larger structure with new obj
+        const withDeletedMove = {
+          ...move,
+          movements: deletedMvmt,
+        }
+        console.log('withDeletedMove: ', withDeletedMove)
+        //-------------updates local+db------------
+        //local
+        setMove(withDeletedMove)
+        //db
+
+        const lsLearningMovesArr =
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+        const moveIndex = lsLearningMovesArr.findIndex(
+          (a) => a.moveId === move.moveId,
+        )
+        if (moveIndex !== undefined && moveIndex > -1) {
+          setLocalStorageGlobal[lsUserLearning](
+            //gets localstorage learning
+            lsLearningMovesArr
+              //updates the specific move with our deleted one
+              .toSpliced(moveIndex, 1, withDeletedMove),
+            accessToLocalStorage,
+          )
+        } else {
+          console.log(
+            'ERROR: cannot find the current moveid compared to localstorage learning moveArr',
+          )
+        }
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
+    }
+  }
+
+  /**
+   * onclick handler for user trying to add a new movement. makes a movement below the current.
+   * returns void
+   */
+  const onClickAddMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    console.log('trying to add a new movement')
+    if (move) {
+      //---------makes new move-----------
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        const insertedNewMove = {
+          ...move,
+          movements: move.movements?.toSpliced(currMovementGroupIndex + 1, 0, {
+            displayName: 'new-movement-b',
+            movementId: makeMovementId(),
+            positionId: makePositionId(),
+            transitionId: makeTransitionId(),
+          }),
+        }
+        //-------------updates local+db------------
+        setMove(insertedNewMove)
+
+        //db
+        setLocalStorageGlobal[lsUserLearning](
+          //gets localstorage learning and updates the specific move with our deleted one
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
+            currMovementGroupIndex,
+            1,
+          ),
+          accessToLocalStorage,
+        )
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
     }
   }
 
@@ -377,10 +542,24 @@ const RenderMoveLearn = () => {
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
-              const { position, transition } = getPositionAndTransition(
-                movement,
-                move,
-              )
+              //gets position and transition referred to by movementGroup obj
+              const {
+                //-----makes a defaults if none found to handle edge cases----
+                //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
+                position = i !== localMovements.length - 1 &&
+                  makeDefaultPosition({
+                    displayName: 'new-position',
+                  }),
+                //doesn't make a transitionobj for the first pos, as nothing to transition from
+                transition = i !== 0 &&
+                  makeDefaultTransition({
+                    displayName: 'new-transition',
+                    from: localMovements[i - 1].positionId || makePositionId(),
+                    to: position ? position.positionId : makePositionId(),
+                    transitionId: makeTransitionId(),
+                  }),
+              } = getPositionAndTransition(movement, move)
+              //---------------------------------------------------------------
               return (
                 <div
                   className="my-6 flex flex-col items-center"
@@ -388,26 +567,46 @@ const RenderMoveLearn = () => {
                 >
                   <div className="flex">
                     {
-                      //if user is not editing, show the edit button
+                      //--------------MOVEMENT GROUP TITLE-------
+                      //if user is not editing, show delete and add button
                       (isEditing !== null && isEditing[i]) || (
                         <>
                           <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
                             {movement.displayName}
                           </h1>
-                          <div className="ml-1 w-2">
-                            <RenderEditButton
-                              onClick={() => {
-                                //change displayname to input
-                                console.log('open input')
-                                setIsEditing({ [i]: true })
-                              }}
-                            />
+                          {/* ----------MODIFICATION BUTTONS-----*/}
+                          <div className="ml-2 flex items-center">
+                            <div className="w-2">
+                              <RenderEditButton
+                                onClick={() => {
+                                  setIsEditing({ [i]: true })
+                                }}
+                              />
+                            </div>
+                            <div className="ml-2 w-2">
+                              <RenderAddButton
+                                id={movement.movementId}
+                                onClick={onClickAddMovement}
+                              />
+                            </div>
+                            {
+                              //if there's more than one mvmt left, show delete button
+                              localMovements.length > 1 && (
+                                <div className="ml-2 w-2">
+                                  <RenderRedDeleteButton
+                                    id={movement.movementId}
+                                    onClick={onClickDeleteMovement}
+                                  />
+                                </div>
+                              )
+                            }
                           </div>
                         </>
                       )
                     }
                     {
-                      //if user is editing, edit button can save
+                      // ---------------EDIT INPUT------------
+                      //if user is editing, edit button can save. dont show delete and add button.
                       isEditing !== null && isEditing[i] && (
                         <>
                           <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
@@ -418,16 +617,7 @@ const RenderMoveLearn = () => {
                             />
                             <button type="submit">
                               <div className="ml-1 w-2">
-                                {
-                                  <RenderEditButton
-                                    onClick={() => {
-                                      console.log('was clicked is ok')
-                                      // setIsEditing({ [i]: true })
-                                      //change displayname to input
-                                      // setValue("example", "luo")
-                                    }}
-                                  />
-                                }
+                                <RenderEditButton />
                               </div>
                             </button>
                           </form>
@@ -438,12 +628,14 @@ const RenderMoveLearn = () => {
                   <div className="mb-4 mt-2 flex justify-center">
                     <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
                   </div>
+                  {/*---------------TRANSITIONS w/ HEARTS & POSITIONS w/ HEARTS----- */}
                   <div className="flex flex-col items-center text-xs">
                     {transition && (
                       //If its a transition render Transition
                       <div className="flex flex-col py-3">
                         <span>
                           <RenderHearts
+                            movements={localMovements}
                             setMove={setMove}
                             accessToLocalStorage={accessToLocalStorage}
                             rating={transition?.slowRating}
@@ -462,6 +654,7 @@ const RenderMoveLearn = () => {
                       <div className="flex flex-col py-3">
                         <span>
                           <RenderHearts
+                            movements={localMovements}
                             setMove={setMove}
                             accessToLocalStorage={accessToLocalStorage}
                             rating={position?.slowRating}

@@ -7,7 +7,7 @@ import { lsFlows, lsUserMoves } from './_utils/localStorageTypes'
 import { Flow } from './_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from './_utils/accessLocalStorage'
 import Image from 'next/image'
 
@@ -87,7 +87,7 @@ export default function Home() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      updateLocalStorageGlobal[lsFlows](
+      setLocalStorageGlobal[lsFlows](
         [...getLocalStorageGlobal[lsFlows](accessToLocalStorage), learning],
         accessToLocalStorage,
       )

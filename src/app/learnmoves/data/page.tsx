@@ -103,6 +103,12 @@ const RenderTable = () => {
     <section className="body-font text-gray-600">
       <div className="container mx-auto max-w-se px-5 py-24">
         <div className="mb-8 flex w-full flex-col text-center">
+          <Link
+            className="fixed top-16 text-xs"
+            href={{ pathname: '/learnmoves/' }}
+          >
+            <button>{`<- Back to moves`}</button>
+          </Link>
           <h1 className="title-font mb-2 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             {move?.displayName}
           </h1>
@@ -120,7 +126,7 @@ const RenderTable = () => {
             <Link
               className="py-2"
               href={{
-                pathname: '/learnmoves/move/learn',
+                pathname: '/learnmoves/data/learn',
                 query: { moveId: move.moveId, speed: 'slow' },
               }}
             >
@@ -132,7 +138,7 @@ const RenderTable = () => {
           {move && (
             <Link
               href={{
-                pathname: '/learnmoves/move/editpositions',
+                pathname: '/learnmoves/data/editpositions',
                 query: { moveId: move.moveId },
               }}
             >

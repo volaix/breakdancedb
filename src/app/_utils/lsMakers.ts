@@ -33,14 +33,18 @@ export const makeMovementId = (): MovementId => {
 
 export const makeDefaultPosition = ({
   displayName,
+  positionId = makePositionId(),
+  slowRating = 0,
 }: {
   displayName: string
+  positionId?: PositionId
+  slowRating?: number
 }): Position => {
   return {
     displayName,
-    positionId: makePositionId(),
+    positionId,
+    slowRating,
     imgUrl: null,
-    slowRating: 0,
     normal: false,
     fast: false,
   }
@@ -55,17 +59,21 @@ export const makeDefaultTransition = ({
   displayName,
   from,
   to,
+  slowRating = 0,
+  transitionId,
 }: {
   displayName: string
   from: PositionId
   to: PositionId
+  slowRating?: number
+  transitionId: TransitionId
 }): Transition => {
   return {
     displayName,
-    transitionId: makeTransitionId(),
+    transitionId,
     from,
     to,
-    slowRating: 0,
+    slowRating,
     normal: false,
     fast: false,
     possible: true,
@@ -104,6 +112,7 @@ export const makeTransitions = ({
       displayName: displayNames[index],
       from: position.positionId,
       to: getPositionId(posArray, index),
+      transitionId: makeTransitionId(),
     })
   })
 }
@@ -129,7 +138,7 @@ export const makeDefaultTransitionNames = (
   )
 
 /**
- * Reorders positions and transitions into the correct display order for learnmoves/move/learn page
+ * Reorders positions and transitions into the correct display order for learnmoves/data/learn page
  * @param positions Position[]
  * @param transitions Transition[]
  * @returns [] of Position, Transition

@@ -4,7 +4,7 @@ import RenderHeader from '@/app/_components/Header'
 import { lsUserMoves } from '../_utils/localStorageTypes'
 import {
   getLocalStorageGlobal,
-  updateLocalStorageGlobal,
+  setLocalStorageGlobal,
 } from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
 
@@ -44,7 +44,7 @@ const YourMoves = () => {
 
   //---------------------------handlers-----------------------------
   const onClickSave = () => {
-    updateLocalStorageGlobal[lsUserMoves](
+    setLocalStorageGlobal[lsUserMoves](
       convertMoveString(userMoves) as string[],
       accessToLocalStorage,
     )
