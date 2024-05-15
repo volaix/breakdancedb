@@ -6,7 +6,6 @@ export default function RenderHero() {
     <section className="body-font text-gray-600">
       <div className="container mx-auto flex flex-col items-center px-5 pt-24 md:flex-row">
         <div className="mb-16 flex flex-col items-center text-center md:mb-0 md:w-1/2 md:items-start md:pr-16 md:text-left lg:flex-grow lg:pr-24">
-          {/* TODO make title component. fixes light dark additions all the time*/}
           <h1 className="title-font mb-4 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             BreakdanceDB
           </h1>
