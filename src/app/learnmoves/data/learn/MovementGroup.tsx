@@ -28,7 +28,17 @@ import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { RenderAddButton } from '../../_components/Svgs'
 import { RenderHearts } from './RenderHearts'
+import { useDataLearnStore } from './page'
+import { MovementType, MovementKeys } from './pagetypes'
+import { Dispatch, SetStateAction } from 'react'
 
+//-------------local types------------------
+//input types for react-hook-form
+type Inputs = {
+  [key: `${number}`]: string //displayName
+}
+
+//------------local utils --------------------
 /**
  *
  * Gets text for tooltip
@@ -43,6 +53,24 @@ const getText = (type: MovementType): string => {
   }
 }
 
+const getPositionAndTransition = (
+  movementGroup: MovementGroup,
+  move: Move,
+): {
+  position?: Position
+  transition?: Transition
+} => {
+  return {
+    position: move.positions?.find(
+      (a) => a.positionId === movementGroup.positionId,
+    ),
+    transition: move.transitions?.find(
+      (a) => a.transitionId === movementGroup.transitionId,
+    ),
+  }
+}
+
+//----------------------------------------
 /** Renders Tooltips depending on what is being hovered */
 const RenderTooltip = ({ type }: { type: MovementType }) => {
   return <></>
@@ -69,22 +97,191 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
  * @returns jsx
  */
 export default function RenderMovementGroup(
-  { position,
-    transition,
-    isEditing,
-    setIsEditing,
-    onClickAddMovement,
+  {
     indexNumber,
     movement,
-    onClickDeleteMovement,
     localMovements,
-    handleSubmit,
-    onSubmitNewMoveName,
-    register,
     setMove,
-    accessToLocalStorage,
     move,
+  }: {
+    indexNumber: number
+    localMovements: MovementGroup[]
+    movement: MovementGroup
+    setMove: Dispatch<SetStateAction<Move | null>>
+    move: Move
   }) {
+  //------------------state----------------
+
+  //zustand
+  const setIsEditing = useDataLearnStore((state) => state.setIsEditing)
+  const isEditing = useDataLearnStore((state) => state.isEditing)
+
+  //react
+  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const { register, handleSubmit } = useForm<Inputs>()
+
+  //gets position and transition referred to by movementGroup obj
+  const {
+    //-----makes a defaults if none found to handle edge cases----
+    //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
+    position = indexNumber !== localMovements.length - 1 &&
+    makeDefaultPosition({
+      displayName: 'new-position',
+    }),
+    //doesn't make a transitionobj for the first pos, as nothing to transition from
+    transition = indexNumber !== 0 &&
+    makeDefaultTransition({
+      displayName: 'new-transition',
+      from: localMovements[indexNumber - 1].positionId || makePositionId(),
+      to: position ? position.positionId : makePositionId(),
+      transitionId: makeTransitionId(),
+    }),
+  } = getPositionAndTransition(movement, move)
+  //----------------use effect-----------
+  //makes sure has access to local storage
+  useLocalStorage(setAccessToLocalStorage)
+
+  //---------------handlers------------
+
+  const onClickDeleteMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    if (move) {
+      //---------deletes in a pseudo object-----------
+      //find index to delete
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      //if the index exists
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        //delete it in a new obj
+        const deletedMvmt = [
+          ...(move.movements?.toSpliced(currMovementGroupIndex, 1) || []),
+        ]
+        console.log('deletedMvmt: ', deletedMvmt)
+        //update larger structure with new obj
+        const withDeletedMove = {
+          ...move,
+          movements: deletedMvmt,
+        }
+        console.log('withDeletedMove: ', withDeletedMove)
+        //-------------updates local+db------------
+        //local
+        setMove(withDeletedMove)
+        //db
+
+        const lsLearningMovesArr =
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+        const moveIndex = lsLearningMovesArr.findIndex(
+          (a) => a.moveId === move.moveId,
+        )
+        if (moveIndex !== undefined && moveIndex > -1) {
+          setLocalStorageGlobal[lsUserLearning](
+            //gets localstorage learning
+            lsLearningMovesArr
+              //updates the specific move with our deleted one
+              .toSpliced(moveIndex, 1, withDeletedMove),
+            accessToLocalStorage,
+          )
+        } else {
+          console.log(
+            'ERROR: cannot find the current moveid compared to localstorage learning moveArr',
+          )
+        }
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
+    }
+  }
+
+  /**
+   * onclick handler for user trying to add a new movement. makes a movement below the current.
+   * returns void
+   */
+  const onClickAddMovement: MouseEventHandler<SVGSVGElement> = (e) => {
+    console.log('trying to add a new movement')
+    if (move) {
+      //---------makes new move-----------
+      const currMovementGroupIndex = move.movements?.findIndex(
+        (a) => a.movementId === (e.target as SVGSVGElement).id,
+      )
+
+      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
+        const insertedNewMove = {
+          ...move,
+          movements: move.movements?.toSpliced(currMovementGroupIndex + 1, 0, {
+            displayName: 'new-movement-b',
+            movementId: makeMovementId(),
+            positionId: makePositionId(),
+            transitionId: makeTransitionId(),
+          }),
+        }
+        //-------------updates local+db------------
+        setMove(insertedNewMove)
+
+        //db
+        setLocalStorageGlobal[lsUserLearning](
+          //gets localstorage learning and updates the specific move with our deleted one
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
+            currMovementGroupIndex,
+            1,
+          ),
+          accessToLocalStorage,
+        )
+      } else {
+        console.log('ERROR: cannot find movementId inside movement array')
+      }
+    } else {
+      console.log('ERROR: local move could not be loaded')
+    }
+  }
+
+  /**
+   * To run when submitting the edit button.
+   * After editing movement names, submitting changes to localstorage
+   * @param i is index
+   */
+  //
+  const onSubmitNewMoveName = (i: number): SubmitHandler<Inputs> => {
+    return (data) => {
+      console.log('running onsubmit with', data)
+
+      //var for movements with display names
+      const newMovements: MovementGroup[] = localMovements.map((a, i) => {
+        return {
+          ...a,
+          displayName: data[`${i}`] || localMovements[i].displayName,
+        }
+      })
+      //gets current localstorage
+      const lsCurrent =
+        getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+      //finds the current move inside the db
+      const selectedMove = lsCurrent.findIndex((obj) => obj.moveId === move.moveId)
+
+      if (selectedMove > -1) {
+        const updatedMove: Move = {
+          ...lsCurrent[selectedMove],
+          movements: newMovements,
+        }
+
+        //update locally to view, if skip it wont rerender
+        setMove(updatedMove)
+
+        //updates local storage, while replacing the current move with what's been changed locally
+        setLocalStorageGlobal[lsUserLearning](
+          lsCurrent.toSpliced(selectedMove, 1, updatedMove),
+          accessToLocalStorage,
+        )
+      } else {
+        console.log('could not match moveId with localstorage')
+      }
+      setIsEditing({ [i]: false })
+    }
+  }
+
+  //--------------render-------------
 
   return (
     <div

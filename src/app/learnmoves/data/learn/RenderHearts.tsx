@@ -9,7 +9,8 @@ import {
   setLocalStorageGlobal
 } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
-import { MovementType, MovementKeys, getUpdatedMove } from './page'
+import { getUpdatedMove } from './page'
+import { MovementType, MovementKeys } from './pagetypes'
 
 //-----------------------Renders ------------------------------
 /**
