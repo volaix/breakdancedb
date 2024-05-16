@@ -35,6 +35,7 @@ export interface Move {
   positions?: Position[] //13MAY24: decided to keep this as arr instead obj as in future displaying positions in order with the imgs might be relevant
   transitions?: Transitions
   moveExecution?: MoveExecution
+  hasReverse?: boolean
 }
 
 /**
@@ -64,6 +65,7 @@ export type Position = {
   displayName: string
   imgUrl: string | null
   slowRating: number
+  oppositeSideSlowRating?: number
   normal: boolean
   fast: boolean
 }
