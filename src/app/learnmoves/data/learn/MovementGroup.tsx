@@ -1,36 +1,22 @@
-import {
-  useState,
-  useEffect,
-  Suspense,
-  MouseEventHandler,
-} from 'react'
-import { useLocalStorage } from '@/app/_utils/lib'
-import { MovementGroup, lsUserLearning } from '@/app/_utils/localStorageTypes'
-import { Position, Transition } from '@/app/_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
-import { Move } from '@/app/_utils/localStorageTypes'
-import { useSearchParams } from 'next/navigation'
-import LoadingFallback from '@/app/_components/LoadingFallback'
-import { useRouter } from 'next/navigation'
-import { useForm, SubmitHandler, Form } from 'react-hook-form'
-import {
-  makeDefaultMovementGroupArr,
-  makeDefaultPosition,
-  makeDefaultTransition,
-  makeMovementId,
-  makePositionId,
-  makeTransitionId,
-} from '@/app/_utils/lsMakers'
-import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
-import { RenderAddButton } from '../../_components/Svgs'
-import { RenderHearts } from './RenderHearts'
-import { useDataLearnStore } from './page'
-import { MovementType, MovementKeys } from './pagetypes'
+import LoadingFallback from '@/app/_components/LoadingFallback'
+import { getLocalStorageGlobal, setLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import { useLocalStorage } from '@/app/_utils/lib'
+import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
+import { Position, Transition } from '@/app/_utils/localStorageTypes'
+import { Move } from '@/app/_utils/localStorageTypes'
+import { makeDefaultMovementGroupArr, makeDefaultPosition, makeDefaultTransition, makeMovementId, makePositionId, makeTransitionId } from '@/app/_utils/lsMakers'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { MouseEventHandler, Suspense, useEffect, useState } from 'react'
 import { Dispatch, SetStateAction } from 'react'
+import { Form, SubmitHandler, useForm } from 'react-hook-form'
+
+import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
+import { RenderAddButton } from '../../_components/Svgs'
+import { useDataLearnStore } from './page'
+import { MovementKeys, MovementType } from './pagetypes'
+import { RenderHearts } from './RenderHearts'
 
 //-------------local types------------------
 //input types for react-hook-form
@@ -103,12 +89,14 @@ export default function RenderMovementGroup(
     localMovements,
     setMove,
     move,
+    isOppositeSide,
   }: {
     indexNumber: number
     localMovements: MovementGroup[]
     movement: MovementGroup
     setMove: Dispatch<SetStateAction<Move | null>>
     move: Move
+    isOppositeSide?: boolean
   }) {
   //------------------state----------------
 
@@ -284,18 +272,19 @@ export default function RenderMovementGroup(
   //--------------render-------------
 
   return (
-    <div
-      className="my-6 flex flex-col items-center"
-    >
+    <div className="my-6 flex flex-col items-center" >
       <div className="flex">
         {
           //--------------MOVEMENT GROUP TITLE-------
           //if user is not editing, show delete and add button
           (isEditing !== null && isEditing[indexNumber]) || (
             <>
-              <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
-                {movement.displayName}
-              </h1>
+              <div className='flex flex-col'>
+                {isOppositeSide && <div className='text-xs'>Opposite Side</div>}
+                <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
+                  {movement.displayName}
+                </h1>
+              </div>
               {/* ----------MODIFICATION BUTTONS-----*/}
               <div className="ml-2 flex items-center">
                 <div className="w-2">

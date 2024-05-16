@@ -4,6 +4,7 @@ import {
   useEffect,
   Suspense,
   MouseEventHandler,
+  FormEventHandler,
 } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { MovementGroup, lsUserLearning } from '@/app/_utils/localStorageTypes'
@@ -132,6 +133,24 @@ export const getUpdatedMove = (
   return move
 }
 
+type RadioTypes = {
+  transitionType: 'oppositeSide' | 'sameSide' | 'cannotRepeat'
+}
+
+//FEATURE Move localstorage management to just using zustand
+// import { persist } from 'zustand/middleware'
+
+// const useFishStore = create(
+//   persist(
+//     (set, get) => ({
+//       fishes: 0,
+//       addAFish: () => set({ fishes: get().fishes + 1 }),
+//     }),
+//     {
+//       name: 'food-storage', 
+//     },
+//   ),
+// )
 
 /**
  * Renders the heading text, and all the moves
@@ -152,6 +171,9 @@ const RenderMoveLearn = () => {
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
   const router = useRouter()
+  const inDevelopment = true
+
+  const { register, handleSubmit } = useForm<RadioTypes>()
 
   // -------------------------------------USE EFFECT---------------------------
 
@@ -204,6 +226,17 @@ const RenderMoveLearn = () => {
   }, [accessToLocalStorage, moveId])
 
   //-------------------------------handlers------------------------------
+  const onReverseDirection: SubmitHandler<RadioTypes> = (e) => {
+    console.log('e: ', e)
+    if (e.transitionType === 'oppositeSide') {
+      setHasOppositeSide(true)
+    } else {
+      setHasOppositeSide(false)
+    }
+    //It's too tiring to update like this all the time. Lets use zustand.
+    // setLocalStorageGlobal.userMoves()
+    // addAFish()
+  }
 
 
   //------------------------------RENDER--------------------------------
@@ -234,7 +267,7 @@ const RenderMoveLearn = () => {
           <div className="mx-auto text-base text-xs leading-relaxed lg:w-2/3"></div>
         </div>
         <div>
-          {/* RenderMovementsGroup */}
+          {/* Render Main MovementsGroup */}
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
@@ -249,14 +282,45 @@ const RenderMoveLearn = () => {
               />
             })}
         </div>
-        <form className="py-10">
+        <div>
+          {hasOppositeSide && move &&
+            localMovements &&
+            localMovements.map((movement, i) => {
+              //---------------------------------------------------------------
+              return <RenderMovementGroup
+                key={movement.displayName}
+                movement={movement}
+                indexNumber={i}
+                localMovements={localMovements}
+                setMove={setMove}
+                move={move}
+                isOppositeSide={hasOppositeSide}
+              />
+            })}
+        </div>
+        <div className="dark: text-white">
+          Repeat Options
+        </div>
+        <form
+          className="py-10"
+          onSubmit={handleSubmit(onReverseDirection)}>
           <span>
-            <input type="checkbox" />
+            <input
+              {...register('transitionType')}
+              type="radio" name="transitionType" value="oppositeSide" />
             Move into reverse direction?
           </span>
-          <div className="text-xs">
-            this will double the movement groups
-          </div>
+          {inDevelopment ||
+            <>
+              <input type="radio" />
+              {" Transitions into same direction?  "}
+              <input type="radio" />
+              {"Cannot Transition into same move"}
+            </>
+          }
+          <button type="submit">
+            Update Transition Changes
+          </button>
         </form>
         <div>
         </div>
