@@ -6,15 +6,13 @@ export default function RenderHero() {
     <section className="body-font text-gray-600">
       <div className="container mx-auto flex flex-col items-center px-5 pt-24 md:flex-row">
         <div className="mb-16 flex flex-col items-center text-center md:mb-0 md:w-1/2 md:items-start md:pr-16 md:text-left lg:flex-grow lg:pr-24">
-          {/* TODO make title component. fixes light dark additions all the time*/}
-          <h1 className="title-font mb-4 text-3xl font-medium text-gray-900 sm:text-4xl">
+          <h1 className="title-font mb-4 text-3xl font-medium text-gray-900 sm:text-4xl dark:text-white">
             BreakdanceDB
           </h1>
           <br className="hidden lg:inline-block" />
-          <p className="mb-8 leading-relaxed">
-            {' '}
-            Ditch the scrapbook. Record your footworks, practice systematically,
-            flow in the cypher. Remember sets. Welcome to your new breakdance
+          <p className="mb-8 text-xs leading-relaxed">
+            Ditch the scrapbook. Record your footworks. Practice systematically.
+            Flow in the cypher. Remember sets. Welcome to your new breakdance
             database for footwork.
           </p>
           <div className="flex justify-center">

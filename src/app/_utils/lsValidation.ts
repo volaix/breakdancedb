@@ -30,15 +30,9 @@ const isMoveId = (val: unknown): val is MoveId =>
 const isMove = (val: unknown): val is Move => {
   //check if object
   if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
-    let posMatchTrans = true
-    //check if positions match transitions length. should be equal number of pos to trans
-    if ((val as Move).positions) {
-      posMatchTrans =
-        (val as Move).positions?.length === (val as Move).transitions?.length
-    }
     const hasMoveId = isMoveId((val as Move).moveId)
     const hasDisplayName = typeof (val as Move).displayName === 'string'
-    return hasMoveId && hasDisplayName && posMatchTrans
+    return hasMoveId && hasDisplayName
   }
   return false
 }

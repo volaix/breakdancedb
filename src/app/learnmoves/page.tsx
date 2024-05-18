@@ -55,7 +55,7 @@ export default function RenderLearnMoves() {
   //---------------------render------------------------------------------------
 
   return (
-    <div className="mt-20" style={{ width: '375px' }}>
+    <div className="mt-20 px-5" style={{ width: '375px' }}>
       <>
         <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
           Moves Learning

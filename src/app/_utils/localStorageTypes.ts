@@ -35,6 +35,17 @@ export interface Move {
   positions?: Position[] //13MAY24: decided to keep this as arr instead obj as in future displaying positions in order with the imgs might be relevant
   transitions?: Transitions
   moveExecution?: MoveExecution
+  hasReverse?: boolean
+  loopOption?: TypeLoopOptions
+}
+
+/**
+ * Used in Move obj for what type of loop the move does
+ */
+export type TypeLoopOptions = {
+  hasOppositeSide?: boolean
+  none?: boolean
+  sameDirectionLoop?: boolean
 }
 
 /**
@@ -64,6 +75,7 @@ export type Position = {
   displayName: string
   imgUrl: string | null
   slowRating: number
+  oppositeSideSlowRating?: number
   normal: boolean
   fast: boolean
 }
@@ -74,6 +86,7 @@ export type Position = {
 export interface Transition {
   transitionId: TransitionId
   displayName: string
+  oppositeSideSlowRating?: number
   from: PositionId
   to: PositionId
   slowRating: number

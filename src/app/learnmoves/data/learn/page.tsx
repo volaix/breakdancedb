@@ -1,15 +1,12 @@
 'use client'
-import {
-  useState,
-  useEffect,
-  SetStateAction,
-  Dispatch,
-  Suspense,
-  MouseEventHandler,
-} from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { MovementGroup, lsUserLearning } from '@/app/_utils/localStorageTypes'
-import { Position, Transition } from '@/app/_utils/localStorageTypes'
+import {
+  MovementGroup,
+  TypeLoopOptions,
+  lsUserLearning,
+} from '@/app/_utils/localStorageTypes'
+import RenderMovementGroup from './MovementGroup'
 import {
   getLocalStorageGlobal,
   setLocalStorageGlobal,
@@ -18,320 +15,69 @@ import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
-import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
-import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import {
-  makeDefaultMovementGroupArr,
-  makeDefaultPosition,
-  makeDefaultTransition,
-  makeMovementId,
-  makePositionId,
-  makeTransitionId,
-} from '@/app/_utils/lsMakers'
-import { RenderAddButton } from '../../_components/Svgs'
+import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
+import { create } from 'zustand'
+import { produce } from 'immer'
 
-// ------------------------Local Types ---------------------------------
-//input types for react-hook-form
-type Inputs = {
-  [key: `${number}`]: string //displayName
+
+//-------------------------------Local Types---------------------------------
+
+type RadioTypes = {
+  transitionType: 'oppositeSide' | 'sameSide' | 'cannotRepeat'
 }
 
-type MovementType = 'static' | 'transition'
-type MovementKeys = 'positions' | 'transitions'
-//-------------------------------Local Utils---------------------------------
-/**
- * looks in positions and transitions in Move to update the right value with slowRating
- * @param move Move
- * @returns Move
- */
-const getUpdatedMove = (
-  move: Move,
-  currentlyEditing: MovementType,
-  movementGroup: MovementGroup,
-  slowRating: number,
-  movements: MovementGroup[],
-): Move => {
-  //  determines what key to use when accessing Move
-  let key: MovementKeys
-  switch (currentlyEditing) {
-    case 'static':
-      key = 'positions'
-      break
-    case 'transition':
-      key = 'transitions'
-      break
-  }
-
-  //TODO refactor this almost duplicated code. RN lacking typescript ability to have the key
-  if (key === 'positions') {
-    const index = move[key]?.findIndex((a) => {
-      return a.positionId === movementGroup.positionId
-    })
-    if (index !== undefined && index > -1 && move.positions) {
-      return {
-        ...move,
-        [key]: move[key]?.toSpliced(index, 1, {
-          ...move.positions[index],
-          slowRating,
-        }),
-      }
-    } else {
-      console.log('ERROR: Could not find positionId in movementGroup')
-      //return move with a default position anyway
-      return {
-        ...move,
-        positions: move.positions?.toSpliced(
-          move.positions.length,
-          0,
-          makeDefaultPosition({
-            slowRating,
-            displayName: 'newPos',
-            positionId: movementGroup.positionId,
-          }),
-        ),
-      }
-    }
-  } else if (key === 'transitions') {
-    const index = move[key]?.findIndex((a) => {
-      return a.transitionId === movementGroup.transitionId
-    })
-    if (index !== undefined && index > -1 && move.transitions) {
-      return {
-        ...move,
-        [key]: move[key]?.toSpliced(index, 1, {
-          ...move.transitions[index],
-          slowRating,
-        }),
-      }
-    } else {
-      console.log('ERROR: Could not find transitionId in movementGroup')
-      //return move with a default position anyway
-      const mvmtIndex = movements.findIndex(
-        (a) => a.positionId === movementGroup.positionId,
-      )
-      return {
-        ...move,
-        transitions: move.transitions?.toSpliced(
-          move.transitions.length,
-          0,
-          makeDefaultTransition({
-            slowRating,
-            displayName: 'newTrans',
-            transitionId: movementGroup.transitionId || makeTransitionId(),
-            to: movementGroup.positionId || makePositionId(),
-            from: movements[mvmtIndex - 1].positionId || makePositionId(),
-          }),
-        ),
-      }
-    }
-  }
-  return move
-}
-
-const getPositionAndTransition = (
-  movementGroup: MovementGroup,
-  move: Move,
-): {
-  position?: Position
-  transition?: Transition
-} => {
-  return {
-    position: move.positions?.find(
-      (a) => a.positionId === movementGroup.positionId,
-    ),
-    transition: move.transitions?.find(
-      (a) => a.transitionId === movementGroup.transitionId,
-    ),
-  }
-}
-
-/**
- *
- * Gets text for tooltip
- * @returns
- */
-const getText = (type: MovementType): string => {
-  switch (type) {
-    case 'static':
-      return 'For Footwork: statics are dancing using mainly the one position. Get confidence in the movement. Think big hip rotations. Shifting weight. Using hands and feet. Using knees. Adding flow concepts. Spinning. Shoulder alignment.'
-    case 'transition':
-      return 'For FW: Go from previous pose to current pose. Try whips with legs. Ease-in or Ease-out. Play with speed. Add foot steps inbetween. Alternate heel to toe. Butt slide. Foot slide. Hand slide.'
-  }
-}
-
-//-----------------------Renders ------------------------------
-
-/**
- * Renders 10 hearts. Used above each movement. Occurs multiple times per movement group.
- * @returns jsx
- */
-const RenderHearts = ({
-  rating,
-  move,
-  accessToLocalStorage,
-  currentlyEditing,
-  movementGroup,
-  setMove,
-  movements,
-}: {
-  movementGroup: MovementGroup
-  movements: MovementGroup[]
-  rating: number
-  move: Move
-  accessToLocalStorage: boolean
-  currentlyEditing: MovementType
-  setMove: Dispatch<SetStateAction<Move | null>>
-}) => {
-  //zustand to get state here rather than passed as props?
-
-  //make a movekey for when we update in localstorage. defaulting to positions
-  let moveKey: MovementKeys
-  switch (currentlyEditing) {
-    case 'static':
-      moveKey = 'positions'
-      break
-    case 'transition':
-      moveKey = 'transitions'
-      break
-  }
-
-  //----------------------------------------render-------------------------------
-  return (
-    <div className="flex flex-row-reverse items-center justify-end">
-      {
-        //render 10 hearts
-        Array.from(Array(10)).map((a, i) => {
-          return (
-            <>
-              <input
-                //When heart is clicked, the input will update local state and localstorage
-                onChange={(e) => {
-                  //-----------------------makes the updated move------------------
-                  console.log('making updated move')
-                  const updatedMove = getUpdatedMove(
-                    move,
-                    currentlyEditing,
-                    movementGroup,
-                    Number(e.target.id),
-                    movements,
-                  )
-
-                  console.log('updatedMove: ', updatedMove)
-                  //-----------------------updates display----------------------------
-
-                  //updates view, otherwise user has to refresh to get updates from localstorageDB data
-                  // setLocalMovements(updatedMove)
-                  setMove(updatedMove)
-
-                  //------------------------updates db--------------------------------
-
-                  //expression for if Move[] matches has a match provided moveid
-                  const matchCriteria = (a: Move) => a.moveId === move.moveId
-
-                  //all the moves from localstorage
-                  const globalMoves =
-                    getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-
-                  //validation if local moveId exists in global moveId
-                  if (globalMoves.find(matchCriteria)) {
-                    //updates localstorage on click
-                    setLocalStorageGlobal[lsUserLearning](
-                      globalMoves.map((ogMove: Move) =>
-                        matchCriteria(ogMove) ? updatedMove : ogMove,
-                      ),
-                      accessToLocalStorage,
-                    )
-                  } else {
-                    //TODO have UI visible error handling
-                    console.log('cannot find moveid in localstorage')
-                  }
-                }}
-                checked={i === 10 - rating}
-                type="radio"
-                className="peer -ms-5 size-5 cursor-pointer
-              appearance-none border-0 bg-transparent
-              text-transparent
-              checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
-                id={'' + (10 - i)}
-              />
-              <label
-                className="pointer-events-none text-gray-300 
-            peer-checked:text-red-500"
-              >
-                <svg
-                  className="size-5 flex-shrink-0"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534
-                 4.736 3.562-3.248 8 1.314z"
-                  ></path>
-                </svg>
-              </label>
-            </>
-          )
-        })
-      }
-    </div>
-  )
-}
-
-/** Renders Tooltips depending on what is being hovered */
-const RenderTooltip = ({ type }: { type: MovementType }) => {
-  return <></>
-  //FEATURE Have tooltips explain what statics and transitions are
-
-  //text of the tooltip
-  const text = getText(type)
-
-  //tooltip has been selected
-  const [isSelected, setIsSelected] = useState<boolean>(false)
-
-  //render
-  return (
-    <div className="flex items-center pl-0.5">
-      <svg width="15" height="15" viewBox="0 0 24 24">
-        <path d="m13 17-2 0 0-6 2 0 0 6zm-1-15c6 0 10 4 10 10s-4 10-10 10-10-4-10-10 4-10 10-10zm0 18c4 0 8-4 8-8s-4-8-8-8-8 4-8 8 4 8 8 8zm1-11-2 0 0-2 2 0 0 2z" />
-      </svg>
-    </div>
-  )
-}
+//-----------------------------------------------
 
 /**
  * Renders the heading text, and all the moves
  */
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
-  //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
-  const [isEditing, setIsEditing] = useState<{ [key: string]: boolean } | null>(
-    null,
-  )
 
+  //react
   const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
+  const [loopOptions, setLoopOptions] = useState<TypeLoopOptions>({
+    hasOppositeSide: false,
+    none: true,
+    sameDirectionLoop: false,
+  })
 
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
   const router = useRouter()
-  const { register, handleSubmit } = useForm<Inputs>()
+  const inDevelopment = true
+
+  const { register, handleSubmit } = useForm<RadioTypes>()
 
   // -------------------------------------USE EFFECT---------------------------
+
+  useEffect(() => {
+    if (accessToLocalStorage) {
+      //sets local loop options to what's set in localstorage
+    }
+  }, [accessToLocalStorage])
 
   //makes sure has access to local storage
   useLocalStorage(setAccessToLocalStorage)
 
   //Hook to update after localstorage has been set
-  useEffect(() => {}, [setIsEditing])
+  // useEffect(() => { }, [setIsEditing])
 
   //sets the order of the movements
   useEffect(() => {
     if (move) {
+      if (!!move?.loopOption) {
+        //sets local to whatever localstorage is
+        if (move.loopOption.hasOppositeSide) {
+          setLoopOptions({ hasOppositeSide: true })
+        } else {
+          //defaults to "none"
+          setLoopOptions({ none: true })
+        }
+      }
       if (move?.movements?.length) {
         //set local movements
         setLocalMovements(move.movements)
@@ -372,143 +118,34 @@ const RenderMoveLearn = () => {
   }, [accessToLocalStorage, moveId])
 
   //-------------------------------handlers------------------------------
+  const onReverseDirection: SubmitHandler<RadioTypes> = (e) => {
+    console.log('e: ', e)
+    let loopKey: keyof TypeLoopOptions
 
-  /**
-   * To run when submitting the edit button.
-   * After editing movement names, submitting changes to localstorage
-   * @param i is index
-   */
-  //
-  const onSubmitNewMoveName = (i: number): SubmitHandler<Inputs> => {
-    return (data) => {
-      console.log('running onsubmit with', data)
-
-      //var for movements with display names
-      const newMovements: MovementGroup[] = localMovements.map((a, i) => {
-        return {
-          ...a,
-          displayName: data[`${i}`] || localMovements[i].displayName,
-        }
-      })
-      //gets current localstorage
-      const lsCurrent =
-        getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-      //finds the current move inside the db
-      const selectedMove = lsCurrent.findIndex((obj) => obj.moveId === moveId)
-
-      if (selectedMove > -1) {
-        const updatedMove: Move = {
-          ...lsCurrent[selectedMove],
-          movements: newMovements,
-        }
-
-        //update locally to view, if skip it wont rerender
-        setMove(updatedMove)
-
-        //updates local storage, while replacing the current move with what's been changed locally
-        setLocalStorageGlobal[lsUserLearning](
-          lsCurrent.toSpliced(selectedMove, 1, updatedMove),
-          accessToLocalStorage,
-        )
-      } else {
-        console.log('could not match moveId with localstorage')
-      }
-      setIsEditing({ [i]: false })
-    }
-  }
-
-  const onClickDeleteMovement: MouseEventHandler<SVGSVGElement> = (e) => {
-    if (move) {
-      //---------deletes in a pseudo object-----------
-      //find index to delete
-      const currMovementGroupIndex = move.movements?.findIndex(
-        (a) => a.movementId === (e.target as SVGSVGElement).id,
-      )
-
-      //if the index exists
-      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
-        //delete it in a new obj
-        const deletedMvmt = [
-          ...(move.movements?.toSpliced(currMovementGroupIndex, 1) || []),
-        ]
-        console.log('deletedMvmt: ', deletedMvmt)
-        //update larger structure with new obj
-        const withDeletedMove = {
-          ...move,
-          movements: deletedMvmt,
-        }
-        console.log('withDeletedMove: ', withDeletedMove)
-        //-------------updates local+db------------
-        //local
-        setMove(withDeletedMove)
-        //db
-
-        const lsLearningMovesArr =
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
-        const moveIndex = lsLearningMovesArr.findIndex(
-          (a) => a.moveId === move.moveId,
-        )
-        if (moveIndex !== undefined && moveIndex > -1) {
-          setLocalStorageGlobal[lsUserLearning](
-            //gets localstorage learning
-            lsLearningMovesArr
-              //updates the specific move with our deleted one
-              .toSpliced(moveIndex, 1, withDeletedMove),
-            accessToLocalStorage,
-          )
-        } else {
-          console.log(
-            'ERROR: cannot find the current moveid compared to localstorage learning moveArr',
-          )
-        }
-      } else {
-        console.log('ERROR: cannot find movementId inside movement array')
-      }
+    //--------------set locally--------------
+    if (e.transitionType === 'oppositeSide') {
+      setLoopOptions({ hasOppositeSide: true })
+      loopKey = 'hasOppositeSide'
     } else {
-      console.log('ERROR: local move could not be loaded')
+      setLoopOptions({ none: true })
+      loopKey = 'none'
     }
-  }
 
-  /**
-   * onclick handler for user trying to add a new movement. makes a movement below the current.
-   * returns void
-   */
-  const onClickAddMovement: MouseEventHandler<SVGSVGElement> = (e) => {
-    console.log('trying to add a new movement')
-    if (move) {
-      //---------makes new move-----------
-      const currMovementGroupIndex = move.movements?.findIndex(
-        (a) => a.movementId === (e.target as SVGSVGElement).id,
-      )
-
-      if (currMovementGroupIndex !== undefined && currMovementGroupIndex > -1) {
-        const insertedNewMove = {
-          ...move,
-          movements: move.movements?.toSpliced(currMovementGroupIndex + 1, 0, {
-            displayName: 'new-movement-b',
-            movementId: makeMovementId(),
-            positionId: makePositionId(),
-            transitionId: makeTransitionId(),
-          }),
-        }
-        //-------------updates local+db------------
-        setMove(insertedNewMove)
-
-        //db
-        setLocalStorageGlobal[lsUserLearning](
-          //gets localstorage learning and updates the specific move with our deleted one
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
-            currMovementGroupIndex,
-            1,
-          ),
-          accessToLocalStorage,
-        )
-      } else {
-        console.log('ERROR: cannot find movementId inside movement array')
-      }
-    } else {
-      console.log('ERROR: local move could not be loaded')
-    }
+    //----------set in localstorage-----------------
+    setLocalStorageGlobal.userLearning(
+      produce(
+        getLocalStorageGlobal.userLearning(accessToLocalStorage),
+        (draft) => {
+          const index = draft.findIndex((a) => a.moveId === move?.moveId)
+          if (index !== undefined && index > -1) {
+            draft[index].loopOption = { [loopKey]: true }
+          } else {
+            return
+          }
+        },
+      ),
+      accessToLocalStorage,
+    )
   }
 
   //------------------------------RENDER--------------------------------
@@ -539,143 +176,116 @@ const RenderMoveLearn = () => {
           <div className="mx-auto text-base text-xs leading-relaxed lg:w-2/3"></div>
         </div>
         <div>
+          {/* Render Main MovementsGroup */}
           {move &&
             localMovements &&
             localMovements.map((movement, i) => {
-              //gets position and transition referred to by movementGroup obj
-              const {
-                //-----makes a defaults if none found to handle edge cases----
-                //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
-                position = i !== localMovements.length - 1 &&
-                  makeDefaultPosition({
-                    displayName: 'new-position',
-                  }),
-                //doesn't make a transitionobj for the first pos, as nothing to transition from
-                transition = i !== 0 &&
-                  makeDefaultTransition({
-                    displayName: 'new-transition',
-                    from: localMovements[i - 1].positionId || makePositionId(),
-                    to: position ? position.positionId : makePositionId(),
-                    transitionId: makeTransitionId(),
-                  }),
-              } = getPositionAndTransition(movement, move)
               //---------------------------------------------------------------
               return (
-                <div
-                  className="my-6 flex flex-col items-center"
+                <RenderMovementGroup
                   key={movement.displayName}
-                >
-                  <div className="flex">
-                    {
-                      //--------------MOVEMENT GROUP TITLE-------
-                      //if user is not editing, show delete and add button
-                      (isEditing !== null && isEditing[i]) || (
-                        <>
-                          <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
-                            {movement.displayName}
-                          </h1>
-                          {/* ----------MODIFICATION BUTTONS-----*/}
-                          <div className="ml-2 flex items-center">
-                            <div className="w-2">
-                              <RenderEditButton
-                                onClick={() => {
-                                  setIsEditing({ [i]: true })
-                                }}
-                              />
-                            </div>
-                            <div className="ml-2 w-2">
-                              <RenderAddButton
-                                id={movement.movementId}
-                                onClick={onClickAddMovement}
-                              />
-                            </div>
-                            {
-                              //if there's more than one mvmt left, show delete button
-                              localMovements.length > 1 && (
-                                <div className="ml-2 w-2">
-                                  <RenderRedDeleteButton
-                                    id={movement.movementId}
-                                    onClick={onClickDeleteMovement}
-                                  />
-                                </div>
-                              )
-                            }
-                          </div>
-                        </>
-                      )
-                    }
-                    {
-                      // ---------------EDIT INPUT------------
-                      //if user is editing, edit button can save. dont show delete and add button.
-                      isEditing !== null && isEditing[i] && (
-                        <>
-                          <form onSubmit={handleSubmit(onSubmitNewMoveName(i))}>
-                            <DefaultStyledInput
-                              registerName={`${i}`}
-                              defaultValue={movement.displayName}
-                              register={register}
-                            />
-                            <button type="submit">
-                              <div className="ml-1 w-2">
-                                <RenderEditButton />
-                              </div>
-                            </button>
-                          </form>
-                        </>
-                      )
-                    }
-                  </div>
-                  <div className="mb-4 mt-2 flex justify-center">
-                    <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
-                  </div>
-                  {/*---------------TRANSITIONS w/ HEARTS & POSITIONS w/ HEARTS----- */}
-                  <div className="flex flex-col items-center text-xs">
-                    {transition && (
-                      //If its a transition render Transition
-                      <div className="flex flex-col py-3">
-                        <span>
-                          <RenderHearts
-                            movements={localMovements}
-                            setMove={setMove}
-                            accessToLocalStorage={accessToLocalStorage}
-                            rating={transition?.slowRating}
-                            move={move}
-                            currentlyEditing={'transition'}
-                            movementGroup={movement}
-                          />
-                          {'Transition: '}
-                          {transition.displayName}
-                        </span>
-                        <div>{'Practice: Slow Transitions'}</div>
-                      </div>
-                    )}
-                    {position && (
-                      //If its a position render position
-                      <div className="flex flex-col py-3">
-                        <span>
-                          <RenderHearts
-                            movements={localMovements}
-                            setMove={setMove}
-                            accessToLocalStorage={accessToLocalStorage}
-                            rating={position?.slowRating}
-                            move={move}
-                            currentlyEditing={'static'}
-                            movementGroup={movement}
-                          />
-                          {'Position: '}
-                          {position.displayName}
-                        </span>
-                        <span className="flex">
-                          <div>{'Practice: Slow Statics'}</div>
-                          <RenderTooltip type={'static'} />
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  movement={movement}
+                  indexNumber={i}
+                  localMovements={localMovements}
+                  setMove={setMove}
+                  move={move}
+                />
               )
             })}
         </div>
+        <div>
+          {
+            //render opposite side movement groups
+            loopOptions.hasOppositeSide && move && localMovements && (
+              <>
+                {/* -----------SPACER--------------- */}
+                <div className="mb-4 mt-2 flex justify-center">
+                  <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+                </div>
+
+                {localMovements.map((movement, i) => {
+                  return (
+                    <RenderMovementGroup
+                      key={movement.displayName}
+                      movement={movement}
+                      indexNumber={i}
+                      localMovements={localMovements}
+                      setMove={setMove}
+                      move={move}
+                      isOppositeSide={loopOptions.hasOppositeSide}
+                    />
+                  )
+                })}
+              </>
+            )
+          }
+        </div>
+
+        <div className="flex flex-col flex-wrap content-center">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="my-5 ml-auto flex w-3/5 w-full justify-center rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+          >
+            Scroll to Top
+          </button>
+        </div>
+        {/* -----------SPACER--------------- */}
+        <div className="mb-4 flex justify-center ">
+          <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+        </div>
+        <div className="pt-15 text-xs dark:text-white">Repeat Options</div>
+        <div>
+          <form
+            className="flex-col pb-5 pt-2 text-xs"
+            onSubmit={handleSubmit(onReverseDirection)}
+          >
+            <div>
+              <span>
+                <input
+                  key={Math.random()}
+                  {...register('transitionType')}
+                  type="radio"
+                  name="transitionType"
+                  value="oppositeSide"
+                  defaultChecked={loopOptions.hasOppositeSide}
+                />
+                Move into reverse direction?
+              </span>
+            </div>
+
+            <div>
+              <span>
+                <input
+                  {...register('transitionType')}
+                  key={Math.random()}
+                  type="radio"
+                  name="transitionType"
+                  value="none"
+                  defaultChecked={loopOptions.none}
+                />
+                None
+              </span>
+            </div>
+
+            {inDevelopment || (
+              <>
+                <input type="radio" />
+                {' Transitions into same direction?  '}
+                <input type="radio" />
+                {'Cannot Transition into same move'}
+              </>
+            )}
+            <div className="flex flex-col flex-wrap content-center">
+              <button
+                type="submit"
+                className="ml-auto mt-5 flex w-3/5 w-full justify-center rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+              >
+                Update Loop
+              </button>
+            </div>
+          </form>
+        </div>
+        <div></div>
       </div>
     </section>
   )
