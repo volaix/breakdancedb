@@ -1,14 +1,11 @@
 'use client'
-import {
-  useState,
-  useEffect,
-  Suspense,
-  MouseEventHandler,
-  FormEventHandler,
-} from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { MovementGroup, lsUserLearning } from '@/app/_utils/localStorageTypes'
-import { Position, Transition } from '@/app/_utils/localStorageTypes'
+import {
+  MovementGroup,
+  TypeLoopOptions,
+  lsUserLearning,
+} from '@/app/_utils/localStorageTypes'
 import RenderMovementGroup from './MovementGroup'
 import {
   getLocalStorageGlobal,
@@ -18,22 +15,15 @@ import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
-import { useForm, SubmitHandler, Form } from 'react-hook-form'
-import {
-  makeDefaultMovementGroupArr,
-  makeDefaultPosition,
-  makeDefaultTransition,
-  makeMovementId,
-  makePositionId,
-  makeTransitionId,
-} from '@/app/_utils/lsMakers'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
 import { create } from 'zustand'
-import { MovementType, MovementKeys } from './pagetypes'
+import { produce } from 'immer'
 
 // ----------------------Page Store-----------------------------
 export interface DataLearnState {
   //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
-  isEditing: ({ [key: string]: boolean }) | null
+  isEditing: { [key: string]: boolean } | null
   setIsEditing: (val: { [key: string]: boolean }) => void
 }
 
@@ -42,115 +32,13 @@ export const useDataLearnStore = create<DataLearnState>()((set) => ({
   setIsEditing: (val) => set(() => ({ isEditing: val })),
 }))
 
-
-//-------------------------------Local Utils---------------------------------
-/**
- * looks in positions and transitions in Move to update the right value with slowRating
- * @param move Move
- * @returns Move
- */
-export const getUpdatedMove = (
-  move: Move,
-  currentlyEditing: MovementType,
-  movementGroup: MovementGroup,
-  slowRating: number,
-  movements: MovementGroup[],
-): Move => {
-  //  determines what key to use when accessing Move
-  let key: MovementKeys
-  switch (currentlyEditing) {
-    case 'static':
-      key = 'positions'
-      break
-    case 'transition':
-      key = 'transitions'
-      break
-  }
-
-  //TODO refactor this almost duplicated code. RN lacking typescript ability to have the key
-  if (key === 'positions') {
-    const index = move[key]?.findIndex((a) => {
-      return a.positionId === movementGroup.positionId
-    })
-    if (index !== undefined && index > -1 && move.positions) {
-      return {
-        ...move,
-        [key]: move[key]?.toSpliced(index, 1, {
-          ...move.positions[index],
-          slowRating,
-        }),
-      }
-    } else {
-      console.log('ERROR: Could not find positionId in movementGroup')
-      //return move with a default position anyway
-      return {
-        ...move,
-        positions: move.positions?.toSpliced(
-          move.positions.length,
-          0,
-          makeDefaultPosition({
-            slowRating,
-            displayName: 'newPos',
-            positionId: movementGroup.positionId,
-          }),
-        ),
-      }
-    }
-  } else if (key === 'transitions') {
-    const index = move[key]?.findIndex((a) => {
-      return a.transitionId === movementGroup.transitionId
-    })
-    if (index !== undefined && index > -1 && move.transitions) {
-      return {
-        ...move,
-        [key]: move[key]?.toSpliced(index, 1, {
-          ...move.transitions[index],
-          slowRating,
-        }),
-      }
-    } else {
-      console.log('ERROR: Could not find transitionId in movementGroup')
-      //return move with a default position anyway
-      const mvmtIndex = movements.findIndex(
-        (a) => a.positionId === movementGroup.positionId,
-      )
-      return {
-        ...move,
-        transitions: move.transitions?.toSpliced(
-          move.transitions.length,
-          0,
-          makeDefaultTransition({
-            slowRating,
-            displayName: 'newTrans',
-            transitionId: movementGroup.transitionId || makeTransitionId(),
-            to: movementGroup.positionId || makePositionId(),
-            from: movements[mvmtIndex - 1].positionId || makePositionId(),
-          }),
-        ),
-      }
-    }
-  }
-  return move
-}
+//-------------------------------Local Types---------------------------------
 
 type RadioTypes = {
   transitionType: 'oppositeSide' | 'sameSide' | 'cannotRepeat'
 }
 
-//FEATURE Move localstorage management to just using zustand
-// import { persist } from 'zustand/middleware'
-
-// const useFishStore = create(
-//   persist(
-//     (set, get) => ({
-//       fishes: 0,
-//       addAFish: () => set({ fishes: get().fishes + 1 }),
-//     }),
-//     {
-//       name: 'food-storage', 
-//     },
-//   ),
-// )
+//-----------------------------------------------
 
 /**
  * Renders the heading text, and all the moves
@@ -158,15 +46,15 @@ type RadioTypes = {
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
 
-  //zustand
-  const setIsEditing = useDataLearnStore((state) => state.setIsEditing)
-  const isEditing = useDataLearnStore((state) => state.isEditing)
-
   //react
   const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
-  const [hasOppositeSide, setHasOppositeSide] = useState<boolean>(false)
+  const [loopOptions, setLoopOptions] = useState<TypeLoopOptions>({
+    hasOppositeSide: false,
+    none: true,
+    sameDirectionLoop: false,
+  })
 
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
@@ -177,6 +65,12 @@ const RenderMoveLearn = () => {
 
   // -------------------------------------USE EFFECT---------------------------
 
+  useEffect(() => {
+    if (accessToLocalStorage) {
+      //sets local loop options to what's set in localstorage
+    }
+  }, [accessToLocalStorage])
+
   //makes sure has access to local storage
   useLocalStorage(setAccessToLocalStorage)
 
@@ -186,6 +80,15 @@ const RenderMoveLearn = () => {
   //sets the order of the movements
   useEffect(() => {
     if (move) {
+      if (!!move?.loopOption) {
+        //sets local to whatever localstorage is
+        if (move.loopOption.hasOppositeSide) {
+          setLoopOptions({ hasOppositeSide: true })
+        } else {
+          //defaults to "none"
+          setLoopOptions({ none: true })
+        }
+      }
       if (move?.movements?.length) {
         //set local movements
         setLocalMovements(move.movements)
@@ -228,16 +131,33 @@ const RenderMoveLearn = () => {
   //-------------------------------handlers------------------------------
   const onReverseDirection: SubmitHandler<RadioTypes> = (e) => {
     console.log('e: ', e)
-    if (e.transitionType === 'oppositeSide') {
-      setHasOppositeSide(true)
-    } else {
-      setHasOppositeSide(false)
-    }
-    //It's too tiring to update like this all the time. Lets use zustand.
-    // setLocalStorageGlobal.userMoves()
-    // addAFish()
-  }
+    let loopKey: keyof TypeLoopOptions
 
+    //--------------set locally--------------
+    if (e.transitionType === 'oppositeSide') {
+      setLoopOptions({ hasOppositeSide: true })
+      loopKey = 'hasOppositeSide'
+    } else {
+      setLoopOptions({ none: true })
+      loopKey = 'none'
+    }
+
+    //----------set in localstorage-----------------
+    setLocalStorageGlobal.userLearning(
+      produce(
+        getLocalStorageGlobal.userLearning(accessToLocalStorage),
+        (draft) => {
+          const index = draft.findIndex((a) => a.moveId === move?.moveId)
+          if (index !== undefined && index > -1) {
+            draft[index].loopOption = { [loopKey]: true }
+          } else {
+            return
+          }
+        },
+      ),
+      accessToLocalStorage,
+    )
+  }
 
   //------------------------------RENDER--------------------------------
 
@@ -272,58 +192,111 @@ const RenderMoveLearn = () => {
             localMovements &&
             localMovements.map((movement, i) => {
               //---------------------------------------------------------------
-              return <RenderMovementGroup
-                key={movement.displayName}
-                movement={movement}
-                indexNumber={i}
-                localMovements={localMovements}
-                setMove={setMove}
-                move={move}
-              />
+              return (
+                <RenderMovementGroup
+                  key={movement.displayName}
+                  movement={movement}
+                  indexNumber={i}
+                  localMovements={localMovements}
+                  setMove={setMove}
+                  move={move}
+                />
+              )
             })}
         </div>
         <div>
-          {hasOppositeSide && move &&
-            localMovements &&
-            localMovements.map((movement, i) => {
-              //---------------------------------------------------------------
-              return <RenderMovementGroup
-                key={movement.displayName}
-                movement={movement}
-                indexNumber={i}
-                localMovements={localMovements}
-                setMove={setMove}
-                move={move}
-                isOppositeSide={hasOppositeSide}
-              />
-            })}
-        </div>
-        <div className="dark: text-white">
-          Repeat Options
-        </div>
-        <form
-          className="py-10"
-          onSubmit={handleSubmit(onReverseDirection)}>
-          <span>
-            <input
-              {...register('transitionType')}
-              type="radio" name="transitionType" value="oppositeSide" />
-            Move into reverse direction?
-          </span>
-          {inDevelopment ||
-            <>
-              <input type="radio" />
-              {" Transitions into same direction?  "}
-              <input type="radio" />
-              {"Cannot Transition into same move"}
-            </>
+          {
+            //render opposite side movement groups
+            loopOptions.hasOppositeSide && move && localMovements && (
+              <>
+                {/* -----------SPACER--------------- */}
+                <div className="mb-4 mt-2 flex justify-center">
+                  <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+                </div>
+
+                {localMovements.map((movement, i) => {
+                  return (
+                    <RenderMovementGroup
+                      key={movement.displayName}
+                      movement={movement}
+                      indexNumber={i}
+                      localMovements={localMovements}
+                      setMove={setMove}
+                      move={move}
+                      isOppositeSide={loopOptions.hasOppositeSide}
+                    />
+                  )
+                })}
+              </>
+            )
           }
-          <button type="submit">
-            Update Transition Changes
-          </button>
-        </form>
-        <div>
         </div>
+
+        <div className="flex flex-col flex-wrap content-center">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="my-5 ml-auto flex w-3/5 w-full justify-center rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+          >
+            Scroll to Top
+          </button>
+        </div>
+        {/* -----------SPACER--------------- */}
+        <div className="mb-4 flex justify-center ">
+          <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+        </div>
+        <div className="pt-15 text-xs dark:text-white">Repeat Options</div>
+        <div>
+          <form
+            className="flex-col pb-5 pt-2 text-xs"
+            onSubmit={handleSubmit(onReverseDirection)}
+          >
+            <div>
+              <span>
+                <input
+                  key={Math.random()}
+                  {...register('transitionType')}
+                  type="radio"
+                  name="transitionType"
+                  value="oppositeSide"
+                  defaultChecked={loopOptions.hasOppositeSide}
+                />
+                Move into reverse direction?
+              </span>
+            </div>
+
+            <div>
+              <span>
+                <input
+                  {...register('transitionType')}
+                  key={Math.random()}
+                  type="radio"
+                  name="transitionType"
+                  value="none"
+                  defaultChecked={loopOptions.none}
+                />
+                None
+              </span>
+            </div>
+
+            {inDevelopment || (
+              <>
+                <input type="radio" />
+                {' Transitions into same direction?  '}
+                <input type="radio" />
+                {'Cannot Transition into same move'}
+              </>
+            )}
+            <div className="flex flex-col flex-wrap content-center">
+              <button
+                type="submit"
+                className="ml-auto mt-5 flex w-3/5 w-full justify-center rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+              >
+                Update Loop
+              </button>
+            </div>
+          </form>
+        </div>
+        <div></div>
       </div>
     </section>
   )
