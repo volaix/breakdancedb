@@ -10,7 +10,7 @@ export default function RenderHero() {
             BreakdanceDB
           </h1>
           <br className="hidden lg:inline-block" />
-          <p className="mb-8 leading-relaxed text-xs">
+          <p className="mb-8 text-xs leading-relaxed">
             Ditch the scrapbook. Record your footworks. Practice systematically.
             Flow in the cypher. Remember sets. Welcome to your new breakdance
             database for footwork.
