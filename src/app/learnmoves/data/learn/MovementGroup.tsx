@@ -1,11 +1,21 @@
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import LoadingFallback from '@/app/_components/LoadingFallback'
-import { getLocalStorageGlobal, setLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
+import {
+  getLocalStorageGlobal,
+  setLocalStorageGlobal,
+} from '@/app/_utils/accessLocalStorage'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { Move } from '@/app/_utils/localStorageTypes'
-import { makeDefaultMovementGroupArr, makeDefaultPosition, makeDefaultTransition, makeMovementId, makePositionId, makeTransitionId } from '@/app/_utils/lsMakers'
+import {
+  makeDefaultMovementGroupArr,
+  makeDefaultPosition,
+  makeDefaultTransition,
+  makeMovementId,
+  makePositionId,
+  makeTransitionId,
+} from '@/app/_utils/lsMakers'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { MouseEventHandler, Suspense, useEffect, useState } from 'react'
@@ -82,22 +92,21 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
  * renders a single movement group for the data/learn page
  * @returns jsx
  */
-export default function RenderMovementGroup(
-  {
-    indexNumber,
-    movement,
-    localMovements,
-    setMove,
-    move,
-    isOppositeSide,
-  }: {
-    indexNumber: number
-    localMovements: MovementGroup[]
-    movement: MovementGroup
-    setMove: Dispatch<SetStateAction<Move | null>>
-    move: Move
-    isOppositeSide?: boolean
-  }) {
+export default function RenderMovementGroup({
+  indexNumber,
+  movement,
+  localMovements,
+  setMove,
+  move,
+  isOppositeSide,
+}: {
+  indexNumber: number
+  localMovements: MovementGroup[]
+  movement: MovementGroup
+  setMove: Dispatch<SetStateAction<Move | null>>
+  move: Move
+  isOppositeSide?: boolean
+}) {
   //------------------state----------------
 
   //zustand
@@ -113,17 +122,17 @@ export default function RenderMovementGroup(
     //-----makes a defaults if none found to handle edge cases----
     //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
     position = indexNumber !== localMovements.length - 1 &&
-    makeDefaultPosition({
-      displayName: 'new-position',
-    }),
+      makeDefaultPosition({
+        displayName: 'new-position',
+      }),
     //doesn't make a transitionobj for the first pos, as nothing to transition from
     transition = indexNumber !== 0 &&
-    makeDefaultTransition({
-      displayName: 'new-transition',
-      from: localMovements[indexNumber - 1].positionId || makePositionId(),
-      to: position ? position.positionId : makePositionId(),
-      transitionId: makeTransitionId(),
-    }),
+      makeDefaultTransition({
+        displayName: 'new-transition',
+        from: localMovements[indexNumber - 1].positionId || makePositionId(),
+        to: position ? position.positionId : makePositionId(),
+        transitionId: makeTransitionId(),
+      }),
   } = getPositionAndTransition(movement, move)
   //----------------use effect-----------
   //makes sure has access to local storage
@@ -246,7 +255,9 @@ export default function RenderMovementGroup(
       const lsCurrent =
         getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
       //finds the current move inside the db
-      const selectedMove = lsCurrent.findIndex((obj) => obj.moveId === move.moveId)
+      const selectedMove = lsCurrent.findIndex(
+        (obj) => obj.moveId === move.moveId,
+      )
 
       if (selectedMove > -1) {
         const updatedMove: Move = {
@@ -272,18 +283,38 @@ export default function RenderMovementGroup(
   //--------------render-------------
 
   return (
-    <div className="my-6 flex flex-col items-center" >
+    <div className="my-6 flex flex-col items-center">
       <div className="flex">
         {
           //--------------MOVEMENT GROUP TITLE-------
           //if user is not editing, show delete and add button
           (isEditing !== null && isEditing[indexNumber]) || (
             <>
-              <div className='flex flex-col'>
-                {isOppositeSide && <div className='text-xs'>Opposite Side</div>}
-                <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
-                  {movement.displayName}
-                </h1>
+              <div className="flex flex-col">
+                {
+                  //show flag for if it's opposite side
+                  isOppositeSide && (
+                    <div className="text-xs text-indigo-500 ">
+                      Opposite Side
+                    </div>
+                  )
+                }
+                {
+                  //if not opposite side display title text normally
+                  isOppositeSide || (
+                    <h1 className="title-font text-lg font-medium capitalize text-gray-900 dark:text-white">
+                      {movement.displayName}
+                    </h1>
+                  )
+                }
+                {
+                  // if it's opposite side use italics
+                  isOppositeSide && (
+                    <h1 className="title-font text-lg font-medium capitalize italic text-gray-900 dark:text-white">
+                      {movement.displayName}
+                    </h1>
+                  )
+                }
               </div>
               {/* ----------MODIFICATION BUTTONS-----*/}
               <div className="ml-2 flex items-center">
@@ -337,29 +368,38 @@ export default function RenderMovementGroup(
         }
       </div>
       <div className="mb-4 mt-2 flex justify-center">
+        {/* -----------SPACER--------------- */}
         <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
       </div>
       {/*---------------TRANSITIONS w/ HEARTS & POSITIONS w/ HEARTS----- */}
       <div className="flex flex-col items-center text-xs">
-        {transition && (
-          //If its a transition render Transition
-          <div className="flex flex-col py-3">
-            <span>
-              <RenderHearts
-                movements={localMovements}
-                setMove={setMove}
-                accessToLocalStorage={accessToLocalStorage}
-                rating={transition?.slowRating}
-                move={move}
-                currentlyEditing={'transition'}
-                movementGroup={movement}
-              />
-              {'Transition: '}
-              {transition.displayName}
-            </span>
-            <div>{'Practice: Slow Transitions'}</div>
-          </div>
-        )}
+        {
+          // render if it's a transition and not in the first movement group
+          //impossible to transition into first movementgroup
+          transition && indexNumber !== 0 && (
+            //If its a transition render Transition
+            <div className="flex flex-col py-3">
+              <span>
+                <RenderHearts
+                  movements={localMovements}
+                  setMove={setMove}
+                  rating={
+                    isOppositeSide
+                      ? transition.oppositeSideSlowRating
+                      : transition.slowRating
+                  }
+                  isOppositeSide={!!isOppositeSide}
+                  move={move}
+                  currentlyEditing={'transition'}
+                  movementGroup={movement}
+                />
+                {'Transition: '}
+                {transition.displayName}
+              </span>
+              <div>{'Practice: Slow Transitions'}</div>
+            </div>
+          )
+        }
         {position && (
           //If its a position render position
           <div className="flex flex-col py-3">
@@ -367,8 +407,12 @@ export default function RenderMovementGroup(
               <RenderHearts
                 movements={localMovements}
                 setMove={setMove}
-                accessToLocalStorage={accessToLocalStorage}
-                rating={position?.slowRating}
+                isOppositeSide={!!isOppositeSide}
+                rating={
+                  isOppositeSide
+                    ? position.oppositeSideSlowRating
+                    : position.slowRating
+                }
                 move={move}
                 currentlyEditing={'static'}
                 movementGroup={movement}
