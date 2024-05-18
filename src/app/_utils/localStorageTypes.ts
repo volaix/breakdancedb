@@ -36,6 +36,16 @@ export interface Move {
   transitions?: Transitions
   moveExecution?: MoveExecution
   hasReverse?: boolean
+  loopOption?: TypeLoopOptions
+}
+
+/**
+ * Used in Move obj for what type of loop the move does
+ */
+export type TypeLoopOptions = {
+  hasOppositeSide?: boolean
+  none?: boolean
+  sameDirectionLoop?: boolean
 }
 
 /**
@@ -76,6 +86,7 @@ export type Position = {
 export interface Transition {
   transitionId: TransitionId
   displayName: string
+  oppositeSideSlowRating?: number
   from: PositionId
   to: PositionId
   slowRating: number
