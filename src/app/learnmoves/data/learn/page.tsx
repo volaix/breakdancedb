@@ -20,17 +20,6 @@ import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
 import { create } from 'zustand'
 import { produce } from 'immer'
 
-// ----------------------Page Store-----------------------------
-export interface DataLearnState {
-  //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
-  isEditing: { [key: string]: boolean } | null
-  setIsEditing: (val: { [key: string]: boolean }) => void
-}
-
-export const useDataLearnStore = create<DataLearnState>()((set) => ({
-  isEditing: null,
-  setIsEditing: (val) => set(() => ({ isEditing: val })),
-}))
 
 //-------------------------------Local Types---------------------------------
 
