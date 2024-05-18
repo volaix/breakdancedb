@@ -35,15 +35,18 @@ export const makeDefaultPosition = ({
   displayName,
   positionId = makePositionId(),
   slowRating = 0,
+  oppositeSideSlowRating = 0,
 }: {
   displayName: string
   positionId?: PositionId
+  oppositeSideSlowRating?: number
   slowRating?: number
 }): Position => {
   return {
     displayName,
     positionId,
     slowRating,
+    oppositeSideSlowRating,
     imgUrl: null,
     normal: false,
     fast: false,
@@ -61,8 +64,10 @@ export const makeDefaultTransition = ({
   to,
   slowRating = 0,
   transitionId,
+  oppositeSideSlowRating = 0,
 }: {
   displayName: string
+  oppositeSideSlowRating?: number
   from: PositionId
   to: PositionId
   slowRating?: number
@@ -71,6 +76,7 @@ export const makeDefaultTransition = ({
   return {
     displayName,
     transitionId,
+    oppositeSideSlowRating,
     from,
     to,
     slowRating,
