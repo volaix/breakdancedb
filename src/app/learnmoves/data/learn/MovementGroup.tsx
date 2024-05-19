@@ -133,17 +133,17 @@ export default function RenderMovementGroup({
     //-----makes a defaults if none found to handle edge cases----
     //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
     position = indexNumber !== localMovements.length - 1 &&
-    makeDefaultPosition({
-      displayName: 'new-position',
-    }),
+      makeDefaultPosition({
+        displayName: 'new-position',
+      }),
     //doesn't make a transitionobj for the first pos, as nothing to transition from
     transition = indexNumber !== 0 &&
-    makeDefaultTransition({
-      displayName: 'new-transition',
-      from: localMovements[indexNumber - 1].positionId || makePositionId(),
-      to: position ? position.positionId : makePositionId(),
-      transitionId: makeTransitionId(),
-    }),
+      makeDefaultTransition({
+        displayName: 'new-transition',
+        from: localMovements[indexNumber - 1].positionId || makePositionId(),
+        to: position ? position.positionId : makePositionId(),
+        transitionId: makeTransitionId(),
+      }),
   } = getPositionAndTransition(movement, move)
   //----------------use effect-----------
   //makes sure has access to local storage
