@@ -1,10 +1,9 @@
 import { safeJsonParse } from './lib'
-import { lsValueFlow, lsValueMove, lsValueLearn } from './typehelpers'
-import { lsFlows, lsUserMoves, lsUserLearning } from './localStorageTypes'
-import { isFlowArr, isUserMoves, isMoveArr } from './lsValidation'
+import { lsFlows, lsUserLearning, lsUserMoves } from './localStorageTypes'
 import { Flow } from './localStorageTypes'
-
 import { Move } from './localStorageTypes'
+import { isFlowArr, isMoveArr, isUserMoves } from './lsValidation'
+import { lsValueFlow, lsValueLearn, lsValueMove } from './typehelpers'
 
 //-----------------------------------DB----------------------------
 /**
@@ -48,9 +47,7 @@ export const setLocalStorageGlobal = {
   [lsUserLearning]: (val: Move[], accessToLocalStorage: boolean) => {
     console.log('updating')
     //quit early if localstorage unaccessible
-    if (!accessToLocalStorage) {
-      return
-    }
+    if (!accessToLocalStorage) return
 
     console.log('validating')
     //validation
@@ -68,10 +65,12 @@ const isErrorInGetLocalStorage = ({
 }: {
   accessToLocalStorage: boolean
 }): boolean => {
+  console.log('testing access to local storage')
   if (!accessToLocalStorage) {
     console.log('no access to local storage')
     return true
   }
+  console.log('has access to local storage')
   return false
 }
 /**

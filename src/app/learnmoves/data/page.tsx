@@ -126,7 +126,7 @@ const RenderTable = () => {
             <Link
               className="py-2"
               href={{
-                pathname: '/learnmoves/data/learn',
+                pathname: '/learnmoves/data/study',
                 query: { moveId: move.moveId, speed: 'slow' },
               }}
             >

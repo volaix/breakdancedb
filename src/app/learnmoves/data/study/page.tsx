@@ -20,7 +20,6 @@ import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
 import { create } from 'zustand'
 import { produce } from 'immer'
 
-
 //-------------------------------Local Types---------------------------------
 
 type RadioTypes = {
