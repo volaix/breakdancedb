@@ -49,7 +49,7 @@ export type TypeLoopOptions = {
 }
 
 /**
- * Used to display movement groups in /learnmoves/data/learn
+ * Used to display movement groups in /learnmoves/data/study
  */
 export type MovementGroup = {
   movementId: MovementId

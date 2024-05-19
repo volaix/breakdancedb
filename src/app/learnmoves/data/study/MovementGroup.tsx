@@ -100,7 +100,7 @@ const RenderTooltip = ({ type }: { type: MovementType }) => {
 }
 
 /**
- * renders a single movement group for the data/learn page
+ * renders a single movement group for the data/study page
  * @returns jsx
  */
 export default function RenderMovementGroup({
