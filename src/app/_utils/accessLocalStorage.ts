@@ -1,65 +1,8 @@
 import { safeJsonParse } from './lib'
 import { lsFlows, lsUserLearning, lsUserMoves } from './localStorageTypes'
-import { Flow } from './localStorageTypes'
-import { Move } from './localStorageTypes'
-import { isFlowArr, isMoveArr, isUserMoves } from './lsValidation'
 import { lsValueFlow, lsValueLearn, lsValueMove } from './typehelpers'
 
 //-----------------------------------DB----------------------------
-/**
- *
- * Upload to local storage.
- * This should be the only usage of localstorage.setItem
- * Delete all others.
- * @returns void
- */
-export const setLocalStorageGlobal = {
-  //------------------updates "flows" key in localstorage------------
-  [lsFlows]: (val: Flow[], accessToLocalStorage: boolean) => {
-    //quit early if localstorage unaccessible
-    if (!accessToLocalStorage) {
-      return
-    }
-
-    if (isFlowArr(val)) {
-      //validation
-      localStorage.setItem(lsFlows, JSON.stringify(val))
-    } else {
-      console.log('failed validation')
-    }
-  },
-  //------------------updates "userMoves" key in localstorage------------
-  [lsUserMoves]: (val: string[], accessToLocalStorage: boolean) => {
-    //quit early if localstorage unaccessible
-    if (!accessToLocalStorage) {
-      return
-    }
-
-    if (isUserMoves(val)) {
-      //validation
-      localStorage.setItem(lsUserMoves, JSON.stringify(val))
-    } else {
-      console.log('failed validation')
-    }
-  },
-  //------------------updates "userLearning" key in localstorage------------
-  //most used in /learnmoves
-  [lsUserLearning]: (val: Move[], accessToLocalStorage: boolean) => {
-    console.log('updating')
-    //quit early if localstorage unaccessible
-    if (!accessToLocalStorage) return
-
-    console.log('validating')
-    //validation
-    if (isMoveArr(val)) {
-      console.log('passed validation and setting in local storage')
-      localStorage.setItem(lsUserLearning, JSON.stringify(val))
-      console.log('successfully data in localstorage')
-    } else {
-      console.log('isMoveArr failed validation', val)
-    }
-  },
-}
 const isErrorInGetLocalStorage = ({
   accessToLocalStorage,
 }: {

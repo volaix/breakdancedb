@@ -3,10 +3,7 @@ import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
-import {
-  setLocalStorageGlobal,
-  getLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useMoveStore } from './store'
 import { makeTransitions } from '@/app/_utils/lsMakers'
@@ -103,11 +100,7 @@ const RenderPage = () => {
       }
 
       //update db
-      const learning = [...existingMoves, newMove]
-      //#P1MIGRATION
-      setLsUserLearning(learning)
-      setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage,)
-
+      setLsUserLearning([...existingMoves, newMove])
     }
     setSaveText('Saved')
     router.back()

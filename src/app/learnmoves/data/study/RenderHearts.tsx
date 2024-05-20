@@ -6,10 +6,7 @@ import {
   TransitionId,
   lsUserLearning,
 } from '@/app/_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { MovementType, MovementKeys } from './pagetypes'
 import { useLocalStorage } from '@/app/_utils/lib'
@@ -239,15 +236,10 @@ export const RenderHearts = ({
 
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
-                    //updates localstorage on click
-                    const learning = globalMoves.map((ogMove: Move) =>
-                      matchCriteria(ogMove) ? updatedMove : ogMove,
-                    )
-                    //#P1MIGRATION
-                    setLsUserLearning(learning)
-                    setLocalStorageGlobal[lsUserLearning](
-                      learning,
-                      accessToLocalStorage,
+                    setLsUserLearning(
+                      globalMoves.map((ogMove: Move) =>
+                        matchCriteria(ogMove) ? updatedMove : ogMove,
+                      ),
                     )
                   } else {
                     //TODO have UI visible error handling

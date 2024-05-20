@@ -2,10 +2,7 @@
 //@format
 import RenderHeader from '@/app/_components/Header'
 import { lsUserMoves } from '../_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '../_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 

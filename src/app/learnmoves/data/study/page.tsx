@@ -7,10 +7,7 @@ import {
   lsUserLearning,
 } from '@/app/_utils/localStorageTypes'
 import RenderMovementGroup from './MovementGroup'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
@@ -19,6 +16,7 @@ import { useForm, SubmitHandler } from 'react-hook-form'
 import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
 import { create } from 'zustand'
 import { produce } from 'immer'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //-------------------------------Local Types---------------------------------
 
@@ -33,8 +31,7 @@ type RadioTypes = {
  */
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
-
-  //react
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
@@ -101,13 +98,13 @@ const RenderMoveLearn = () => {
         const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
         //---------sets---------
         //update db first, after move is set, it will rerender
-        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
+        setLsUserLearning(updatedMvmtArr)
         //set local move, and localmovements will be updated on rerender
         setMove(newMoveObj)
         //----------------------------------
       }
     }
-  }, [accessToLocalStorage, move])
+  }, [accessToLocalStorage, move, setLsUserLearning])
 
   //get learning moves
   useEffect(() => {
@@ -131,7 +128,7 @@ const RenderMoveLearn = () => {
     }
 
     //----------set in localstorage-----------------
-    setLocalStorageGlobal.userLearning(
+    setLsUserLearning(
       produce(
         getLocalStorageGlobal.userLearning(accessToLocalStorage),
         (draft) => {
@@ -143,7 +140,6 @@ const RenderMoveLearn = () => {
           }
         },
       ),
-      accessToLocalStorage,
     )
   }
 

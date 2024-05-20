@@ -5,10 +5,7 @@ import { useState, useEffect } from 'react'
 import { safeJsonParse, useLocalStorage } from '../_utils/lib'
 import { lsFlows, lsUserMoves } from '../_utils/localStorageTypes'
 import { Flow } from '../_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '../_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
 import Image from 'next/image'
 import React from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
@@ -90,7 +87,10 @@ export default function RenderFlows() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLsFlows([...getLocalStorageGlobal[lsFlows](accessToLocalStorage), learning])
+      setLsFlows([
+        ...getLocalStorageGlobal[lsFlows](accessToLocalStorage),
+        learning,
+      ])
     } else {
       console.log('cannot find move currently being learned')
     }

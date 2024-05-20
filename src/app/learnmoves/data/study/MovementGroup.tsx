@@ -1,9 +1,6 @@
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import LoadingFallback from '@/app/_components/LoadingFallback'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
@@ -132,17 +129,17 @@ export default function RenderMovementGroup({
     //-----makes a defaults if none found to handle edge cases----
     //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
     position = indexNumber !== localMovements.length - 1 &&
-    makeDefaultPosition({
-      displayName: 'new-position',
-    }),
+      makeDefaultPosition({
+        displayName: 'new-position',
+      }),
     //doesn't make a transitionobj for the first pos, as nothing to transition from
     transition = indexNumber !== 0 &&
-    makeDefaultTransition({
-      displayName: 'new-transition',
-      from: localMovements[indexNumber - 1].positionId || makePositionId(),
-      to: position ? position.positionId : makePositionId(),
-      transitionId: makeTransitionId(),
-    }),
+      makeDefaultTransition({
+        displayName: 'new-transition',
+        from: localMovements[indexNumber - 1].positionId || makePositionId(),
+        to: position ? position.positionId : makePositionId(),
+        transitionId: makeTransitionId(),
+      }),
   } = getPositionAndTransition(movement, move)
   //----------------use effect-----------
   //makes sure has access to local storage
@@ -182,10 +179,9 @@ export default function RenderMovementGroup({
           (a) => a.moveId === move.moveId,
         )
         if (moveIndex !== undefined && moveIndex > -1) {
-          const learning = lsLearningMovesArr.toSpliced(moveIndex, 1, withDeletedMove)
-          //#P1MIGRATION
-          setLsUserLearning(learning)
-          setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage)
+          setLsUserLearning(
+            lsLearningMovesArr.toSpliced(moveIndex, 1, withDeletedMove),
+          )
         } else {
           console.log(
             'ERROR: cannot find the current moveid compared to localstorage learning moveArr',
@@ -226,11 +222,12 @@ export default function RenderMovementGroup({
         setMove(insertedNewMove)
 
         //db
-        const learning = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(currMovementGroupIndex, 1,)
-
-        //#P1MIGRATION
-        setLsUserLearning(learning)
-        setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage,)
+        setLsUserLearning(
+          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
+            currMovementGroupIndex,
+            1,
+          ),
+        )
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
       }
@@ -275,13 +272,7 @@ export default function RenderMovementGroup({
         setMove(updatedMove)
 
         //update db
-        const learning = lsCurrent.toSpliced(selectedMove, 1, updatedMove)
-        //#P1MIGRATION
-        setLsUserLearning(learning)
-        setLocalStorageGlobal[lsUserLearning](
-          learning,
-          accessToLocalStorage,
-        )
+        setLsUserLearning(lsCurrent.toSpliced(selectedMove, 1, updatedMove))
       } else {
         console.log('could not match moveId with localstorage')
       }

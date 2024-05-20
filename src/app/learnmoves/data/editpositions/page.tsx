@@ -4,10 +4,7 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { makePositionId } from '@/app/_utils/lsMakers'
 import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
+import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -138,56 +135,56 @@ const RenderPositions = () => {
               {
                 //if positions exist show positions
                 move?.positions &&
-                move?.positions.map((a, index) => {
-                  return (
-                    <a key={a.positionId}>
-                      {
-                        // if editing, hide move display name and show input
-                        !editing[index] ? (
-                          a.displayName
-                        ) : (
-                          <input
-                            value={a.displayName}
-                            onChange={
-                              //onChange, update displayName inside Position
-                              (e) => {
-                                if (move) {
-                                  const updatedPositions: Position[] =
-                                    move.positions?.toSpliced(index, 1, {
-                                      ...move.positions[index],
-                                      displayName: e.target.value,
-                                    }) || []
-                                  setMove({
-                                    ...move,
-                                    positions: updatedPositions,
-                                  })
+                  move?.positions.map((a, index) => {
+                    return (
+                      <a key={a.positionId}>
+                        {
+                          // if editing, hide move display name and show input
+                          !editing[index] ? (
+                            a.displayName
+                          ) : (
+                            <input
+                              value={a.displayName}
+                              onChange={
+                                //onChange, update displayName inside Position
+                                (e) => {
+                                  if (move) {
+                                    const updatedPositions: Position[] =
+                                      move.positions?.toSpliced(index, 1, {
+                                        ...move.positions[index],
+                                        displayName: e.target.value,
+                                      }) || []
+                                    setMove({
+                                      ...move,
+                                      positions: updatedPositions,
+                                    })
+                                  }
                                 }
                               }
-                            }
-                            type="text"
-                          />
-                        )
-                      }
-                      {
-                        // disable ability to delete or add moves when currently editing.
-                        !editing[index] && (
-                          <div className="flex">
-                            <RenderAddButton
-                              onClick={onClickAdd(index + 1)}
+                              type="text"
                             />
-                            <RenderEditButton onClick={onClickEdit(index)} />
-                            <div onClick={onClickDelete(index)}>
-                              <RenderRedDeleteButton />
+                          )
+                        }
+                        {
+                          // disable ability to delete or add moves when currently editing.
+                          !editing[index] && (
+                            <div className="flex">
+                              <RenderAddButton
+                                onClick={onClickAdd(index + 1)}
+                              />
+                              <RenderEditButton onClick={onClickEdit(index)} />
+                              <div onClick={onClickDelete(index)}>
+                                <RenderRedDeleteButton />
+                              </div>
                             </div>
-                          </div>
-                        )
-                      }
-                      {editing[index] && (
-                        <RenderEditButton onClick={onClickEdit(index)} />
-                      )}
-                    </a>
-                  )
-                })
+                          )
+                        }
+                        {editing[index] && (
+                          <RenderEditButton onClick={onClickEdit(index)} />
+                        )}
+                      </a>
+                    )
+                  })
               }
               {
                 //if there are no moves, add new move
@@ -211,9 +208,7 @@ const RenderPositions = () => {
                 return a
               })
               //set in DB
-              //#P1MIGRATION
               setLsUserLearning(updatedMoves)
-              setLocalStorageGlobal[lsUserLearning](updatedMoves, accessToLocalStorage)
             }}
             href={{
               pathname: '/learnmoves/data',
