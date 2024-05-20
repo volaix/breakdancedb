@@ -46,7 +46,7 @@ const RenderPosition = ({ position }: { position: number }) => {
  * Renders the new move page
  * @returns jsx
  */
-const RenderPage = () => {
+const RenderPageNewMove = () => {
   //-----------------------state------------------------------
   const { updatePositions, moveName, positions, updateMove } = useMoveStore()
   const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
@@ -193,4 +193,4 @@ const RenderPage = () => {
   )
 }
 
-export default RenderPage
+export default RenderPageNewMove

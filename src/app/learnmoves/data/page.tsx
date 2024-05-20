@@ -153,7 +153,7 @@ const RenderTable = () => {
   )
 }
 
-const RenderPage = () => {
+const RenderPageLearnMovesData = () => {
   return (
     <div>
       <Suspense fallback={<LoadingFallback />}>
@@ -163,4 +163,4 @@ const RenderPage = () => {
   )
 }
 
-export default RenderPage
+export default RenderPageLearnMovesData

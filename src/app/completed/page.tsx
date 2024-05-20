@@ -141,7 +141,7 @@ const RenderCompletedMoves = () => {
  * Renders the /completed page.
  * @returns jsx
  */
-export default function RenderPage() {
+export default function RenderPageCompleted() {
   return (
     <div>
       <RenderHeader />

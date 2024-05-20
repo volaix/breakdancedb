@@ -227,7 +227,7 @@ const RenderPositions = () => {
  *
  * Render the move/editpositions page
  */
-export default function RenderPage() {
+export default function RenderPageEditPositions() {
   return (
     <div>
       <Suspense fallback={<LoadingFallback />}>

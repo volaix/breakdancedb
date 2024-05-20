@@ -110,7 +110,7 @@ const YourMoves = () => {
  * Renders the /yourmoves page.
  * @returns jsx
  */
-export default function RenderPage() {
+export default function RenderPageYourMoves() {
   return (
     <div>
       <RenderHeader />

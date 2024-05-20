@@ -278,7 +278,7 @@ const RenderMoveLearn = () => {
   )
 }
 
-export default function RenderPage() {
+export default function RenderPageLearnMovesStudy() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RenderMoveLearn />
