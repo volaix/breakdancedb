@@ -30,6 +30,7 @@ interface ZustandLocalStorage {
   setLsUserLearning: (learning: Move[]) => void
   //getters
   getLsFlows: () => Flow[]
+  getLsUserMoves: () => string[]
 }
 
 export const useZustandStore = create<ZustandLocalStorage>()(
@@ -45,6 +46,7 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
       //getters
       getLsFlows: () => get()[lsFlows],
+      getLsUserMoves: () => get()[lsUserMoves],
     }),
     {
       name: 'zustand-local-storage',

@@ -26,6 +26,7 @@ const YourMoves = () => {
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const setLsUserMoves = useZustandStore((state) => state.setLsUserMoves)
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
 
   //-----------------------------hooks------------------------------
   useEffect(() => {
@@ -36,10 +37,10 @@ const YourMoves = () => {
   useEffect(() => {
     setUserMoves(
       convertMoveArray(
-        getLocalStorageGlobal[lsUserMoves](accessToLocalStorage),
+        getLsUserMoves()
       ),
     )
-  }, [accessToLocalStorage])
+  }, [accessToLocalStorage, getLsUserMoves])
 
   //---------------------------handlers-----------------------------
   const onClickSave = () => {
