@@ -10,6 +10,14 @@ import {
   Move,
 } from './localStorageTypes'
 
+/*
+  Migration Timeline:
+  P1: CURRENT - DUPLICATION OF DATA ZUSTAND LOCAL STORAGE
+  P2: FUTURE - RETRIEVAL OF DATA FROM ZUSTAND LOCAL STORAGE
+  P3: FUTURE - DELETION OF WRITING TO NORMAL LOCAL STORAGE
+  P2: FUTURE - DELETION OF READING NORMAL LOCAL STORAGE
+*/
+
 interface ZustandLocalStorage {
   //-----------properties-----------
 //   [lsFlows]: Flow[]
