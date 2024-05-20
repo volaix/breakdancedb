@@ -11,6 +11,7 @@ import {
 } from '../_utils/accessLocalStorage'
 import Image from 'next/image'
 import React from 'react'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]) =>
@@ -56,6 +57,7 @@ export default function RenderFlows() {
   //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
   const displayMoves = learning && userMoves.length > 0
+  const setLsFlows = useZustandStore((state) => state.setLsFlows)
 
   //---------------------------hooks---------------------------------
   //checks if has access to localstorage
@@ -88,10 +90,7 @@ export default function RenderFlows() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLocalStorageGlobal[lsFlows](
-        [...getLocalStorageGlobal[lsFlows](accessToLocalStorage), learning],
-        accessToLocalStorage,
-      )
+      setLsFlows([...getLocalStorageGlobal[lsFlows](accessToLocalStorage), learning])
     } else {
       console.log('cannot find move currently being learned')
     }
