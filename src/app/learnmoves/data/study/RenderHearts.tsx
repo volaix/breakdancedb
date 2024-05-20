@@ -240,8 +240,7 @@ export const RenderHearts = ({
                       ),
                     )
                   } else {
-                    //TODO have UI visible error handling
-                    console.log('cannot find moveid in localstorage')
+                    console.error('cannot find moveid in localstorage')
                   }
                 }}
                 checked={i === 10 - rating}

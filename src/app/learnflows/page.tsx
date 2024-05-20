@@ -74,7 +74,6 @@ export default function RenderFlows() {
 
   //on mount setLearning
   useEffect(() => {
-    //TODO: Learn moves according to algorithm
     setLearningToRandom(userMoves)
   }, [userMoves])
 

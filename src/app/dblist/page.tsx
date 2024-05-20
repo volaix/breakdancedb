@@ -21,7 +21,6 @@ const DbEntry = ({ move }: { move: string }) => {
 }
 
 export default function Page() {
-  //TODO use localstorage
   return (
     <>
       <RenderHeader />
