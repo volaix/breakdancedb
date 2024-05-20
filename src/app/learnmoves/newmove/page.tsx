@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsMakers'
-import { lsUserLearning } from '@/app/_utils/localStorageTypes'
-import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useMoveStore } from './store'
 import { makeTransitions } from '@/app/_utils/lsMakers'
@@ -43,6 +41,7 @@ const RenderPosition = ({ position }: { position: number }) => {
     </div>
   )
 }
+
 /**
  * Renders the new move page
  * @returns jsx
@@ -51,6 +50,7 @@ const RenderPage = () => {
   //-----------------------state------------------------------
   const { updatePositions, moveName, positions, updateMove } = useMoveStore()
   const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const [saveText, setSaveText] = useState<string>('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [existingMoves, setExistingMoves] = useState<Move[]>([])
@@ -63,10 +63,8 @@ const RenderPage = () => {
 
   //sets existing moves with what's learning in localstorage
   useEffect(() => {
-    setExistingMoves(
-      getLocalStorageGlobal[lsUserLearning](accessToLocalStorage),
-    )
-  }, [accessToLocalStorage])
+    setExistingMoves(getLsUserLearning())
+  }, [accessToLocalStorage, getLsUserLearning])
 
   //When RangeVal updates, update positions in the shared state*/
   useEffect(() => {

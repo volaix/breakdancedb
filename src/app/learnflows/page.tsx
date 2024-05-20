@@ -85,10 +85,7 @@ export default function RenderFlows() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLsFlows([
-        ...getLsFlows(),
-        learning,
-      ])
+      setLsFlows([...getLsFlows(), learning])
     } else {
       console.log('cannot find move currently being learned')
     }

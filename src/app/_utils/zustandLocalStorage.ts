@@ -1,9 +1,8 @@
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 
 import {
   Flow,
-  LocalStorageStructure,
   lsFlows,
   lsUserLearning,
   lsUserMoves,
@@ -31,6 +30,7 @@ interface ZustandLocalStorage {
   //getters
   getLsFlows: () => Flow[]
   getLsUserMoves: () => string[]
+  getLsUserLearning: () => Move[]
 }
 
 export const useZustandStore = create<ZustandLocalStorage>()(
@@ -47,6 +47,7 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       //getters
       getLsFlows: () => get()[lsFlows],
       getLsUserMoves: () => get()[lsUserMoves],
+      getLsUserLearning: () => get()[lsUserLearning],
     }),
     {
       name: 'zustand-local-storage',

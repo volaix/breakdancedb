@@ -2,9 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makePositionId } from '@/app/_utils/lsMakers'
-import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
-import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -30,26 +28,25 @@ const RenderPositions = () => {
   const [currentMoves, setCurrentMoves] = useState<Move[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
 
   //------------------------------Use Effect-----------------------------------------
   //Gets all the current moves
   useEffect(() => {
-    setCurrentMoves([
-      ...getLocalStorageGlobal[lsUserLearning](accessToLocalStorage),
-    ])
-  }, [accessToLocalStorage])
+    setCurrentMoves([...getLsUserLearning()])
+  }, [accessToLocalStorage, getLsUserLearning])
 
   // Sets accessToLocalStorage as boolean
   useLocalStorage(setAccessToLocalStorage)
 
   //Get current move
   useEffect(() => {
-    const allMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+    const allMoves = getLsUserLearning()
     const selectedMove = allMoves.find((obj) => obj.moveId === moveId)
     setMove(selectedMove || null)
-  }, [accessToLocalStorage, moveId])
+  }, [accessToLocalStorage, moveId, getLsUserLearning])
 
   /**
    * Update the group of current moves to be ready to send to localstorage

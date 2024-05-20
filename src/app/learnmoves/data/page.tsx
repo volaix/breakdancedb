@@ -1,15 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { MoveExecution } from '@/app/_utils/localStorageTypes'
-import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 /**
  * Calculates % learned of move positions
@@ -87,16 +86,17 @@ const RenderTable = () => {
   const moveId: string | null = searchParams?.get('moveId') || null
   const numberOfPositions = move?.positions?.length
   const numberOfTransitions = move?.transitions?.length
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
 
   //----------------------------hooks----------------------------
   useLocalStorage(setAccessToLocalStorage)
 
   //get learning moves
   useEffect(() => {
-    const allMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+    const allMoves = getLsUserLearning()
     const selectedMove = allMoves.find((obj) => obj.moveId === moveId)
     setMove(selectedMove || null)
-  }, [accessToLocalStorage, moveId])
+  }, [accessToLocalStorage, moveId, getLsUserLearning])
 
   //--------------------------render--------------------------
   return (

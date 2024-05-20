@@ -1,8 +1,6 @@
 'use client'
 //@format
 import RenderHeader from '@/app/_components/Header'
-import { lsUserMoves } from '../_utils/localStorageTypes'
-import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -35,11 +33,7 @@ const YourMoves = () => {
 
   //Populate existing moves
   useEffect(() => {
-    setUserMoves(
-      convertMoveArray(
-        getLsUserMoves()
-      ),
-    )
+    setUserMoves(convertMoveArray(getLsUserMoves()))
   }, [accessToLocalStorage, getLsUserMoves])
 
   //---------------------------handlers-----------------------------

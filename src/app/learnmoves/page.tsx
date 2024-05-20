@@ -1,9 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { lsUserLearning } from '../_utils/localStorageTypes'
-import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
 import { Move } from '../_utils/localStorageTypes'
 import Link from 'next/link'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
  * is Mapped to render moves that the user is currently learning
@@ -36,9 +35,11 @@ const RenderMoveBox = ({ move }: { move: Move }) => {
  * @returns jsx
  */
 export default function RenderLearnMoves() {
+  //---------------------state----------------
   const [accessToLocalStorage, setAccessToLocalStorage] =
     useState<boolean>(false)
   const [learning, setLearning] = useState<Move[]>([])
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
 
   //-----------------------useeffect-----------------------------------
   useEffect(() => {
@@ -48,9 +49,9 @@ export default function RenderLearnMoves() {
   //get learning moves
   useEffect(() => {
     if (accessToLocalStorage) {
-      setLearning(getLocalStorageGlobal[lsUserLearning](accessToLocalStorage))
+      setLearning(getLsUserLearning())
     }
-  }, [accessToLocalStorage])
+  }, [accessToLocalStorage, getLsUserLearning])
 
   //---------------------render------------------------------------------------
 

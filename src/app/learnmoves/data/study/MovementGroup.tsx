@@ -1,7 +1,6 @@
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
-import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
+import { MovementGroup } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { Move } from '@/app/_utils/localStorageTypes'
 import {
@@ -9,7 +8,7 @@ import {
   makeDefaultTransition,
   makeMovementId,
   makePositionId,
-  makeTransitionId
+  makeTransitionId,
 } from '@/app/_utils/lsMakers'
 import { MouseEventHandler, useState } from 'react'
 import { Dispatch, SetStateAction } from 'react'
@@ -114,6 +113,7 @@ export default function RenderMovementGroup({
 }) {
   //------------------state----------------
 
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const setIsEditing = useDataLearnStore((state) => state.setIsEditing)
   const isEditing = useDataLearnStore((state) => state.isEditing)
   const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
@@ -169,8 +169,7 @@ export default function RenderMovementGroup({
         setMove(withDeletedMove)
         //db
 
-        const lsLearningMovesArr =
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+        const lsLearningMovesArr = getLsUserLearning()
         const moveIndex = lsLearningMovesArr.findIndex(
           (a) => a.moveId === move.moveId,
         )
@@ -219,10 +218,7 @@ export default function RenderMovementGroup({
 
         //db
         setLsUserLearning(
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
-            currMovementGroupIndex,
-            1,
-          ),
+          getLsUserLearning().toSpliced(currMovementGroupIndex, 1),
         )
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
@@ -250,8 +246,7 @@ export default function RenderMovementGroup({
         }
       })
       //gets current localstorage
-      const lsCurrent =
-        getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+      const lsCurrent = getLsUserLearning()
       //finds the current move inside the db
       const selectedMove = lsCurrent.findIndex(
         (obj) => obj.moveId === move.moveId,
