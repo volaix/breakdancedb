@@ -1,27 +1,23 @@
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
-import LoadingFallback from '@/app/_components/LoadingFallback'
 import { getLocalStorageGlobal } from '@/app/_utils/accessLocalStorage'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { Move } from '@/app/_utils/localStorageTypes'
 import {
-  makeDefaultMovementGroupArr,
   makeDefaultPosition,
   makeDefaultTransition,
   makeMovementId,
   makePositionId,
-  makeTransitionId,
+  makeTransitionId
 } from '@/app/_utils/lsMakers'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import { MouseEventHandler, Suspense, useEffect, useState } from 'react'
+import { MouseEventHandler, useState } from 'react'
 import { Dispatch, SetStateAction } from 'react'
-import { Form, SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import { RenderAddButton } from '../../_components/Svgs'
-import { MovementKeys, MovementType } from './pagetypes'
+import { MovementType } from './pagetypes'
 import { RenderHearts } from './RenderHearts'
 import { create } from 'zustand'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
