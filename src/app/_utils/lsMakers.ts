@@ -1,13 +1,14 @@
 import { v4 } from 'uuid'
+
 import {
   MoveId,
-  PositionId,
-  TransitionId,
-  Position,
-  Transition,
-  Transitions,
   MovementGroup,
   MovementId,
+  Position,
+  PositionId,
+  Transition,
+  TransitionId,
+  Transitions,
 } from './localStorageTypes'
 
 // ------------------------makers-----------------------------
