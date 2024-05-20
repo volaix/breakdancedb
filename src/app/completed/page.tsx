@@ -6,6 +6,7 @@ import { useLocalStorage } from '@/app/_utils/lib'
 import { lsFlows } from '../_utils/localStorageTypes'
 import { Flow } from '../_utils/localStorageTypes'
 import { getLocalStorageGlobal } from '../_utils/accessLocalStorage'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
  * renders the flow box that displays 3 lines of text (the flow learned)
@@ -100,6 +101,7 @@ const RenderCompletedMoves = () => {
   //------------------------------state---------------------------------
   const [flows, setFlows] = useState<Flow[] | null>(null)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //-----------------------------hooks-------------------------------
   //checks if has access to localstorage
@@ -107,8 +109,8 @@ const RenderCompletedMoves = () => {
 
   //updates flows using localstorage
   useEffect(() => {
-    setFlows(getLocalStorageGlobal[lsFlows](accessToLocalStorage))
-  }, [accessToLocalStorage])
+    setFlows(getLsFlows())
+  }, [accessToLocalStorage, getLsFlows])
 
   //-----------------------------render---------------------------------
   //TODO: Shows flows, transitions, moves, combos, and organises them by frequency or date accessed

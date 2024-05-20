@@ -55,6 +55,7 @@ export default function RenderFlows() {
   const [learning, setLearning] = useState<Learning>(null)
   const displayMoves = learning && userMoves.length > 0
   const setLsFlows = useZustandStore((state) => state.setLsFlows)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //---------------------------hooks---------------------------------
   //checks if has access to localstorage
@@ -88,7 +89,7 @@ export default function RenderFlows() {
     if (learning) {
       //updates localstorage with the added flow
       setLsFlows([
-        ...getLocalStorageGlobal[lsFlows](accessToLocalStorage),
+        ...getLsFlows(),
         learning,
       ])
     } else {
