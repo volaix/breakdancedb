@@ -21,12 +21,12 @@ import {
 interface ZustandLocalStorage {
   //-----------properties-----------
 //   [lsFlows]: Flow[]
-//   [lsUserMoves]: string[]
+  [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
   //------------methods------------
   //setters
 //   setLsFlows: (flows: Flow[]) => void
-//   setLsUserMoves: (moves: string[]) => void
+  setLsUserMoves: (moves: string[]) => void
   setLsUserLearning: (learning: Move[]) => void
   //getters
 }
@@ -35,11 +35,11 @@ export const useZustandStore = create<ZustandLocalStorage>()(
   persist(
     (set, get) => ({
     //   [lsFlows]: [],
-    //   [lsUserMoves]: [],
+      [lsUserMoves]: [],
       [lsUserLearning]: [],
       //setters
     //   setLsFlows: (flows) => set({ [lsFlows]: flows }),
-    //   setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
+      setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
       setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
     }),
     {

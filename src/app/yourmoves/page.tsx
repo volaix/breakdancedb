@@ -7,6 +7,7 @@ import {
   setLocalStorageGlobal,
 } from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //---------------------------utils---------------------------------
 const convertMoveString = (moveString: string): string[] => {
@@ -27,6 +28,7 @@ const YourMoves = () => {
   const [userMoves, setUserMoves] = useState<string>('')
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const setLsUserMoves = useZustandStore((state) => state.setLsUserMoves)
 
   //-----------------------------hooks------------------------------
   useEffect(() => {
@@ -44,10 +46,7 @@ const YourMoves = () => {
 
   //---------------------------handlers-----------------------------
   const onClickSave = () => {
-    setLocalStorageGlobal[lsUserMoves](
-      convertMoveString(userMoves) as string[],
-      accessToLocalStorage,
-    )
+    setLsUserMoves(convertMoveString(userMoves) as string[])
     setSaveText('Saved')
     //TODO show modal saved to localstorage
   }
