@@ -12,7 +12,7 @@ I didn't do any.
 
 ### Checklist for opinionated, typed, linted, deployed, and mergable code.
 
-`yarn format:fix && yarn ts && yarn lint`
+`yarn ok` to test all the boxes 📦
 
 - "yarn format" to check prettier 🔍
 - "yarn format:fix" to autofix 💃
