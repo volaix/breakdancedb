@@ -20,6 +20,7 @@ import {
   makeTransitionId,
 } from '@/app/_utils/lsMakers'
 import { produce } from 'immer'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //--------------local utils--------------
 /**
@@ -182,6 +183,7 @@ export const RenderHearts = ({
   isOppositeSide: boolean
 }) => {
   //-----------------------------state-------------------
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
   //make a movekey for when we update in localstorage. defaulting to positions
@@ -238,10 +240,13 @@ export const RenderHearts = ({
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
                     //updates localstorage on click
+                    const learning = globalMoves.map((ogMove: Move) =>
+                      matchCriteria(ogMove) ? updatedMove : ogMove,
+                    )
+                    //#P1MIGRATION
+                    setLsUserLearning(learning)
                     setLocalStorageGlobal[lsUserLearning](
-                      globalMoves.map((ogMove: Move) =>
-                        matchCriteria(ogMove) ? updatedMove : ogMove,
-                      ),
+                      learning,
                       accessToLocalStorage,
                     )
                   } else {

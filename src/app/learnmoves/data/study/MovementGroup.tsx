@@ -27,6 +27,7 @@ import { RenderAddButton } from '../../_components/Svgs'
 import { MovementKeys, MovementType } from './pagetypes'
 import { RenderHearts } from './RenderHearts'
 import { create } from 'zustand'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 // ----------------------store-----------------------------
 export interface DataLearnState {
   //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
@@ -120,11 +121,9 @@ export default function RenderMovementGroup({
 }) {
   //------------------state----------------
 
-  //zustand
   const setIsEditing = useDataLearnStore((state) => state.setIsEditing)
   const isEditing = useDataLearnStore((state) => state.isEditing)
-
-  //react
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const { register, handleSubmit } = useForm<Inputs>()
 
@@ -133,17 +132,17 @@ export default function RenderMovementGroup({
     //-----makes a defaults if none found to handle edge cases----
     //do not have a default for the last movementgroup as it's just a transition loop to repeat and doesnt have positions
     position = indexNumber !== localMovements.length - 1 &&
-      makeDefaultPosition({
-        displayName: 'new-position',
-      }),
+    makeDefaultPosition({
+      displayName: 'new-position',
+    }),
     //doesn't make a transitionobj for the first pos, as nothing to transition from
     transition = indexNumber !== 0 &&
-      makeDefaultTransition({
-        displayName: 'new-transition',
-        from: localMovements[indexNumber - 1].positionId || makePositionId(),
-        to: position ? position.positionId : makePositionId(),
-        transitionId: makeTransitionId(),
-      }),
+    makeDefaultTransition({
+      displayName: 'new-transition',
+      from: localMovements[indexNumber - 1].positionId || makePositionId(),
+      to: position ? position.positionId : makePositionId(),
+      transitionId: makeTransitionId(),
+    }),
   } = getPositionAndTransition(movement, move)
   //----------------use effect-----------
   //makes sure has access to local storage
@@ -183,13 +182,10 @@ export default function RenderMovementGroup({
           (a) => a.moveId === move.moveId,
         )
         if (moveIndex !== undefined && moveIndex > -1) {
-          setLocalStorageGlobal[lsUserLearning](
-            //gets localstorage learning
-            lsLearningMovesArr
-              //updates the specific move with our deleted one
-              .toSpliced(moveIndex, 1, withDeletedMove),
-            accessToLocalStorage,
-          )
+          const learning = lsLearningMovesArr.toSpliced(moveIndex, 1, withDeletedMove)
+          //#P1MIGRATION
+          setLsUserLearning(learning)
+          setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage)
         } else {
           console.log(
             'ERROR: cannot find the current moveid compared to localstorage learning moveArr',
@@ -226,17 +222,15 @@ export default function RenderMovementGroup({
           }),
         }
         //-------------updates local+db------------
+        //#P2MIGRATION DELETE
         setMove(insertedNewMove)
 
         //db
-        setLocalStorageGlobal[lsUserLearning](
-          //gets localstorage learning and updates the specific move with our deleted one
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
-            currMovementGroupIndex,
-            1,
-          ),
-          accessToLocalStorage,
-        )
+        const learning = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(currMovementGroupIndex, 1,)
+
+        //#P1MIGRATION
+        setLsUserLearning(learning)
+        setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage,)
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
       }
@@ -276,12 +270,16 @@ export default function RenderMovementGroup({
           movements: newMovements,
         }
 
+        //Can be deleted at #P2MIGRATION
         //update locally to view, if skip it wont rerender
         setMove(updatedMove)
 
-        //updates local storage, while replacing the current move with what's been changed locally
+        //update db
+        const learning = lsCurrent.toSpliced(selectedMove, 1, updatedMove)
+        //#P1MIGRATION
+        setLsUserLearning(learning)
         setLocalStorageGlobal[lsUserLearning](
-          lsCurrent.toSpliced(selectedMove, 1, updatedMove),
+          learning,
           accessToLocalStorage,
         )
       } else {

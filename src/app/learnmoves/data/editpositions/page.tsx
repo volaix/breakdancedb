@@ -17,6 +17,7 @@ import {
   RenderAddButton,
   RenderRedDeleteButton,
 } from '../../_components/Svgs'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //------------------------------components-----------------------
 
@@ -26,16 +27,16 @@ import {
  * @returns jsx
  */
 const RenderPositions = () => {
-  // Vars/State
+  //---------------------------------state--------------------
   const [move, setMove] = useState<Move | null>(null)
   const [editing, setEditing] = useState<{ [key: number]: boolean }>({})
   const [currentMoves, setCurrentMoves] = useState<Move[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
 
   //------------------------------Use Effect-----------------------------------------
-  //----------------------------------------------------------------------------------
   //Gets all the current moves
   useEffect(() => {
     setCurrentMoves([
@@ -137,56 +138,56 @@ const RenderPositions = () => {
               {
                 //if positions exist show positions
                 move?.positions &&
-                  move?.positions.map((a, index) => {
-                    return (
-                      <a key={a.positionId}>
-                        {
-                          // if editing, hide move display name and show input
-                          !editing[index] ? (
-                            a.displayName
-                          ) : (
-                            <input
-                              value={a.displayName}
-                              onChange={
-                                //onChange, update displayName inside Position
-                                (e) => {
-                                  if (move) {
-                                    const updatedPositions: Position[] =
-                                      move.positions?.toSpliced(index, 1, {
-                                        ...move.positions[index],
-                                        displayName: e.target.value,
-                                      }) || []
-                                    setMove({
-                                      ...move,
-                                      positions: updatedPositions,
-                                    })
-                                  }
+                move?.positions.map((a, index) => {
+                  return (
+                    <a key={a.positionId}>
+                      {
+                        // if editing, hide move display name and show input
+                        !editing[index] ? (
+                          a.displayName
+                        ) : (
+                          <input
+                            value={a.displayName}
+                            onChange={
+                              //onChange, update displayName inside Position
+                              (e) => {
+                                if (move) {
+                                  const updatedPositions: Position[] =
+                                    move.positions?.toSpliced(index, 1, {
+                                      ...move.positions[index],
+                                      displayName: e.target.value,
+                                    }) || []
+                                  setMove({
+                                    ...move,
+                                    positions: updatedPositions,
+                                  })
                                 }
                               }
-                              type="text"
+                            }
+                            type="text"
+                          />
+                        )
+                      }
+                      {
+                        // disable ability to delete or add moves when currently editing.
+                        !editing[index] && (
+                          <div className="flex">
+                            <RenderAddButton
+                              onClick={onClickAdd(index + 1)}
                             />
-                          )
-                        }
-                        {
-                          // disable ability to delete or add moves when currently editing.
-                          !editing[index] && (
-                            <div className="flex">
-                              <RenderAddButton
-                                onClick={onClickAdd(index + 1)}
-                              />
-                              <RenderEditButton onClick={onClickEdit(index)} />
-                              <div onClick={onClickDelete(index)}>
-                                <RenderRedDeleteButton />
-                              </div>
+                            <RenderEditButton onClick={onClickEdit(index)} />
+                            <div onClick={onClickDelete(index)}>
+                              <RenderRedDeleteButton />
                             </div>
-                          )
-                        }
-                        {editing[index] && (
-                          <RenderEditButton onClick={onClickEdit(index)} />
-                        )}
-                      </a>
-                    )
-                  })
+                          </div>
+                        )
+                      }
+                      {editing[index] && (
+                        <RenderEditButton onClick={onClickEdit(index)} />
+                      )}
+                    </a>
+                  )
+                })
               }
               {
                 //if there are no moves, add new move
@@ -209,10 +210,10 @@ const RenderPositions = () => {
                 }
                 return a
               })
-              setLocalStorageGlobal[lsUserLearning](
-                updatedMoves,
-                accessToLocalStorage,
-              )
+              //set in DB
+              //#P1MIGRATION
+              setLsUserLearning(updatedMoves)
+              setLocalStorageGlobal[lsUserLearning](updatedMoves, accessToLocalStorage)
             }}
             href={{
               pathname: '/learnmoves/data',

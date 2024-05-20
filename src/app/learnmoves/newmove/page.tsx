@@ -14,6 +14,7 @@ import { makePositions } from '@/app/_utils/lsMakers'
 import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
 import { useRouter } from 'next/navigation'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 /**
  * Renders a text input with default position name
@@ -52,6 +53,7 @@ const RenderPosition = ({ position }: { position: number }) => {
 const RenderPage = () => {
   //-----------------------state------------------------------
   const { updatePositions, moveName, positions, updateMove } = useMoveStore()
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const [saveText, setSaveText] = useState<string>('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [existingMoves, setExistingMoves] = useState<Move[]>([])
@@ -87,7 +89,6 @@ const RenderPage = () => {
         positions: lsPositions,
       })
 
-      //makes a new move
       const newMove: Move = {
         displayName: moveName,
         moveId: makeMoveId(),
@@ -101,11 +102,12 @@ const RenderPage = () => {
         transitions: newTransitions,
       }
 
-      //updates localstorage with newmove
-      setLocalStorageGlobal[lsUserLearning](
-        [...existingMoves, newMove],
-        accessToLocalStorage,
-      )
+      //update db
+      const learning = [...existingMoves, newMove]
+      //#P1MIGRATION
+      setLsUserLearning(learning)
+      setLocalStorageGlobal[lsUserLearning](learning, accessToLocalStorage,)
+
     }
     setSaveText('Saved')
     router.back()
