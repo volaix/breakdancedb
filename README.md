@@ -2,8 +2,6 @@
 
 APP = A power user's move database
 
-Roadmap: https://trello.com/invite/b/io1dH18G/ATTI3b20ecf6d8200e4485972068f0d98e1aD9E2704F/dev-roadmap
-
 1. MOVE LVL. video into shapes. Focus on move.
 2. TRANSITIONS LVL. shapes into transitions. Focus on movement.
 3. FLOW LVL. transitions into flow. Focus on dance.
