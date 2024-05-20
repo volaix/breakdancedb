@@ -2,12 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makePositionId } from '@/app/_utils/lsMakers'
-import { lsUserLearning } from '@/app/_utils/localStorageTypes'
 import { Position } from '@/app/_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -17,6 +12,7 @@ import {
   RenderAddButton,
   RenderRedDeleteButton,
 } from '../../_components/Svgs'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //------------------------------components-----------------------
 
@@ -26,32 +22,31 @@ import {
  * @returns jsx
  */
 const RenderPositions = () => {
-  // Vars/State
+  //---------------------------------state--------------------
   const [move, setMove] = useState<Move | null>(null)
   const [editing, setEditing] = useState<{ [key: number]: boolean }>({})
   const [currentMoves, setCurrentMoves] = useState<Move[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const searchParams = useSearchParams()
   const moveId: string | null = searchParams?.get('moveId') || null
 
   //------------------------------Use Effect-----------------------------------------
-  //----------------------------------------------------------------------------------
   //Gets all the current moves
   useEffect(() => {
-    setCurrentMoves([
-      ...getLocalStorageGlobal[lsUserLearning](accessToLocalStorage),
-    ])
-  }, [accessToLocalStorage])
+    setCurrentMoves([...getLsUserLearning()])
+  }, [accessToLocalStorage, getLsUserLearning])
 
   // Sets accessToLocalStorage as boolean
   useLocalStorage(setAccessToLocalStorage)
 
   //Get current move
   useEffect(() => {
-    const allMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+    const allMoves = getLsUserLearning()
     const selectedMove = allMoves.find((obj) => obj.moveId === moveId)
     setMove(selectedMove || null)
-  }, [accessToLocalStorage, moveId])
+  }, [accessToLocalStorage, moveId, getLsUserLearning])
 
   /**
    * Update the group of current moves to be ready to send to localstorage
@@ -209,10 +204,8 @@ const RenderPositions = () => {
                 }
                 return a
               })
-              setLocalStorageGlobal[lsUserLearning](
-                updatedMoves,
-                accessToLocalStorage,
-              )
+              //set in DB
+              setLsUserLearning(updatedMoves)
             }}
             href={{
               pathname: '/learnmoves/data',
@@ -234,7 +227,7 @@ const RenderPositions = () => {
  *
  * Render the move/editpositions page
  */
-export default function RenderPage() {
+export default function RenderPageEditPositions() {
   return (
     <div>
       <Suspense fallback={<LoadingFallback />}>

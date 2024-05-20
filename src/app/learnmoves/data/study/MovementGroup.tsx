@@ -1,32 +1,25 @@
 import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
-import LoadingFallback from '@/app/_components/LoadingFallback'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { lsUserLearning, MovementGroup } from '@/app/_utils/localStorageTypes'
+import { MovementGroup } from '@/app/_utils/localStorageTypes'
 import { Position, Transition } from '@/app/_utils/localStorageTypes'
 import { Move } from '@/app/_utils/localStorageTypes'
 import {
-  makeDefaultMovementGroupArr,
   makeDefaultPosition,
   makeDefaultTransition,
   makeMovementId,
   makePositionId,
   makeTransitionId,
 } from '@/app/_utils/lsMakers'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import { MouseEventHandler, Suspense, useEffect, useState } from 'react'
+import { MouseEventHandler, useState } from 'react'
 import { Dispatch, SetStateAction } from 'react'
-import { Form, SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
 import { RenderAddButton } from '../../_components/Svgs'
-import { MovementKeys, MovementType } from './pagetypes'
+import { MovementType } from './pagetypes'
 import { RenderHearts } from './RenderHearts'
 import { create } from 'zustand'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 // ----------------------store-----------------------------
 export interface DataLearnState {
   //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
@@ -120,11 +113,10 @@ export default function RenderMovementGroup({
 }) {
   //------------------state----------------
 
-  //zustand
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const setIsEditing = useDataLearnStore((state) => state.setIsEditing)
   const isEditing = useDataLearnStore((state) => state.isEditing)
-
-  //react
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const { register, handleSubmit } = useForm<Inputs>()
 
@@ -177,18 +169,13 @@ export default function RenderMovementGroup({
         setMove(withDeletedMove)
         //db
 
-        const lsLearningMovesArr =
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+        const lsLearningMovesArr = getLsUserLearning()
         const moveIndex = lsLearningMovesArr.findIndex(
           (a) => a.moveId === move.moveId,
         )
         if (moveIndex !== undefined && moveIndex > -1) {
-          setLocalStorageGlobal[lsUserLearning](
-            //gets localstorage learning
-            lsLearningMovesArr
-              //updates the specific move with our deleted one
-              .toSpliced(moveIndex, 1, withDeletedMove),
-            accessToLocalStorage,
+          setLsUserLearning(
+            lsLearningMovesArr.toSpliced(moveIndex, 1, withDeletedMove),
           )
         } else {
           console.log(
@@ -226,16 +213,12 @@ export default function RenderMovementGroup({
           }),
         }
         //-------------updates local+db------------
+        //#P2MIGRATION DELETE
         setMove(insertedNewMove)
 
         //db
-        setLocalStorageGlobal[lsUserLearning](
-          //gets localstorage learning and updates the specific move with our deleted one
-          getLocalStorageGlobal[lsUserLearning](accessToLocalStorage).toSpliced(
-            currMovementGroupIndex,
-            1,
-          ),
-          accessToLocalStorage,
+        setLsUserLearning(
+          getLsUserLearning().toSpliced(currMovementGroupIndex, 1),
         )
       } else {
         console.log('ERROR: cannot find movementId inside movement array')
@@ -263,8 +246,7 @@ export default function RenderMovementGroup({
         }
       })
       //gets current localstorage
-      const lsCurrent =
-        getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+      const lsCurrent = getLsUserLearning()
       //finds the current move inside the db
       const selectedMove = lsCurrent.findIndex(
         (obj) => obj.moveId === move.moveId,
@@ -276,14 +258,12 @@ export default function RenderMovementGroup({
           movements: newMovements,
         }
 
+        //Can be deleted at #P2MIGRATION
         //update locally to view, if skip it wont rerender
         setMove(updatedMove)
 
-        //updates local storage, while replacing the current move with what's been changed locally
-        setLocalStorageGlobal[lsUserLearning](
-          lsCurrent.toSpliced(selectedMove, 1, updatedMove),
-          accessToLocalStorage,
-        )
+        //update db
+        setLsUserLearning(lsCurrent.toSpliced(selectedMove, 1, updatedMove))
       } else {
         console.log('could not match moveId with localstorage')
       }

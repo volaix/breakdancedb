@@ -1,6 +1,6 @@
 ### What I did in this PR:
 
-I fixed/added **\_\_**
+I'm too lazy to write something.
 
 ### How did I do it?
 
@@ -12,7 +12,7 @@ I didn't do any.
 
 ### Checklist for opinionated, typed, linted, deployed, and mergable code.
 
-`yarn format:fix && yarn ts && yarn lint`
+`yarn ok` to test all the boxes 📦
 
 - "yarn format" to check prettier 🔍
 - "yarn format:fix" to autofix 💃

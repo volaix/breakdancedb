@@ -1,12 +1,8 @@
 'use client'
 //@format
 import RenderHeader from '@/app/_components/Header'
-import { lsUserMoves } from '../_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '../_utils/accessLocalStorage'
 import { useState, useEffect } from 'react'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //---------------------------utils---------------------------------
 const convertMoveString = (moveString: string): string[] => {
@@ -27,6 +23,8 @@ const YourMoves = () => {
   const [userMoves, setUserMoves] = useState<string>('')
   const [saveText, setSaveText] = useState('Save')
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const setLsUserMoves = useZustandStore((state) => state.setLsUserMoves)
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
 
   //-----------------------------hooks------------------------------
   useEffect(() => {
@@ -35,19 +33,12 @@ const YourMoves = () => {
 
   //Populate existing moves
   useEffect(() => {
-    setUserMoves(
-      convertMoveArray(
-        getLocalStorageGlobal[lsUserMoves](accessToLocalStorage),
-      ),
-    )
-  }, [accessToLocalStorage])
+    setUserMoves(convertMoveArray(getLsUserMoves()))
+  }, [accessToLocalStorage, getLsUserMoves])
 
   //---------------------------handlers-----------------------------
   const onClickSave = () => {
-    setLocalStorageGlobal[lsUserMoves](
-      convertMoveString(userMoves) as string[],
-      accessToLocalStorage,
-    )
+    setLsUserMoves(convertMoveString(userMoves) as string[])
     setSaveText('Saved')
     //TODO show modal saved to localstorage
   }
@@ -119,7 +110,7 @@ const YourMoves = () => {
  * Renders the /yourmoves page.
  * @returns jsx
  */
-export default function RenderPage() {
+export default function RenderPageYourMoves() {
   return (
     <div>
       <RenderHeader />

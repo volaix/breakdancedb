@@ -4,12 +4,7 @@ import {
   MovementGroup,
   PositionId,
   TransitionId,
-  lsUserLearning,
 } from '@/app/_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { MovementType, MovementKeys } from './pagetypes'
 import { useLocalStorage } from '@/app/_utils/lib'
@@ -20,6 +15,7 @@ import {
   makeTransitionId,
 } from '@/app/_utils/lsMakers'
 import { produce } from 'immer'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //--------------local utils--------------
 /**
@@ -182,6 +178,8 @@ export const RenderHearts = ({
   isOppositeSide: boolean
 }) => {
   //-----------------------------state-------------------
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
 
   //make a movekey for when we update in localstorage. defaulting to positions
@@ -232,21 +230,17 @@ export const RenderHearts = ({
                   const matchCriteria = (a: Move) => a.moveId === move.moveId
 
                   //all the moves from localstorage
-                  const globalMoves =
-                    getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+                  const globalMoves = getLsUserLearning()
 
                   //validation if local moveId exists in global moveId
                   if (globalMoves.find(matchCriteria)) {
-                    //updates localstorage on click
-                    setLocalStorageGlobal[lsUserLearning](
+                    setLsUserLearning(
                       globalMoves.map((ogMove: Move) =>
                         matchCriteria(ogMove) ? updatedMove : ogMove,
                       ),
-                      accessToLocalStorage,
                     )
                   } else {
-                    //TODO have UI visible error handling
-                    console.log('cannot find moveid in localstorage')
+                    console.error('cannot find moveid in localstorage')
                   }
                 }}
                 checked={i === 10 - rating}

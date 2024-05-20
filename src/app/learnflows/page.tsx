@@ -2,15 +2,10 @@
 // @format
 import RenderHeader from '@/app/_components/Header'
 import { useState, useEffect } from 'react'
-import { safeJsonParse, useLocalStorage } from '../_utils/lib'
-import { lsFlows, lsUserMoves } from '../_utils/localStorageTypes'
+import { useLocalStorage } from '../_utils/lib'
 import { Flow } from '../_utils/localStorageTypes'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '../_utils/accessLocalStorage'
 import Image from 'next/image'
-import React from 'react'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]) =>
@@ -50,12 +45,14 @@ const RenderMove = ({ move }: { move: string }) => {
  */
 export default function RenderFlows() {
   //-----------------------------state-----------------------------
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
-  //userMoves here is global moves from local storage
   const [userMoves, setUserMoves] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
   const displayMoves = learning && userMoves.length > 0
+  const setLsFlows = useZustandStore((state) => state.setLsFlows)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //---------------------------hooks---------------------------------
   //checks if has access to localstorage
@@ -63,8 +60,8 @@ export default function RenderFlows() {
 
   //Populate existing moves
   useEffect(() => {
-    setUserMoves(getLocalStorageGlobal[lsUserMoves](accessToLocalStorage))
-  }, [accessToLocalStorage])
+    setUserMoves(getLsUserMoves())
+  }, [accessToLocalStorage, getLsUserMoves])
 
   //sets learning to random
   const setLearningToRandom = (moves: string[]) => {
@@ -77,7 +74,6 @@ export default function RenderFlows() {
 
   //on mount setLearning
   useEffect(() => {
-    //TODO: Learn moves according to algorithm
     setLearningToRandom(userMoves)
   }, [userMoves])
 
@@ -88,10 +84,7 @@ export default function RenderFlows() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLocalStorageGlobal[lsFlows](
-        [...getLocalStorageGlobal[lsFlows](accessToLocalStorage), learning],
-        accessToLocalStorage,
-      )
+      setLsFlows([...getLsFlows(), learning])
     } else {
       console.log('cannot find move currently being learned')
     }

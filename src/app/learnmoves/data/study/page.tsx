@@ -1,24 +1,16 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import {
-  MovementGroup,
-  TypeLoopOptions,
-  lsUserLearning,
-} from '@/app/_utils/localStorageTypes'
+import { MovementGroup, TypeLoopOptions } from '@/app/_utils/localStorageTypes'
 import RenderMovementGroup from './MovementGroup'
-import {
-  getLocalStorageGlobal,
-  setLocalStorageGlobal,
-} from '@/app/_utils/accessLocalStorage'
 import { Move } from '@/app/_utils/localStorageTypes'
 import { useSearchParams } from 'next/navigation'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { makeDefaultMovementGroupArr } from '@/app/_utils/lsMakers'
-import { create } from 'zustand'
 import { produce } from 'immer'
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //-------------------------------Local Types---------------------------------
 
@@ -33,8 +25,8 @@ type RadioTypes = {
  */
 const RenderMoveLearn = () => {
   //-------------------------------state--------------------------------
-
-  //react
+  const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
+  const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
   const [localMovements, setLocalMovements] = useState<MovementGroup[]>([])
   const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
   const [move, setMove] = useState<Move | null>(null)
@@ -88,8 +80,8 @@ const RenderMoveLearn = () => {
         //----------update DB -----------------
         //--------make defaults----------
         //get the current move[]
-        const lsMoveArr =
-          getLocalStorageGlobal.userLearning(accessToLocalStorage)
+        const lsMoveArr = getLsUserLearning()
+
         //index of move that we need to add movements[] to
         const mvIndex = lsMoveArr.findIndex((a) => a.moveId === move.moveId)
         //makes a move obj with new mvmts[]
@@ -101,20 +93,20 @@ const RenderMoveLearn = () => {
         const updatedMvmtArr = lsMoveArr.toSpliced(mvIndex, 1, newMoveObj)
         //---------sets---------
         //update db first, after move is set, it will rerender
-        setLocalStorageGlobal.userLearning(updatedMvmtArr, accessToLocalStorage)
+        setLsUserLearning(updatedMvmtArr)
         //set local move, and localmovements will be updated on rerender
         setMove(newMoveObj)
         //----------------------------------
       }
     }
-  }, [accessToLocalStorage, move])
+  }, [accessToLocalStorage, getLsUserLearning, move, setLsUserLearning])
 
   //get learning moves
   useEffect(() => {
-    const allMoves = getLocalStorageGlobal[lsUserLearning](accessToLocalStorage)
+    const allMoves = getLsUserLearning()
     const selectedMove = allMoves.find((obj) => obj.moveId === moveId)
     setMove(selectedMove || null)
-  }, [accessToLocalStorage, moveId])
+  }, [accessToLocalStorage, moveId, getLsUserLearning])
 
   //-------------------------------handlers------------------------------
   const onReverseDirection: SubmitHandler<RadioTypes> = (e) => {
@@ -131,19 +123,15 @@ const RenderMoveLearn = () => {
     }
 
     //----------set in localstorage-----------------
-    setLocalStorageGlobal.userLearning(
-      produce(
-        getLocalStorageGlobal.userLearning(accessToLocalStorage),
-        (draft) => {
-          const index = draft.findIndex((a) => a.moveId === move?.moveId)
-          if (index !== undefined && index > -1) {
-            draft[index].loopOption = { [loopKey]: true }
-          } else {
-            return
-          }
-        },
-      ),
-      accessToLocalStorage,
+    setLsUserLearning(
+      produce(getLsUserLearning(), (draft) => {
+        const index = draft.findIndex((a) => a.moveId === move?.moveId)
+        if (index !== undefined && index > -1) {
+          draft[index].loopOption = { [loopKey]: true }
+        } else {
+          return
+        }
+      }),
     )
   }
 
@@ -290,7 +278,7 @@ const RenderMoveLearn = () => {
   )
 }
 
-export default function RenderPage() {
+export default function RenderPageLearnMovesStudy() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RenderMoveLearn />

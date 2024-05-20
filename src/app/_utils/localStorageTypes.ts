@@ -5,6 +5,7 @@ import { Brand } from './typehelpers'
  *
  * Structure of Local Storage
  */
+//Is duplicated in gloalState.ts Do not merge with both. Delete this.
 export interface LocalStorageStructure {
   [lsFlows]: Flow[]
   [lsUserMoves]: string[]
