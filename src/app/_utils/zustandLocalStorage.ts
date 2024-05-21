@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import {
   Flow,
+  lsDanceList,
   lsFlows,
   lsUserLearning,
   lsUserMoves,
@@ -17,6 +18,17 @@ type LocalStorageProperties = {
   [lsFlows]: Flow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
+  [lsDanceList]: string[]
+}
+
+/**
+ * Default Properties on the Zustand Local Storage Global
+ */
+const initialState: LocalStorageProperties = {
+  [lsFlows]: [],
+  [lsUserMoves]: [],
+  [lsUserLearning]: [],
+  [lsDanceList]: ['head', 'shoulders', 'knees'],
 }
 
 /**
@@ -31,21 +43,13 @@ interface ZustandLocalStorage extends LocalStorageProperties {
   getLsFlows: () => Flow[]
   getLsUserMoves: () => string[]
   getLsUserLearning: () => Move[]
+  getDanceList: () => string[]
   //globals
   replaceGlobalState: (state: {
     state: LocalStorageProperties
     version: number
   }) => void
   resetGlobalState: () => void
-}
-
-/**
- * Default Properties on the Zustand Local Storage Global
- */
-const initialState: LocalStorageProperties = {
-  [lsFlows]: [],
-  [lsUserMoves]: [],
-  [lsUserLearning]: [],
 }
 
 /**
@@ -64,6 +68,7 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       getLsFlows: () => get()[lsFlows],
       getLsUserMoves: () => get()[lsUserMoves],
       getLsUserLearning: () => get()[lsUserLearning],
+      getDanceList: () => get()[lsDanceList],
       //globals
       replaceGlobalState: (zustandState) => set(zustandState.state),
       resetGlobalState: () => set(initialState),

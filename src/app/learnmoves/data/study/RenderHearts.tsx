@@ -54,8 +54,6 @@ const getUpdatedMoveSlowRating = ({
     const index = move.positions?.findIndex((a) => {
       return a.positionId === movementGroup.positionId
     })
-    console.log('move[key]: ', move[key])
-    console.log('movementGroup.positionId: ', movementGroup.positionId)
     if (index !== undefined && index > -1 && move.positions) {
       //if move.positions index can be found, then update the slowrating
       return produce(move, (draft) => {
@@ -181,7 +179,9 @@ export const RenderHearts = ({
   //-----------------------------state-------------------
   const setLsUserLearning = useZustandStore((state) => state.setLsUserLearning)
   const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
-  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
+  const [openLegend, setOpenLegend] = useState<boolean>(false)
+  const [openList, setOpenList] = useState<boolean>(false)
+  const danceList = useZustandStore((state) => state.getDanceList)()
 
   //make a movekey for when we update in localstorage. defaulting to positions
   let moveKey: MovementKeys
@@ -194,86 +194,133 @@ export const RenderHearts = ({
       break
   }
 
-  //--------------hooks-----------
-  //makes sure has access to local storage
-  useLocalStorage(setAccessToLocalStorage)
+  //---------handlers------------
+  const handleClickLegend = () => {
+    setOpenLegend(!openLegend)
+  }
+  const handleClickList = () => {
+    setOpenList(!openList)
+  }
 
   //----------------------------------------render-------------------------------
   return (
-    <div className="flex flex-row-reverse items-center justify-end">
-      {
-        //render 10 hearts
-        Array.from(Array(10)).map((a, i) => {
-          return (
-            <>
-              <input
-                //When heart is clicked, the input will update local state and localstorage
-                onChange={(e) => {
-                  //-----------------------makes the updated move------------------
-                  console.log('making updated move')
-                  const updatedMove = getUpdatedMoveSlowRating({
-                    move,
-                    currentlyEditing,
-                    movementGroup,
-                    slowRating: Number(e.target.id),
-                    movements,
-                    isOppositeSide,
-                  })
+    <>
+      <div className="flex flex-row-reverse items-center justify-end">
+        {
+          //render 10 hearts
+          Array.from(Array(10)).map((a, i) => {
+            return (
+              <>
+                <input
+                  //When heart is clicked, the input will update local state and localstorage
+                  onChange={(e) => {
+                    //-----------------------makes the updated move------------------
+                    console.log('making updated move')
+                    const updatedMove = getUpdatedMoveSlowRating({
+                      move,
+                      currentlyEditing,
+                      movementGroup,
+                      slowRating: Number(e.target.id),
+                      movements,
+                      isOppositeSide,
+                    })
 
-                  console.log('updatedMove: ', updatedMove)
-                  //-----------------------updates display----------------------------
-                  //updates view, otherwise user has to refresh to get updates from localstorageDB data
-                  // setLocalMovements(updatedMove)
-                  setMove(updatedMove)
+                    console.log('updatedMove: ', updatedMove)
+                    //-----------------------updates display----------------------------
+                    //updates view, otherwise user has to refresh to get updates from localstorageDB data
+                    // setLocalMovements(updatedMove)
+                    setMove(updatedMove)
 
-                  //------------------------updates db--------------------------------
-                  //expression for if Move[] matches has a match provided moveid
-                  const matchCriteria = (a: Move) => a.moveId === move.moveId
+                    //------------------------updates db--------------------------------
+                    //expression for if Move[] matches has a match provided moveid
+                    const matchCriteria = (a: Move) => a.moveId === move.moveId
 
-                  //all the moves from localstorage
-                  const globalMoves = getLsUserLearning()
+                    //all the moves from localstorage
+                    const globalMoves = getLsUserLearning()
 
-                  //validation if local moveId exists in global moveId
-                  if (globalMoves.find(matchCriteria)) {
-                    setLsUserLearning(
-                      globalMoves.map((ogMove: Move) =>
-                        matchCriteria(ogMove) ? updatedMove : ogMove,
-                      ),
-                    )
-                  } else {
-                    console.error('cannot find moveid in localstorage')
-                  }
-                }}
-                checked={i === 10 - rating}
-                type="radio"
-                className="peer -ms-5 size-5 cursor-pointer
+                    //validation if local moveId exists in global moveId
+                    if (globalMoves.find(matchCriteria)) {
+                      setLsUserLearning(
+                        globalMoves.map((ogMove: Move) =>
+                          matchCriteria(ogMove) ? updatedMove : ogMove,
+                        ),
+                      )
+                    } else {
+                      console.error('cannot find moveid in localstorage')
+                    }
+                  }}
+                  checked={i === 10 - rating}
+                  type="radio"
+                  className="peer -ms-5 size-5 cursor-pointer
               appearance-none border-0 bg-transparent
               text-transparent
               checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
-                id={'' + (10 - i)}
-              />
-              <label
-                className="pointer-events-none text-gray-300 
+                  id={'' + (10 - i)}
+                />
+                <label
+                  className="pointer-events-none text-gray-300 
             peer-checked:text-red-500"
-              >
-                <svg
-                  className="size-5 flex-shrink-0"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
                 >
-                  <path
-                    fill-rule="evenodd"
-                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534
+                  <svg
+                    className="size-5 flex-shrink-0"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534
                  4.736 3.562-3.248 8 1.314z"
-                  ></path>
-                </svg>
-              </label>
-            </>
-          )
-        })
-      }
-    </div>
+                    ></path>
+                  </svg>
+                </label>
+              </>
+            )
+          })
+        }
+      </div>
+      <div>
+        {/* -----open close legend------ */}
+        <div className="text-center text-[8px] text-indigo-500 opacity-25 dark:text-white">
+          <button onClick={handleClickLegend} className="italic">
+            {openLegend ? `close` : `view heart legend`}{' '}
+          </button>
+        </div>
+        {/* -----------legend----------- */}
+        {openLegend && (
+          <div className="mb-5">
+            <h1> # of hearts </h1>
+            <ol className="mt-2 list-decimal">
+              <li>tried to go to the position </li>
+              <li> can go to the position </li>
+              <li>tried to control the position</li>
+              <li> can control the position </li>
+              <li>tried to move 60bpm w/list</li>
+              <li> can move 60bpm w/ list </li>
+              <li>can move 200bpm half list</li>
+              <li> can move 200 bpm w/ list </li>
+              <li>can move 300bpm half list</li>
+              <li> can move 300bpm w/ list </li>
+            </ol>
+            <div className="text-center text-[8px] text-indigo-500 opacity-25 dark:text-white">
+              <button onClick={handleClickList} className="italic">
+                {openList ? `close dance list` : `view dance list`}{' '}
+              </button>
+            </div>
+            {openList && (
+              <div>
+                <h1>Dance List</h1>
+                <ol className="mt-2 list-decimal">
+                  {danceList.length > 0 &&
+                    danceList.map((a) => <li key={a}>{a}</li>)}
+                  {danceList.length > 0 || <li>no dance list can be loaded</li>}
+                </ol>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   )
 }
