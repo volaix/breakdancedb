@@ -32,7 +32,10 @@ interface ZustandLocalStorage extends LocalStorageProperties {
   getLsUserMoves: () => string[]
   getLsUserLearning: () => Move[]
   //globals
-  replaceGlobalState: (state: { state: LocalStorageProperties, version: number }) => void
+  replaceGlobalState: (state: {
+    state: LocalStorageProperties
+    version: number
+  }) => void
   resetGlobalState: () => void
 }
 

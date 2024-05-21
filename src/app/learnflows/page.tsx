@@ -122,9 +122,7 @@ export default function RenderFlows() {
               <RenderMove move={learning['exitMove']} />
             </>
           )}
-          {displayMoves || (
-            <div>No moves to display</div>
-          )}
+          {displayMoves || <div>No moves to display</div>}
         </div>
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">

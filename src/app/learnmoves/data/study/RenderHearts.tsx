@@ -19,8 +19,6 @@ import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //--------------local utils--------------
 
-
-
 /**
  * looks in positions and transitions in Move to update the right value with slowRating
  * @param move Move

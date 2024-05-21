@@ -112,7 +112,7 @@ const RenderPageNewMove = () => {
   const max = '20'
   //-----------------------------Render---------------------------
   return (
-    <div className='mt-20'>
+    <div className="mt-20">
       <Link
         href="/learnmoves"
         className="inline-flex items-center text-indigo-400"
