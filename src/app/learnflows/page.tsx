@@ -122,36 +122,36 @@ export default function RenderFlows() {
               <RenderMove move={learning['exitMove']} />
             </>
           )}
-          {displayMoves || (
-            <div>please add your moves or import move db here</div>
-          )}
+          {displayMoves || <div>No moves to display</div>}
         </div>
-        <div className="flex justify-evenly px-2 py-5">
-          {/* FEATURE on click yes, pop up some celebration. also a rating system on how good it was overall
+        {displayMoves && (
+          <div className="flex justify-evenly px-2 py-5">
+            {/* FEATURE on click yes, pop up some celebration. also a rating system on how good it was overall
           how good each move was
           and how good each transition was
           i.e. overall + ea move + ea trans = 7 ratings total 
           */}
-          <a
-            onClick={onClickYes}
-            className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
-          >
-            Yes
-          </a>
+            <a
+              onClick={onClickYes}
+              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
+            >
+              Yes
+            </a>
 
-          <a
-            onClick={onClickSkip}
-            className="rounded border border-violet-600 px-6 py-2 text-center text-violet-600"
-          >
-            Skip
-          </a>
-          <a
-            onClick={onClickNo}
-            className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white"
-          >
-            No
-          </a>
-        </div>
+            <a
+              onClick={onClickSkip}
+              className="rounded border border-violet-600 px-6 py-2 text-center text-violet-600"
+            >
+              Skip
+            </a>
+            <a
+              onClick={onClickNo}
+              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white"
+            >
+              No
+            </a>
+          </div>
+        )}
       </div>
     </main>
   )

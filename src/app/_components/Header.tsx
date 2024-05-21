@@ -86,8 +86,13 @@ export default function RenderHeader() {
                       <a href="/dblist">(old)All Moves</a>
                     </li>
                   )}
-                  <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/completed">History</a>
+                  {inDevelopment || (
+                    <li className="my-2 border-b border-gray-400 uppercase">
+                      <a href="/completed">History</a>
+                    </li>
+                  )}
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/importexport">Import / Export</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
