@@ -110,4 +110,5 @@ export type MoveId = Brand<string, 'MoveId'>
 export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
+export const lsDanceList = 'danceList'
 export type LocalStorageKeys = keyof LocalStorageStructure

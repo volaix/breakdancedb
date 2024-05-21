@@ -100,7 +100,7 @@ export default function RenderImportExport() {
         </div>
         {/* -----------spacer-------------- */}
         <div className="mb-4 mt-2 flex w-10 justify-center">
-          <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+          <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
         </div>
         <div className="text-base text-black dark:text-white">Import</div>
         <div className="mt-4 flex flex-col items-center justify-center">
@@ -116,7 +116,7 @@ export default function RenderImportExport() {
         </button>
         {/* -----------spacer-------------- */}
         <div className="mb-4 mt-2 flex w-10 justify-center">
-          <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+          <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
         </div>
         <div className="text-base text-black dark:text-white">Export</div>
         <button
@@ -127,7 +127,7 @@ export default function RenderImportExport() {
         </button>
         {/* -----------spacer-------------- */}
         <div className="mb-4 mt-2 flex w-10 justify-center">
-          <div className="inline-flex h-1 w-16 w-full rounded-full bg-indigo-500"></div>
+          <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
         </div>
         <button
           className=" m-2 w-2/3 rounded border-0 bg-red-500 px-6 py-2 text-center text-white focus:outline-none"
