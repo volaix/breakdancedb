@@ -94,6 +94,9 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
                     <a href="/importexport">Import / Export</a>
                   </li>
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/warmup">Warmup Protocol</a>
+                  </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
                       <a href="/nodes">Nodeview</a>

@@ -39,6 +39,7 @@ interface ZustandLocalStorage extends LocalStorageProperties {
   setLsFlows: (flows: Flow[]) => void
   setLsUserMoves: (moves: string[]) => void
   setLsUserLearning: (learning: Move[]) => void
+  setDanceList: (list: string[]) => void
   //getters
   getLsFlows: () => Flow[]
   getLsUserMoves: () => string[]
@@ -64,6 +65,7 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       setLsFlows: (flows) => set({ [lsFlows]: flows }),
       setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
       setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
+      setDanceList: (list) => set({ [lsDanceList]: list }),
       //getters
       getLsFlows: () => get()[lsFlows],
       getLsUserMoves: () => get()[lsUserMoves],
