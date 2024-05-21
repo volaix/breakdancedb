@@ -10,6 +10,7 @@ import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
 import rocks from '@/db/rocks.json'
 import { useRouter } from 'next/navigation'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
+import Link from 'next/link'
 
 /**
  * Renders a text input with default position name
@@ -111,8 +112,8 @@ const RenderPageNewMove = () => {
   const max = '20'
   //-----------------------------Render---------------------------
   return (
-    <div>
-      <a
+    <div className='mt-20'>
+      <Link
         href="/learnmoves"
         className="inline-flex items-center text-indigo-400"
       >
@@ -129,7 +130,7 @@ const RenderPageNewMove = () => {
           <path d="M12 5l7 7-7 7"></path>
         </svg>
         go back to learn moves
-      </a>
+      </Link>
       <div className="relative px-5 text-xs">
         <label className="text-sm leading-7 text-gray-600 dark:text-gray-400">
           Move Name

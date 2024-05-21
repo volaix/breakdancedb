@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
 import {
   Flow,
   lsFlows,
@@ -9,13 +8,7 @@ import {
   Move,
 } from './localStorageTypes'
 
-/*
-  Migration Timeline:
-  //P1: CURRENT - DUPLICATION OF DATA ZUSTAND LOCAL STORAGE
-  P2: current - RETRIEVAL OF DATA FROM ZUSTAND LOCAL STORAGE
-  //P3: FUTURE - DELETION OF WRITING TO NORMAL LOCAL STORAGE
-  P4: FUTURE - DELETION OF READING NORMAL LOCAL STORAGE
-*/
+export const zustandLocalStorage = 'zustand-local-storage'
 
 interface ZustandLocalStorage {
   //-----------properties-----------
@@ -50,7 +43,7 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       getLsUserLearning: () => get()[lsUserLearning],
     }),
     {
-      name: 'zustand-local-storage',
+      name: zustandLocalStorage,
     },
   ),
 )
