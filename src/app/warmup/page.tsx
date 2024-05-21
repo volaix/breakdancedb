@@ -3,6 +3,10 @@
 import { ChangeEvent, useEffect, useState } from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
+/**
+ * Renders a page that displays warmup tips, with a list that can be saved of all the things to warmup
+ * @returns jsx
+ */
 export default function RenderPageWarmup() {
   //------------------------state------------------------
   const [list, setList] = useState<string[]>([])
