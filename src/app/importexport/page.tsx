@@ -1,13 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { zustandLocalStorage } from "../_utils/zustandLocalStorage"
+import { useZustandStore, zustandLocalStorage } from "../_utils/zustandLocalStorage"
 
 export default function RenderImportExport() {
     //------------------------state------------------------
     const [successMessage, setSuccessMessage] = useState<string>('')
     const [importActive, setImportActive] = useState<boolean>(false)
     const [file, setFile] = useState<FileReader | null>(null)
+    const replaceGlobalState = useZustandStore((state) => state.replaceGlobalState)
+    const resetGlobalState = useZustandStore((state) => state.resetGlobalState)
 
     //----------------------handlers------------------------
 
@@ -21,7 +23,8 @@ export default function RenderImportExport() {
             //error handling
             if (file.result instanceof ArrayBuffer) return console.error('ArrayBuffer is not supported')
 
-            localStorage.setItem('importedJson', JSON.parse(file.result))
+            //sets in zustand global
+            replaceGlobalState(JSON.parse(JSON.parse(file.result))) //intentionally json.parse x2
             setSuccessMessage('successfully loaded')
         }
     }
@@ -69,6 +72,8 @@ export default function RenderImportExport() {
     //clears localstorage
     const handleClear = () => {
         localStorage.clear()
+        resetGlobalState()
+
         alert('Local Storage Cleared')
     }
     //-----------------------render------------------------

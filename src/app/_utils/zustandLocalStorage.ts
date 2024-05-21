@@ -10,12 +10,19 @@ import {
 
 export const zustandLocalStorage = 'zustand-local-storage'
 
-interface ZustandLocalStorage {
-  //-----------properties-----------
+/**
+ * Types of Properties on the Zustand Local Storage Global
+ */
+type LocalStorageProperties = {
   [lsFlows]: Flow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
-  //------------methods------------
+}
+
+/**
+ * Types of Methods on the Zustand Local Storage Global
+ */
+interface ZustandLocalStorage extends LocalStorageProperties {
   //setters
   setLsFlows: (flows: Flow[]) => void
   setLsUserMoves: (moves: string[]) => void
@@ -24,15 +31,28 @@ interface ZustandLocalStorage {
   getLsFlows: () => Flow[]
   getLsUserMoves: () => string[]
   getLsUserLearning: () => Move[]
+  //globals
+  replaceGlobalState: (state: { state: LocalStorageProperties, version: number }) => void
+  resetGlobalState: () => void
 }
 
+/**
+ * Default Properties on the Zustand Local Storage Global
+ */
+const initialState: LocalStorageProperties = {
+  [lsFlows]: [],
+  [lsUserMoves]: [],
+  [lsUserLearning]: [],
+}
+
+/**
+ * Zustand Global Store State
+ */
 export const useZustandStore = create<ZustandLocalStorage>()(
   persist(
     (set, get) => ({
       //properties
-      [lsFlows]: [],
-      [lsUserMoves]: [],
-      [lsUserLearning]: [],
+      ...initialState,
       //setters
       setLsFlows: (flows) => set({ [lsFlows]: flows }),
       setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
@@ -41,6 +61,9 @@ export const useZustandStore = create<ZustandLocalStorage>()(
       getLsFlows: () => get()[lsFlows],
       getLsUserMoves: () => get()[lsUserMoves],
       getLsUserLearning: () => get()[lsUserLearning],
+      //globals
+      replaceGlobalState: (zustandState) => set(zustandState.state),
+      resetGlobalState: () => set(initialState),
     }),
     {
       name: zustandLocalStorage,
