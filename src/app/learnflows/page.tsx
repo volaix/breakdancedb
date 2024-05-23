@@ -105,7 +105,6 @@ export default function RenderFlows() {
     } else {
       console.log('cannot find move currently being learned')
     }
-
     updateLearning()
   }
   const onClickSkip = () => {
@@ -115,16 +114,19 @@ export default function RenderFlows() {
     updateLearning()
   }
 
+  //-----------------------render--------------------
   return (
     <main>
       <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
         <div className="mt-10 flex w-full flex-col">
           <div className="mb-20 flex w-full flex-col text-center dark:text-gray-400">
             <h1 className="title-font mb-2 text-3xl font-medium text-white sm:text-4xl">
-              Pricing
+              Flows
             </h1>
             <p className="mx-auto text-base leading-relaxed lg:w-2/3">
-              Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical.
+              {`
+              Try play around with these three moves. Dance with each move. Try to go ham quickly through them. It's up to you. Rate it at the end with some notes.
+`}
             </p>
             <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
               <button className="bg-indigo-500 px-4 py-1 text-white focus:outline-none">
