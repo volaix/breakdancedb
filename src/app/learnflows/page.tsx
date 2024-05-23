@@ -147,7 +147,7 @@ export default function RenderFlows() {
             </div>
           </div>
           {/* //----------------------FLOW INFORMATION AREA----------------------- */}
-          <div className="flex w-full flex-col gap-4 text-[8px]">
+          <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
             {(
               ['entryMove', 'keyMove', 'exitMove'] as Array<
                 keyof SelectedCategoryState
