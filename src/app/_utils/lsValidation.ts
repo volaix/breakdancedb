@@ -1,6 +1,7 @@
-import { LocalStorageValues } from './localStorageTypes'
+import { LocalStorageValues, lsUserMoves } from './localStorageTypes'
 import { validate } from 'uuid'
 import { Flow, MoveId, Move } from './localStorageTypes'
+import { initialState, GlobalStateProperties } from './zustandLocalStorage'
 
 /**
  * Checks if localStorageValue is a Flow[]
@@ -71,6 +72,16 @@ export const isFlow = (val: unknown): val is Flow => {
     const hasKeyMove = typeof (val as Flow).keyMove === 'string'
     const hasExitMove = typeof (val as Flow).exitMove === 'string'
     return hasEntrymove && hasKeyMove && hasExitMove
+  }
+  return false
+}
+
+/**
+ * Checks if param is a key of [lsUserMoves]
+ */
+export const isValidUserMoveKey = (key: string): key is keyof GlobalStateProperties[typeof lsUserMoves] => {
+  if (initialState[lsUserMoves][key as keyof GlobalStateProperties[typeof lsUserMoves]]) {
+    return true
   }
   return false
 }
