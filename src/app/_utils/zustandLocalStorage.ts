@@ -65,12 +65,12 @@ export const useZustandStore = create<ZustandGlobalStore>()( //ZustandGlobalStor
         //-----Getters (Root level keys )------
         getLsFlows: () => get()[lsFlows],
         getLsUserMoves: () => get()[lsUserMoves], 
-        getLsUserLearning: () => get()[lsUserLearning], getDanceList: () => get()[lsDanceList],
+        getLsUserLearning: () => get()[lsUserLearning], 
+        getDanceList: () => get()[lsDanceList],
 
         //============nested================
         //-------User Move Keys --------
-        setLsUserMovesByKey: (
-          key: keyof GlobalStateProperties[typeof lsUserMoves],
+        setLsUserMovesByKey: ( key: keyof GlobalStateProperties[typeof lsUserMoves],
           values: string[],
         ) => {
           return set((state) => {
