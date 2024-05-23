@@ -9,6 +9,7 @@ export default function DefaultStyledInput<T extends FieldValues>({
   defaultValue: string
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void
   registerName: string
+  //TODO you can use React.forwardRef to pass the ref too.    <input ref={ref} and delete register/registername see https://react-hook-form.com/get-started#Integratinganexistingform
   register: UseFormRegister<T>
 }) {
   return (
