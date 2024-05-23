@@ -35,6 +35,7 @@ export default function RenderFlows() {
   const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
+  const [singleCategory, setSingleCategory] = useState<boolean>(true)
   const displayMoves = learning && movesFromGlobalState.length > 0
   const setLsFlows = useZustandStore((state) => state.setLsFlows)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
@@ -119,24 +120,33 @@ export default function RenderFlows() {
     <main>
       <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
         <div className="mt-10 flex w-full flex-col">
-          <div className="mb-20 flex w-full flex-col text-center dark:text-gray-400">
-            <h1 className="title-font mb-2 text-3xl font-medium text-white sm:text-4xl">
+          <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
+            {/* ---------------------------TITLE SUBTITLE------------------------ */}
+            <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
               Flows
             </h1>
-            <p className="mx-auto text-base leading-relaxed lg:w-2/3">
-              {`
-              Try play around with these three moves. Dance with each move. Try to go ham quickly through them. It's up to you. Rate it at the end with some notes.
-`}
+            <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
+              {`Try play around with three moves. Dance with each move. Or go quickly through it. It's up to you. Ratings at the end with some notes.`}
             </p>
+            {/* ---------------------------BUTTON SWITCH------------------------ */}
             <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
-              <button className="bg-indigo-500 px-4 py-1 text-white focus:outline-none">
-                Monthly
+              <button
+                disabled={singleCategory}
+                onClick={() => setSingleCategory(true)}
+                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
+              >
+                Single
               </button>
-              <button className="px-4 py-1 text-gray-300 focus:outline-none">
-                Annually
+              <button
+                disabled={!singleCategory}
+                onClick={() => setSingleCategory(false)}
+                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
+              >
+                Custom
               </button>
             </div>
           </div>
+          {/* //----------------------FLOW INFORMATION AREA----------------------- */}
           <div className="flex w-full flex-col gap-4 text-[8px]">
             {(
               ['entryMove', 'keyMove', 'exitMove'] as Array<
@@ -144,7 +154,7 @@ export default function RenderFlows() {
               >
             ).map((dropdown, index) => (
               <div key={index} className="relative flex">
-                {/* //---------------------------3 dropdowns------------------------- */}
+                {/* //-------------------------DROPDOWN------------------------- */}
                 <div className="w-1/2">
                   <div>{dropdown}</div>
                   <div className="relative">
@@ -174,7 +184,7 @@ export default function RenderFlows() {
                     </div>
                   </div>
                 </div>
-                {/* //---------------------------render move------------------------- */}
+                {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
                 <div className="w-1/2">
                   {displayMoves && (
                     <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
@@ -187,9 +197,10 @@ export default function RenderFlows() {
               </div>
             ))}
           </div>
-          {/* //-------------------------------------- */}
+          {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
           {displayMoves || <div>No moves to display</div>}
         </div>
+        {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">
             <a
