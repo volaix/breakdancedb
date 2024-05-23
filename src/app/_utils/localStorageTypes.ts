@@ -108,7 +108,6 @@ export const lsFreezes = 'freezes'
 export const lsFloorwork = 'floorwork'
 export const lsSuicides = 'suicides'
 export const lsDrops = 'drops'
-export const lsTransitions = 'transitions'
 export const lsBlowups = 'blowups'
 export const lsMisc = 'misc'
 

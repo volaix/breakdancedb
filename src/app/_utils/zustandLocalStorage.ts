@@ -13,7 +13,6 @@ import {
   lsPower,
   lsSuicides,
   lsToprock,
-  lsTransitions,
   lsUserLearning,
   lsUserMoves,
   Move,
@@ -48,7 +47,6 @@ export type GlobalStateProperties = {
     [lsFloorwork]: string[]
     [lsSuicides]: string[]
     [lsDrops]: string[]
-    [lsTransitions]: string[]
     [lsBlowups]: string[]
     [lsMisc]: string[]
   }
@@ -69,7 +67,6 @@ export const initialState: GlobalStateProperties = {
     [lsFloorwork]: [],
     [lsSuicides]: [],
     [lsDrops]: [],
-    [lsTransitions]: [],
     [lsBlowups]: [],
     [lsMisc]: [],
   },
