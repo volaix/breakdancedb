@@ -1,16 +1,5 @@
 import { Brand } from './typehelpers'
-
-//------------------ROOT STRUCTURE--------------
-/**
- *
- * Structure of Local Storage
- */
-//Is duplicated in gloalState.ts Do not merge with both. Delete this.
-export interface LocalStorageStructure {
-  [lsFlows]: Flow[]
-  [lsUserMoves]: string[]
-  [lsUserLearning]: Move[]
-}
+import { GlobalStateProperties } from './zustandLocalStorage'
 
 //----------------------------------------------
 //------------Local Storage Values ------------------
@@ -99,7 +88,7 @@ export interface Transition {
 //---------------Local Storage Values One Liners --------------------
 export type Transitions = Transition[]
 /* Any value of Any Local Storage Keys */
-export type LocalStorageValues = LocalStorageStructure[LocalStorageKeys]
+export type LocalStorageValues = GlobalStateProperties[LocalStorageKeys]
 
 export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
@@ -111,4 +100,16 @@ export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
-export type LocalStorageKeys = keyof LocalStorageStructure
+
+export const lsToprock = 'toprock'
+export const lsFootwork = 'footwork'
+export const lsPower = 'power'
+export const lsFreezes = 'freezes'
+export const lsFloorwork = 'floorwork'
+export const lsSuicides = 'suicides'
+export const lsDrops = 'drops'
+export const lsTransitions = 'transitions'
+export const lsBlowups = 'blowups'
+export const lsMisc = 'misc'
+
+export type LocalStorageKeys = keyof GlobalStateProperties
