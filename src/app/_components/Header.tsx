@@ -71,7 +71,7 @@ export default function RenderHeader() {
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnflows">Learn Footwork Flows</a>
+                    <a href="/learnflows">Learn Flows</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
@@ -79,7 +79,7 @@ export default function RenderHeader() {
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/yourmoves">Your Footworks</a>
+                    <a href="/yourmoves">Your Moves</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
