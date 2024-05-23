@@ -118,7 +118,6 @@ type GlobalStatePropertiesV0 = {
   [lsDanceList]: string[]
 }
 
-
 /**
  * Zustand Global Store State
  */
@@ -177,12 +176,16 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         console.log('persistedState: ', persistedState)
 
         //migrating from 0 to current
-        if (isGlobalStateV0(persistedState, version) && migrationIsSafe(0, version)) {
+        if (
+          isGlobalStateV0(persistedState, version) &&
+          migrationIsSafe(0, version)
+        ) {
           let base = {
             ...persistedState,
-            [lsUserMoves]: { //version0 = string[]. version2 = {[category]: string}
+            [lsUserMoves]: {
+              //version0 = string[]. version2 = {[category]: string}
               ...initialState[lsUserMoves],
-            }
+            },
           }
           //if there's existing footwork, reuse it
           if (persistedState[lsUserMoves].length > 0) {
@@ -192,7 +195,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         }
         return initialState
       },
-    }
+    },
   ),
 )
 
@@ -203,10 +206,12 @@ const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   return false
 }
 
-const isGlobalStateV0 = (state: unknown, version: number): state is GlobalStatePropertiesV0 => {
+const isGlobalStateV0 = (
+  state: unknown,
+  version: number,
+): state is GlobalStatePropertiesV0 => {
   //wow this is a lazy validation. it'd be nice if zod was used in future to parse
   if (version === 0) {
     return true
-  }
-  else return false
+  } else return false
 }
