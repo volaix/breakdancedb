@@ -13,7 +13,7 @@
     "ts:watch": "yarn ts --watch",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
-    "precommit": "lint-staged",
+    "precommit": "lint-staged --allow-empty",
     "postinstall": "husky"
   },
   "lint-staged": {
