@@ -4,7 +4,6 @@ import RenderHeader from '@/app/_components/Header'
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '../_utils/lib'
 import { Flow } from '../_utils/localStorageTypes'
-import Image from 'next/image'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //------------------------local utils------------------------------
@@ -15,7 +14,7 @@ const getRandomItem = (items: string[]) =>
 type Learning = Flow | null
 //------------------------components-------------------------------
 /**
- * Renders an Image with some text below for each one of the flows
+ * Renders text for each one of the flows
  * @param
  * @returns
  */
@@ -25,13 +24,6 @@ const RenderMove = ({ move }: { move: string }) => {
     <>
       {move && (
         <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
-          <Image
-            width="600"
-            height="400"
-            className="w-5/6 w-full"
-            alt="move name"
-            src={'https://dummyimage.com/600x400/000/fff'}
-          />
           <div className="capitalize text-black dark:text-white">{move}</div>
         </div>
       )}
@@ -90,29 +82,20 @@ export default function RenderFlows() {
     }
 
     setLearningToRandom(userMoves)
-    //FEATURE: celebration UI element.
-    //FEATURE:  popup on 5 star rating for each move multi select
-    //FEATURE: have refresh UI feeling
   }
   const onClickSkip = () => {
-    //FEATURE: have refresh UI feeling
     setLearningToRandom(userMoves)
   }
   const onClickNo = () => {
     setLearningToRandom(userMoves)
-    //FEATURE: have refresh UI feeling
-    //FEATURE: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
-    //FEATURE: Delete entry if you have it in flows
   }
 
-  //FEATURE Filters for categories (not yet built)
-  //FEATURE Categories
   return (
     <main>
       <RenderHeader />
       <div
         className="z-10 
-   mt-20 flex w-full max-w-xs flex-col items-center items-center justify-between font-mono text-sm dark:text-gray-600 "
+   mt-20 flex w-full max-w-xs flex-col items-center justify-between font-mono text-sm dark:text-gray-600 "
       >
         <div className="mt-10">
           {displayMoves && (
@@ -126,11 +109,6 @@ export default function RenderFlows() {
         </div>
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">
-            {/* FEATURE on click yes, pop up some celebration. also a rating system on how good it was overall
-          how good each move was
-          and how good each transition was
-          i.e. overall + ea move + ea trans = 7 ratings total 
-          */}
             <a
               onClick={onClickYes}
               className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
