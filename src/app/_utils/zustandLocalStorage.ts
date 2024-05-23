@@ -48,29 +48,33 @@ export const zustandLocalStorage = 'zustand-local-storage'
 /**
  * Zustand Global Store State
  */
-export const useZustandStore = create<ZustandGlobalStore>()( //ZustandGlobalStore type requires each "&" type to be initialised seperately in obj below
-  persist( //persists in localstorage
-    immer( //immer middleware for safe mutation
+export const useZustandStore = create<ZustandGlobalStore>()(
+  //ZustandGlobalStore type requires each "&" type to be initialised seperately in obj below
+  persist(
+    //persists in localstorage
+    immer(
+      //immer middleware for safe mutation
       (set, get) => ({
         //--------------------state----------------------
         ...initialState,
 
         //============root level===============
         //-----Setters (Root Level Keys)-----
-        setLsFlows: (flows) => set({ [lsFlows]: flows }), 
+        setLsFlows: (flows) => set({ [lsFlows]: flows }),
         setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
-        setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }), 
+        setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
         setDanceList: (list) => set({ [lsDanceList]: list }),
 
         //-----Getters (Root level keys )------
         getLsFlows: () => get()[lsFlows],
-        getLsUserMoves: () => get()[lsUserMoves], 
-        getLsUserLearning: () => get()[lsUserLearning], 
+        getLsUserMoves: () => get()[lsUserMoves],
+        getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
 
         //============nested================
         //-------User Move Keys --------
-        setLsUserMovesByKey: ( key: keyof GlobalStateProperties[typeof lsUserMoves],
+        setLsUserMovesByKey: (
+          key: keyof GlobalStateProperties[typeof lsUserMoves],
           values: string[],
         ) => {
           return set((state) => {
