@@ -1,22 +1,23 @@
 'use client'
 //@format
 import RenderHeader from '@/app/_components/Header'
-import { useState, useEffect, MouseEventHandler } from 'react'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { isValidUserMoveKey } from '../_utils/lsValidation'
+import { useEffect, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
-  lsFootwork,
-  lsPower,
-  lsFreezes,
-  lsFloorwork,
-  lsSuicides,
-  lsDrops,
-  lsTransitions,
+  GlobalStateProperties,
   lsBlowups,
+  lsDrops,
+  lsFloorwork,
+  lsFootwork,
+  lsFreezes,
   lsMisc,
+  lsPower,
+  lsSuicides,
   lsToprock,
+  lsUserMoves,
 } from '../_utils/localStorageTypes'
-import { useForm, SubmitHandler } from 'react-hook-form'
+import { isValidUserMoveKey } from '../_utils/lsValidation'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //---------------------------utils---------------------------------
 const convertMoveString = (moveString: string): string[] => {
@@ -27,27 +28,14 @@ const convertMoveArray = (moveArray: string[]): string => {
 }
 
 //---------------------------types---------------------------------
-type TypeBreakCategories = {
-  [lsToprock]?: boolean
-  [lsFootwork]?: boolean
-  [lsPower]?: boolean
-  [lsFreezes]?: boolean
-  [lsFloorwork]?: boolean
-  [lsSuicides]?: boolean
-  [lsDrops]?: boolean
-  [lsTransitions]?: boolean
-  [lsBlowups]?: boolean
-  [lsMisc]?: boolean
-}
 
 type Inputs = {
   categoryMoves: string
-  firstName: string
 }
 
 //----------------------components-----------------------------
 
-const categories: { label: string; key: keyof TypeBreakCategories }[] = [
+const categories: { label: string; key: keyof GlobalStateProperties[typeof lsUserMoves] }[] = [
   { label: 'Toprocks', key: lsToprock },
   { label: 'Footwork', key: lsFootwork },
   { label: 'Power', key: lsPower },
@@ -55,7 +43,6 @@ const categories: { label: string; key: keyof TypeBreakCategories }[] = [
   { label: 'Floorwork', key: lsFloorwork },
   { label: 'Suicides', key: lsSuicides },
   { label: 'Drops', key: lsDrops },
-  { label: 'Transitions', key: lsTransitions },
   { label: 'Blow Ups', key: lsBlowups },
   { label: 'Misc', key: lsMisc },
 ]
@@ -66,20 +53,30 @@ const categories: { label: string; key: keyof TypeBreakCategories }[] = [
  */
 const RenderYourMoves = () => {
   //-----------------------------state---------------------------
+  //text displays
   const [saveText, setSaveText] = useState('Save')
-  const [selectedKey, setSelectedKey] = useState<TypeBreakCategories>({
-    [lsToprock]: true,
-  })
-  //todo refactor this component so selectedKeyString doesn't have to exist
-  const [selectedKeyString, setSelectedKeyString] =
-    useState<keyof TypeBreakCategories>(lsToprock)
-  const [selectedMoves, setSelectedMoves] = useState<string>('')
+  const [hasLoaded, setHasLoaded] = useState<boolean>(false)
+  const [saveButtonActive, setSaveButtonActive] = useState<boolean>(false)
+  //
+
+  //key of category selected
+  const [selectedKey, setSelectedKey] =
+    useState<keyof GlobalStateProperties[typeof lsUserMoves]>(lsToprock)
+
+  //category string with n\ from zustand global state
+  const [movesFromGlobalState, setMovesFromGlobalState] = useState<string>('')
+
+  //Set new moves in Global State
   const setLsUserMovesByKey = useZustandStore(
     (state) => state.setLsUserMovesByKey,
   )
+
+  //gets moves in global state
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
+
+  //react-hook-form
   const {
     register,
     handleSubmit,
@@ -87,56 +84,51 @@ const RenderYourMoves = () => {
     reset,
     formState: { errors },
   } = useForm<Inputs>()
+
+  //value of categoryMoves textarea
+  const unsavedMoveList = watch('categoryMoves', '')
   //-----------------------------hooks------------------------------
 
-  //Populate Existing Moves
+  //Populate existing moves to textarea: categoryMoves
   useEffect(() => {
-    console.log('the selectedkeystring should be running')
-    //Defaults key to toprock
-    let userMoveKey: keyof TypeBreakCategories = lsToprock
-    console.log('userMoveKey: 1', userMoveKey);
-    //reassign usermovekey using selected
-    for (const key in selectedKey) {
-      if (selectedKey[key as keyof TypeBreakCategories]) {
-        userMoveKey = key as keyof TypeBreakCategories
-      }
-    }
-    console.log('userMoveKey: 2', userMoveKey);
-    setSelectedKeyString(userMoveKey)
     reset({
-      categoryMoves: convertMoveArray(getLsUserMovesByKey(userMoveKey)),
+      categoryMoves: movesFromGlobalState
     })
-  }, [selectedKey, reset, getLsUserMovesByKey])
+    setHasLoaded(true)
+    setSaveButtonActive(false)
+  }, [movesFromGlobalState, reset, setHasLoaded])
 
-  //Populate existing moves
-  // useEffect(() => {
-  //   setUserMoves(convertMoveArray(getLsUserMoves()))
-  // }, [accessToLocalStorage, getLsUserMoves])
+  //onload get moves from global state
+  useEffect(() => {
+    setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(selectedKey)))
+    setSaveButtonActive(false)
+  }, [getLsUserMovesByKey, selectedKey])
+
+  //if textarea has changed, enable save button
+  useEffect(() => {
+    if (unsavedMoveList !== movesFromGlobalState) {
+      setSaveButtonActive(true)
+    } else {
+      setSaveButtonActive(false)
+    }
+  }, [movesFromGlobalState, unsavedMoveList])
 
   //---------------------------handlers-----------------------------
-  // const onClickSave = () => {
-  //   setLsUserMoves(convertMoveString(userMoves) as string[])
-  //   setSaveText('Saved')
-  // }
 
-  const handleChangeCategory = (category: keyof TypeBreakCategories) => {
-    console.log('category: ', category);
-    console.log('has been clicked')
-    // return () => {
-    //   console.log('')
-      setSelectedKey({ [category]: true })
-    // }
+  const handleChangeCategory = (category: keyof GlobalStateProperties[typeof lsUserMoves]) => {
+    setSelectedKey(category)
+    setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(category)))
   }
 
-  //
   const onSaveCategory: SubmitHandler<Inputs> = (data) => {
-    console.log('onsavecategory running')
     //save in global state depending on what is selected
-    if (selectedKey) {
-      const movesArr = convertMoveString(data.categoryMoves)
-      if (isValidUserMoveKey(selectedKeyString)) {
-        setLsUserMovesByKey(selectedKeyString, movesArr)
-      }
+    const movesArr = convertMoveString(data.categoryMoves)
+    if (isValidUserMoveKey(selectedKey)) {
+      setLsUserMovesByKey(selectedKey, movesArr)
+      //does this need to be async?
+      setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(selectedKey)))
+      setSaveText('Saved')
+      setSaveButtonActive(false)
     }
   }
 
@@ -144,7 +136,7 @@ const RenderYourMoves = () => {
   return (
     //--------------------------container--------------------------
     <div>
-      <section className=" body-font relative text-gray-600 dark:text-gray-600 ">
+      <section className="body-font relative text-gray-600 dark:text-gray-600">
         <div className="container mx-auto px-5 py-24">
           {/* -----------------header------------------- */}
           <div className="mb-6 flex w-full flex-col text-center">
@@ -158,66 +150,71 @@ const RenderYourMoves = () => {
           <div className="mx-auto md:w-2/3 lg:w-1/2">
             <div className="body-font text-gray-400">
               <div className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
-                <nav className=" body-font flex flex-wrap items-center justify-center text-base text-gray-300 md:ml-4 md:mr-auto md:border-l md:py-1 md:pl-4 dark:md:border-gray-700">
-                  {/* <div className='flex flex-col'> */}
-                    {
-                      //------category select------------
-                      categories.map((category) => (
+                <nav className="body-font flex flex-wrap items-center justify-center text-base text-gray-300 md:ml-4 md:mr-auto md:border-l md:py-1 md:pl-4 dark:md:border-gray-700">
+                  {
+                    //------category select------------
+                    categories.map((category) => {
+                      const selected = selectedKey === category.key
+                      return (
                         <label
                           key={category.key}
-                          className="mr-5 hover:text-gray-900 dark:hover:text-white"
+                          className={`mr-5 
+                        dark:${selected && 'text-white'}
+                        ${selected && `text-gray-900`}
+                        `}
                         >
                           <input
                             type="radio"
                             className="hidden"
                             name="categories"
                             value={category.label}
-                            checked={selectedKeyString === category.key}
+                            checked={selected}
                             onChange={() => handleChangeCategory(category.key)}
                           />
                           {category.label}
                         </label>
-                      ))
-                    }
-                  {/* </div> */}
+                      )
+                    })
+                  }
                 </nav>
-                {/* ---------------selected button------------------------ */}
-                <button className="mt-4 inline-flex items-center rounded border-0 bg-gray-800 px-3 py-1 text-base hover:bg-gray-700 focus:outline-none md:mt-0">
-                  {`${selectedKey ? Object.keys(selectedKey)[0] + ' selected' : 'none selected'}`}
-                </button>
               </div>
-              {/* --------------------text area form--------------------------- */}
               <form
                 onSubmit={handleSubmit(onSaveCategory)}
                 className="-m-2 flex flex-wrap"
               >
+                {/* --------------------text area form--------------------------- */}
                 <div className="w-full p-2">
                   <div className="relative">
+                    {/* ---------------loaded text------------------------ */}
+                    <div className="text-[9px] absolute mt-5 ml-1">
+                      {`${hasLoaded ? selectedKey + ' loaded' : 'Not loaded'}`}
+                    </div>
                     <label className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
-                      {`Your ${selectedKey ? Object.keys(selectedKey)[0] + 's' : 'moves'}`}
+                      {`Your ${selectedKey ? selectedKey + 's' : 'moves'}`}
                     </label>
                     <div className="flex max-w-xs space-x-4 p-4">
+                      {/* -----------------left textarea------------------- */}
                       <textarea
                         {...register('categoryMoves')}
                         className="h-32 w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
                       />
-                      <pre className="w-1/2 overflow-hidden	 rounded-lg bg-gray-100 p-4 text-xs">
-                        {JSON.stringify(['movea', 'moveb'], null, 2)}
+                      {/* --------------------right json view-------------------- */}
+                      <pre className="text-[10px] h-32 w-1/2 overflow-y-auto rounded-lg bg-gray-100 p-4 text-xs">
+                        {JSON.stringify(unsavedMoveList.split(/\r\n|\r|\n/), null, 1)}
                       </pre>
                     </div>
                     <div className="text-xs">
-                      {convertMoveString(selectedMoves).length + 1} moves. New
-                      move created each line.
+                      {`calculated ${unsavedMoveList.split(/\r\n|\r|\n/).length} moves from above. New move created each line. Saved is ${movesFromGlobalState.split(/\r\n|\r|\n/).length} moves.`}
                     </div>
+                    {/* -------------Save Button------------------ */}
+                    <button
+                      disabled={!saveButtonActive}
+                      type="submit"
+                      className="disabled:opacity-50 mt-5 mx-auto flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none"
+                    >
+                      {saveText}
+                    </button>
                   </div>
-                </div>
-                <div className="flex w-full p-2">
-                  <button
-                    type="submit"
-                    className="mx-auto flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none"
-                  >
-                    {saveText}
-                  </button>
                 </div>
               </form>
             </div>
