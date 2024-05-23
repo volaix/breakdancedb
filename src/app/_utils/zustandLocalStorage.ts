@@ -66,7 +66,8 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         setDanceList: (list) => set({ [lsDanceList]: list }),
 
         //-----Getters (Root level keys )------
-        getLsFlows: () => get()[lsFlows], getLsUserMoves: () => get()[lsUserMoves],
+        getLsFlows: () => get()[lsFlows],
+        getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
 

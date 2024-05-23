@@ -16,11 +16,6 @@
     "precommit": "lint-staged --allow-empty",
     "postinstall": "husky"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.ts": [
       "prettier --write"
