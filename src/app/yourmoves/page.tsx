@@ -35,7 +35,10 @@ type Inputs = {
 
 //----------------------components-----------------------------
 
-const categories: { label: string; key: keyof GlobalStateProperties[typeof lsUserMoves] }[] = [
+const categories: {
+  label: string
+  key: keyof GlobalStateProperties[typeof lsUserMoves]
+}[] = [
   { label: 'Toprocks', key: lsToprock },
   { label: 'Footwork', key: lsFootwork },
   { label: 'Power', key: lsPower },
@@ -92,7 +95,7 @@ const RenderYourMoves = () => {
   //Populate existing moves to textarea: categoryMoves
   useEffect(() => {
     reset({
-      categoryMoves: movesFromGlobalState
+      categoryMoves: movesFromGlobalState,
     })
     setHasLoaded(true)
     setSaveButtonActive(false)
@@ -115,7 +118,9 @@ const RenderYourMoves = () => {
 
   //---------------------------handlers-----------------------------
 
-  const handleChangeCategory = (category: keyof GlobalStateProperties[typeof lsUserMoves]) => {
+  const handleChangeCategory = (
+    category: keyof GlobalStateProperties[typeof lsUserMoves],
+  ) => {
     setSelectedKey(category)
     setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(category)))
   }
@@ -126,7 +131,9 @@ const RenderYourMoves = () => {
     if (isValidUserMoveKey(selectedKey)) {
       setLsUserMovesByKey(selectedKey, movesArr)
       //does this need to be async?
-      setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(selectedKey)))
+      setMovesFromGlobalState(
+        convertMoveArray(getLsUserMovesByKey(selectedKey)),
+      )
       setSaveText('Saved')
       setSaveButtonActive(false)
     }
@@ -186,7 +193,7 @@ const RenderYourMoves = () => {
                 <div className="w-full p-2">
                   <div className="relative">
                     {/* ---------------loaded text------------------------ */}
-                    <div className="text-[9px] absolute mt-5 ml-1">
+                    <div className="absolute ml-1 mt-5 text-[9px]">
                       {`${hasLoaded ? selectedKey + ' loaded' : 'Not loaded'}`}
                     </div>
                     <label className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
@@ -199,8 +206,12 @@ const RenderYourMoves = () => {
                         className="h-32 w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
                       />
                       {/* --------------------right json view-------------------- */}
-                      <pre className="text-[10px] h-32 w-1/2 overflow-y-auto rounded-lg bg-gray-100 p-4 text-xs">
-                        {JSON.stringify(unsavedMoveList.split(/\r\n|\r|\n/), null, 1)}
+                      <pre className="h-32 w-1/2 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs">
+                        {JSON.stringify(
+                          unsavedMoveList.split(/\r\n|\r|\n/),
+                          null,
+                          1,
+                        )}
                       </pre>
                     </div>
                     <div className="text-xs">
@@ -210,7 +221,7 @@ const RenderYourMoves = () => {
                     <button
                       disabled={!saveButtonActive}
                       type="submit"
-                      className="disabled:opacity-50 mt-5 mx-auto flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none"
+                      className="mx-auto mt-5 flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none disabled:opacity-50"
                     >
                       {saveText}
                     </button>

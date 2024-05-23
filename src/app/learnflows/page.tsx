@@ -1,75 +1,100 @@
 'use client'
 // @format
-import RenderHeader from '@/app/_components/Header'
-import { useState, useEffect } from 'react'
-import { useLocalStorage } from '../_utils/lib'
-import { Flow } from '../_utils/localStorageTypes'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import {
+  Flow,
+  GlobalStateProperties,
+  lsBlowups,
+  lsDrops,
+  lsFloorwork,
+  lsFootwork,
+  lsFreezes,
+  lsMisc,
+  lsPower,
+  lsSuicides,
+  lsToprock,
+  lsUserMoves,
+} from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //------------------------local utils------------------------------
-const getRandomItem = (items: string[]) =>
-  items[Math.floor(Math.random() * items.length)]
+const getRandomItem = (items: string[]): string => {
+  return items[Math.floor(Math.random() * items.length)]
+}
 
 //------------------------localtypes-------------------------------
 type Learning = Flow | null
-//------------------------components-------------------------------
-/**
- * Renders text for each one of the flows
- * @param
- * @returns
- */
-const RenderMove = ({ move }: { move: string }) => {
-  //----------------------------render-----------------------------
-  return (
-    <>
-      {move && (
-        <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
-          <div className="capitalize text-black dark:text-white">{move}</div>
-        </div>
-      )}
-    </>
-  )
-}
-
+type Category = keyof GlobalStateProperties[typeof lsUserMoves]
+type SelectedCategoryState = Record<keyof Flow, Category>
 //----------------------------mainrender--------------------------
 /*
  * Renders 3 moves with 3 buttons at the bottom.
  */
 export default function RenderFlows() {
   //-----------------------------state-----------------------------
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
-  const [userMoves, setUserMoves] = useState<string[]>([])
+  const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
   const [learning, setLearning] = useState<Learning>(null)
-  const displayMoves = learning && userMoves.length > 0
+  const displayMoves = learning && movesFromGlobalState.length > 0
   const setLsFlows = useZustandStore((state) => state.setLsFlows)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const getLsUserMovesByKey = useZustandStore(
+    (state) => state.getLsUserMovesByKey,
+  )
+  const categories: Category[] = [
+    lsToprock,
+    lsFootwork,
+    lsPower,
+    lsFreezes,
+    lsFloorwork,
+    lsSuicides,
+    lsDrops,
+    lsBlowups,
+    lsMisc,
+  ]
+  const [selectedCategory, setSelectedCategory] =
+    useState<SelectedCategoryState>({
+      entryMove: lsToprock,
+      keyMove: lsToprock,
+      exitMove: lsToprock,
+    })
+
+  const updateLearning = useCallback(() => {
+    setLearning({
+      entryMove: getRandomItem(getLsUserMovesByKey(selectedCategory.entryMove)),
+      keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
+      exitMove: getRandomItem(getLsUserMovesByKey(selectedCategory.exitMove)),
+    })
+  }, [
+    getLsUserMovesByKey,
+    selectedCategory.entryMove,
+    selectedCategory.exitMove,
+    selectedCategory.keyMove,
+  ])
 
   //---------------------------hooks---------------------------------
-  //checks if has access to localstorage
-  useLocalStorage(setAccessToLocalStorage)
-
   //Populate existing moves
   useEffect(() => {
-    setUserMoves(getLsUserMoves())
-  }, [accessToLocalStorage, getLsUserMoves])
+    setMovesFromGlobalState(getLsUserMovesByKey(lsToprock))
+  }, [getLsUserMovesByKey])
 
-  //sets learning to random
-  const setLearningToRandom = (moves: string[]) => {
-    setLearning({
-      entryMove: getRandomItem(moves),
-      keyMove: getRandomItem(moves),
-      exitMove: getRandomItem(moves),
-    })
-  }
-
-  //on mount setLearning
+  //on mount
   useEffect(() => {
-    setLearningToRandom(userMoves)
-  }, [userMoves])
+    updateLearning()
+  }, [updateLearning])
 
   //-------------------------handlers--------------------------------
+
+  //handle dropdown
+  const handleChange = (
+    e: ChangeEvent<HTMLSelectElement>,
+    dropdown: keyof SelectedCategoryState,
+  ) => {
+    setSelectedCategory({
+      ...selectedCategory,
+      [dropdown]: e.target.value as Category,
+    })
+  }
 
   //update local storage when user clicks yes
   const onClickYes = () => {
@@ -81,30 +106,86 @@ export default function RenderFlows() {
       console.log('cannot find move currently being learned')
     }
 
-    setLearningToRandom(userMoves)
+    updateLearning()
   }
   const onClickSkip = () => {
-    setLearningToRandom(userMoves)
+    updateLearning()
   }
   const onClickNo = () => {
-    setLearningToRandom(userMoves)
+    updateLearning()
   }
 
   return (
     <main>
-      <RenderHeader />
-      <div
-        className="z-10 
-   mt-20 flex w-full max-w-xs flex-col items-center justify-between font-mono text-sm dark:text-gray-600 "
-      >
-        <div className="mt-10">
-          {displayMoves && (
-            <>
-              <RenderMove move={learning['entryMove']} />
-              <RenderMove move={learning['keyMove']} />
-              <RenderMove move={learning['exitMove']} />
-            </>
-          )}
+      <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
+        <div className="mt-10 flex w-full flex-col">
+          <div className="mb-20 flex w-full flex-col text-center dark:text-gray-400">
+            <h1 className="title-font mb-2 text-3xl font-medium text-white sm:text-4xl">
+              Pricing
+            </h1>
+            <p className="mx-auto text-base leading-relaxed lg:w-2/3">
+              Whatever cardigan tote bag tumblr hexagon brooklyn asymmetrical.
+            </p>
+            <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
+              <button className="bg-indigo-500 px-4 py-1 text-white focus:outline-none">
+                Monthly
+              </button>
+              <button className="px-4 py-1 text-gray-300 focus:outline-none">
+                Annually
+              </button>
+            </div>
+          </div>
+          <div className="flex w-full flex-col gap-4 text-[8px]">
+            {(
+              ['entryMove', 'keyMove', 'exitMove'] as Array<
+                keyof SelectedCategoryState
+              >
+            ).map((dropdown, index) => (
+              <div key={index} className="relative flex">
+                {/* //---------------------------3 dropdowns------------------------- */}
+                <div className="w-1/2">
+                  <div>{dropdown}</div>
+                  <div className="relative">
+                    <select
+                      className="focus:shadow-outline block w-full appearance-none rounded border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight shadow hover:border-gray-500 focus:outline-none"
+                      value={selectedCategory[dropdown]}
+                      onChange={(e) => handleChange(e, dropdown)}
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg
+                        className="h-4 w-4 fill-current"
+                        fill="#000000"
+                        height="800px"
+                        width="800px"
+                        version="1.1"
+                        id="Layer_1"
+                        viewBox="0 0 407.437 407.437"
+                      >
+                        <polygon points="386.258,91.567 203.718,273.512 21.179,91.567 0,112.815 203.718,315.87 407.437,112.815 " />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                {/* //---------------------------render move------------------------- */}
+                <div className="w-1/2">
+                  {displayMoves && (
+                    <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
+                      <div className="capitalize text-black dark:text-white">
+                        {learning[dropdown]}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* //-------------------------------------- */}
           {displayMoves || <div>No moves to display</div>}
         </div>
         {displayMoves && (
