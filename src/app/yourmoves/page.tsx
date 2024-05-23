@@ -45,8 +45,20 @@ type Inputs = {
   firstName: string
 }
 
-
 //----------------------components-----------------------------
+
+const categories: { label: string; key: keyof TypeBreakCategories }[] = [
+  { label: 'Toprocks', key: lsToprock },
+  { label: 'Footwork', key: lsFootwork },
+  { label: 'Power', key: lsPower },
+  { label: 'Freezes', key: lsFreezes },
+  { label: 'Floorwork', key: lsFloorwork },
+  { label: 'Suicides', key: lsSuicides },
+  { label: 'Drops', key: lsDrops },
+  { label: 'Transitions', key: lsTransitions },
+  { label: 'Blow Ups', key: lsBlowups },
+  { label: 'Misc', key: lsMisc },
+]
 /**
  * Component that allows user to put in their moves into the database
  * one line per move in a text file.
@@ -54,44 +66,47 @@ type Inputs = {
  */
 const RenderYourMoves = () => {
   //-----------------------------state---------------------------
-  const [userMoves, setUserMoves] = useState<string>('')
   const [saveText, setSaveText] = useState('Save')
-  const [selected, setSelected] = useState<TypeBreakCategories>({})
-  const [textAreaDefault, setTextAreaDefault] = useState<string>('')
-  const setLsUserMoves = useZustandStore((state) => state.setLsUserMoves)
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  const setLsUserMovesByKey = useZustandStore((state) => state.setLsUserMovesByKey)
-  const getLsUserMovesByKey = useZustandStore((state) => state.getLsUserMovesByKey)
-
-
+  const [selectedKey, setSelectedKey] = useState<TypeBreakCategories>({
+    [lsToprock]: true,
+  })
+  //todo refactor this component so selectedKeyString doesn't have to exist
+  const [selectedKeyString, setSelectedKeyString] =
+    useState<keyof TypeBreakCategories>(lsToprock)
+  const [selectedMoves, setSelectedMoves] = useState<string>('')
+  const setLsUserMovesByKey = useZustandStore(
+    (state) => state.setLsUserMovesByKey,
+  )
+  const getLsUserMovesByKey = useZustandStore(
+    (state) => state.getLsUserMovesByKey,
+  )
   const {
     register,
     handleSubmit,
     watch,
     reset,
     formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      categoryMoves: textAreaDefault,
-    },
-  })
+  } = useForm<Inputs>()
   //-----------------------------hooks------------------------------
 
   //Populate Existing Moves
   useEffect(() => {
+    console.log('the selectedkeystring should be running')
     //Defaults key to toprock
     let userMoveKey: keyof TypeBreakCategories = lsToprock
+    console.log('userMoveKey: 1', userMoveKey);
     //reassign usermovekey using selected
-    for (const key in selected) {
-      if (selected[key as keyof TypeBreakCategories]) {
+    for (const key in selectedKey) {
+      if (selectedKey[key as keyof TypeBreakCategories]) {
         userMoveKey = key as keyof TypeBreakCategories
       }
     }
+    console.log('userMoveKey: 2', userMoveKey);
+    setSelectedKeyString(userMoveKey)
     reset({
       categoryMoves: convertMoveArray(getLsUserMovesByKey(userMoveKey)),
     })
-  }, [selected, reset, getLsUserMovesByKey])
-
+  }, [selectedKey, reset, getLsUserMovesByKey])
 
   //Populate existing moves
   // useEffect(() => {
@@ -105,33 +120,33 @@ const RenderYourMoves = () => {
   // }
 
   const handleChangeCategory = (category: keyof TypeBreakCategories) => {
-    return () => {
-      setSelected({ [category]: [category] })
-    }
+    console.log('category: ', category);
+    console.log('has been clicked')
+    // return () => {
+    //   console.log('')
+      setSelectedKey({ [category]: true })
+    // }
   }
 
-
-
+  //
   const onSaveCategory: SubmitHandler<Inputs> = (data) => {
     console.log('onsavecategory running')
     //save in global state depending on what is selected
-    if (selected) {
-      const selectedKey = convertMoveArray(Object.keys(selected).filter((a) => selected[(a as keyof TypeBreakCategories)]))
+    if (selectedKey) {
       const movesArr = convertMoveString(data.categoryMoves)
-      if (isValidUserMoveKey(selectedKey)) {
-        console.log('setting in global state, check app')
-        console.log('selectedKey: ', selectedKey)
-        console.log('movesArr: ', movesArr)
-        setLsUserMovesByKey(selectedKey, movesArr)
+      if (isValidUserMoveKey(selectedKeyString)) {
+        setLsUserMovesByKey(selectedKeyString, movesArr)
       }
     }
   }
 
   //-------------------------render---------------------------------
   return (
+    //--------------------------container--------------------------
     <div>
       <section className=" body-font relative text-gray-600 dark:text-gray-600 ">
         <div className="container mx-auto px-5 py-24">
+          {/* -----------------header------------------- */}
           <div className="mb-6 flex w-full flex-col text-center">
             <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
               Your Moves
@@ -144,71 +159,34 @@ const RenderYourMoves = () => {
             <div className="body-font text-gray-400">
               <div className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
                 <nav className=" body-font flex flex-wrap items-center justify-center text-base text-gray-300 md:ml-4 md:mr-auto md:border-l md:py-1 md:pl-4 dark:md:border-gray-700">
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsToprock)}
-                  >
-                    Toprocks
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsFootwork)}
-                  >
-                    Footwork
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsPower)}
-                  >
-                    Power
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsFreezes)}
-                  >
-                    Freezes
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsFloorwork)}
-                  >
-                    Floorwork
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsSuicides)}
-                  >
-                    Suicides
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsDrops)}
-                  >
-                    Drops
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsTransitions)}
-                  >
-                    Transitions
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsBlowups)}
-                  >
-                    Blow Ups
-                  </a>
-                  <a
-                    className="mr-5 hover:text-gray-900 dark:hover:text-white"
-                    onClick={handleChangeCategory(lsMisc)}
-                  >
-                    Misc
-                  </a>
+                  {/* <div className='flex flex-col'> */}
+                    {
+                      //------category select------------
+                      categories.map((category) => (
+                        <label
+                          key={category.key}
+                          className="mr-5 hover:text-gray-900 dark:hover:text-white"
+                        >
+                          <input
+                            type="radio"
+                            className="hidden"
+                            name="categories"
+                            value={category.label}
+                            checked={selectedKeyString === category.key}
+                            onChange={() => handleChangeCategory(category.key)}
+                          />
+                          {category.label}
+                        </label>
+                      ))
+                    }
+                  {/* </div> */}
                 </nav>
+                {/* ---------------selected button------------------------ */}
                 <button className="mt-4 inline-flex items-center rounded border-0 bg-gray-800 px-3 py-1 text-base hover:bg-gray-700 focus:outline-none md:mt-0">
-                  {`${selected ? Object.keys(selected)[0] + ' selected' : 'none selected'}`}
+                  {`${selectedKey ? Object.keys(selectedKey)[0] + ' selected' : 'none selected'}`}
                 </button>
               </div>
+              {/* --------------------text area form--------------------------- */}
               <form
                 onSubmit={handleSubmit(onSaveCategory)}
                 className="-m-2 flex flex-wrap"
@@ -216,7 +194,7 @@ const RenderYourMoves = () => {
                 <div className="w-full p-2">
                   <div className="relative">
                     <label className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
-                      {`Your ${selected ? Object.keys(selected)[0] + 's' : 'moves'}`}
+                      {`Your ${selectedKey ? Object.keys(selectedKey)[0] + 's' : 'moves'}`}
                     </label>
                     <div className="flex max-w-xs space-x-4 p-4">
                       <textarea
@@ -228,8 +206,8 @@ const RenderYourMoves = () => {
                       </pre>
                     </div>
                     <div className="text-xs">
-                      {convertMoveString(userMoves).length + 1} moves. New move
-                      created each line.
+                      {convertMoveString(selectedMoves).length + 1} moves. New
+                      move created each line.
                     </div>
                   </div>
                 </div>
@@ -245,10 +223,12 @@ const RenderYourMoves = () => {
             </div>
           </div>
         </div>
+        {/* -------------------container--------------------- */}
       </section>
     </div>
   )
 }
+//----------------------------end of react component------------------------
 
 /**
  * Renders the /yourmoves page.
