@@ -13,7 +13,11 @@
     "ts:watch": "yarn ts --watch",
     "format": "prettier --check --ignore-path .gitignore .",
     "format:fix": "prettier --write --ignore-path .gitignore .",
+    "precommit": "lint-staged",
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "*": "prettier --write"
   },
   "dependencies": {
     "immer": "^10.1.1",
