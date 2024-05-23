@@ -57,14 +57,14 @@ export const useZustandStore = create<ZustandGlobalStore>()( //ZustandGlobalStor
 
         //============root level===============
         //-----Setters (Root Level Keys)-----
-        setLsFlows: (flows) => set({ [lsFlows]: flows }), setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
+        setLsFlows: (flows) => set({ [lsFlows]: flows }), 
+        setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
         setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }), 
         setDanceList: (list) => set({ [lsDanceList]: list }),
 
         //-----Getters (Root level keys )------
         getLsFlows: () => get()[lsFlows],
-        getLsUserMoves: () => get()[lsUserMoves],
-        getLsUserLearning: () => get()[lsUserLearning],
+        getLsUserMoves: () => get()[lsUserMoves], getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
 
         //============nested================
