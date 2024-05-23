@@ -1,7 +1,9 @@
-import { create, StateCreator, StoreApi } from 'zustand'
-import { persist, PersistOptions } from 'zustand/middleware'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 import {
-  Flow,
+  GlobalStateProperties,
+  isGlobalStateV0,
   lsBlowups,
   lsDanceList,
   lsDrops,
@@ -15,44 +17,8 @@ import {
   lsToprock,
   lsUserLearning,
   lsUserMoves,
-  Move,
+  ZustandGlobalStore,
 } from './localStorageTypes'
-import { immer } from 'zustand/middleware/immer'
-import { produce } from 'immer'
-
-/**
- * Types for the Zustand Middlewares, used with StateCreator generic
-  For some reason when used makes TS errors. Possibly a package issue rather than dev error.
- */
-type ZustandMiddlewareMutators = [
-  ['zustand/persist', ZustandGlobalStore],
-  ['zustand/immer', never],
-]
-
-/**
- * Name of the key in browsers localStorage
- */
-export const zustandLocalStorage = 'zustand-local-storage'
-
-/**
- * Types of Properties on the Zustand Local Storage Global
- */
-export type GlobalStateProperties = {
-  [lsFlows]: Flow[]
-  [lsUserMoves]: {
-    [lsToprock]: string[]
-    [lsFootwork]: string[]
-    [lsPower]: string[]
-    [lsFreezes]: string[]
-    [lsFloorwork]: string[]
-    [lsSuicides]: string[]
-    [lsDrops]: string[]
-    [lsBlowups]: string[]
-    [lsMisc]: string[]
-  }
-  [lsUserLearning]: Move[]
-  [lsDanceList]: string[]
-}
 
 /**
  * Default Properties on the Zustand Local Storage Global
@@ -75,55 +41,17 @@ export const initialState: GlobalStateProperties = {
 }
 
 /**
- * Type that has all properties and methods of globalstate
+ * Name of the key in browsers localStorage
  */
-type ZustandGlobalStore = GlobalStateProperties & {
-  //============root level===============
-  //-----Setters (Root Level Keys)-----
-  setLsFlows: (flows: Flow[]) => void
-  setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
-  setLsUserLearning: (learning: Move[]) => void
-  setDanceList: (list: string[]) => void
-  //-----Getters (Root level keys )------
-  getLsFlows: () => Flow[]
-  getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
-  getLsUserLearning: () => Move[]
-  getDanceList: () => string[]
-
-  //============nested================
-  //-------User Move Keys --------
-  setLsUserMovesByKey: (
-    key: keyof GlobalStateProperties[typeof lsUserMoves],
-    values: string[],
-  ) => void
-  getLsUserMovesByKey: (
-    key: keyof GlobalStateProperties[typeof lsUserMoves],
-  ) => string[]
-  //=================================
-  //------Reinitialization----------
-  replaceGlobalState: (state: {
-    state: GlobalStateProperties
-    version: number
-  }) => void
-  resetGlobalState: () => void
-}
-
-type GlobalStatePropertiesV0 = {
-  [lsFlows]: Flow[]
-  [lsUserMoves]: string[]
-  [lsUserLearning]: Move[]
-  [lsDanceList]: string[]
-}
+export const zustandLocalStorage = 'zustand-local-storage'
 
 /**
  * Zustand Global Store State
  */
 export const useZustandStore = create<ZustandGlobalStore>()(
-  //requires each "&" type to be initialised seperately in obj below
-  persist(
-    //persists in localstorage
-    immer(
-      //immer middleware for safe mutation
+  //ZustandGlobalStore type requires each "&" type to be initialised seperately in obj below
+  persist( //persists in localstorage
+    immer( //immer middleware for safe mutation
       (set, get) => ({
         //--------------------state----------------------
         ...initialState,
@@ -148,9 +76,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           values: string[],
         ) => {
           return set((state) => {
-            console.log('state[lsUserMoves]: ', state[lsUserMoves])
-            console.log('state: key', state[lsUserMoves][key])
-            console.log('[...values]: ', [...values])
             state[lsUserMoves][key] = [...values]
           })
         },
@@ -166,6 +91,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         resetGlobalState: () => set(initialState),
       }),
     ),
+    //-------------persist options---------------
     {
       name: zustandLocalStorage,
       version: 2,
@@ -194,8 +120,10 @@ export const useZustandStore = create<ZustandGlobalStore>()(
       },
     },
   ),
-)
+) //----------------------end of zustand store-------------------
+//=====================================================================
 
+//-----------------------helpers-----------------------
 const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   if (oldVersion === 0 && currentVersion === 2) {
     return true
@@ -203,12 +131,4 @@ const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   return false
 }
 
-const isGlobalStateV0 = (
-  state: unknown,
-  version: number,
-): state is GlobalStatePropertiesV0 => {
-  //wow this is a lazy validation. it'd be nice if zod was used in future to parse
-  if (version === 0) {
-    return true
-  } else return false
-}
+//----------------------------------------------------

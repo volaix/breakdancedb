@@ -1,7 +1,8 @@
 import { LocalStorageValues, lsUserMoves } from './localStorageTypes'
 import { validate } from 'uuid'
 import { Flow, MoveId, Move } from './localStorageTypes'
-import { initialState, GlobalStateProperties } from './zustandLocalStorage'
+import { initialState } from './zustandLocalStorage'
+import { GlobalStateProperties } from './localStorageTypes'
 
 /**
  * Checks if localStorageValue is a Flow[]
