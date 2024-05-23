@@ -48,8 +48,7 @@ export const zustandLocalStorage = 'zustand-local-storage'
 /**
  * Zustand Global Store State
  */
-export const useZustandStore = create<ZustandGlobalStore>()(
-  //ZustandGlobalStore type requires each "&" type to be initialised seperately in obj below
+export const useZustandStore = create<ZustandGlobalStore>()( //ZustandGlobalStore type requires each "&" type to be initialised seperately in obj below
   persist( //persists in localstorage
     immer( //immer middleware for safe mutation
       (set, get) => ({
