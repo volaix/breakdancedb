@@ -14,8 +14,11 @@ import { MouseEventHandler, useState } from 'react'
 import { Dispatch, SetStateAction } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
-import { RenderEditButton, RenderRedDeleteButton } from '../../_components/Svgs'
-import { RenderAddButton } from '../../_components/Svgs'
+import {
+  RenderEditButton,
+  RenderRedDeleteButton,
+} from '../../../_components/Svgs'
+import { RenderAddButton } from '../../../_components/Svgs'
 import { MovementType } from './pagetypes'
 import { RenderHearts } from './RenderHearts'
 import { create } from 'zustand'

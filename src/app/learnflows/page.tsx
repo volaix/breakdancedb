@@ -16,6 +16,8 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { Brand } from '../_utils/typehelpers'
+import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]): string => {
@@ -60,7 +62,7 @@ export default function RenderFlows() {
       exitMove: lsToprock,
     })
 
-  const updateLearning = useCallback(() => {
+  const shuffleLearning = useCallback(() => {
     setLearning({
       entryMove: getRandomItem(getLsUserMovesByKey(selectedCategory.entryMove)),
       keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
@@ -81,8 +83,8 @@ export default function RenderFlows() {
 
   //on mount
   useEffect(() => {
-    updateLearning()
-  }, [updateLearning])
+    shuffleLearning()
+  }, [shuffleLearning])
 
   //-------------------------handlers--------------------------------
 
@@ -102,17 +104,18 @@ export default function RenderFlows() {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLsFlows([...getLsFlows(), learning])
+      // setLsFlows([...getLsFlows(), learning])
+      console.log('open modal')
     } else {
       console.log('cannot find move currently being learned')
     }
-    updateLearning()
+    shuffleLearning()
   }
   const onClickSkip = () => {
-    updateLearning()
+    shuffleLearning()
   }
   const onClickNo = () => {
-    updateLearning()
+    shuffleLearning()
   }
 
   //-----------------------render--------------------
@@ -133,7 +136,8 @@ export default function RenderFlows() {
               <button
                 disabled={singleCategory}
                 onClick={() => setSingleCategory(true)}
-                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
+                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 
+                disabled:text-white dark:enabled:text-gray-300"
               >
                 Single
               </button>
@@ -156,12 +160,16 @@ export default function RenderFlows() {
               <div key={index} className="relative flex">
                 {/* //-------------------------DROPDOWN------------------------- */}
                 <div className="w-1/2">
+                  {/* title */}
                   <div>{dropdown}</div>
+                  {/* select */}
                   <div className="relative">
                     <select
                       disabled={index !== 0 && singleCategory}
-                      className="focus:shadow-outline : ; block w-full appearance-none rounded border border-gray-300
-                      bg-white px-4 py-2 pr-10 leading-tight shadow focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                      className="focus:shadow-outline block w-full 
+                      appearance-none rounded-lg border border-gray-300
+                      bg-white px-4 py-2 pr-10 leading-tight 
+                       focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                       value={
                         singleCategory
                           ? selectedCategory['entryMove']
@@ -189,13 +197,36 @@ export default function RenderFlows() {
                       </svg>
                     </div>
                   </div>
+                  {/* end of select */}
                 </div>
                 {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
                 <div className="w-1/2">
                   {displayMoves && (
-                    <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
-                      <div className="capitalize text-black dark:text-white">
-                        {learning[dropdown]}
+                    <div
+                      className="mt-4 h-full w-full 
+                     dark:bg-gray-900 dark:text-white"
+                    >
+                      {/* // div so fits same size as dropdown */}
+                      <div
+                        className="
+                      relative flex w-full
+                      appearance-none justify-between overflow-hidden rounded-lg 
+                        border border-gray-300 p-2"
+                      >
+                        <h2 className="font-medium tracking-widest">
+                          {learning[dropdown]}
+                        </h2>
+                        <div className="flex">
+                          <div className="mr-1 h-4 w-4">
+                            <RenderRedoIcon />
+                          </div>
+                          <span
+                            className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
+                          items-center justify-center rounded-full bg-gray-300 text-white"
+                          >
+                            <RenderGreyTick />
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -210,24 +241,20 @@ export default function RenderFlows() {
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">
             <a
-              onClick={onClickYes}
-              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
-            >
-              Yes
-            </a>
-
-            <a
               onClick={onClickSkip}
-              className="rounded border border-violet-600 px-6 py-2 text-center text-violet-600"
+              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
             >
-              Skip
+              re-shuffle
             </a>
-            <a
-              onClick={onClickNo}
-              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white"
-            >
-              No
-            </a>
+            {false && (
+              <a
+                //waiting for modal feature
+                onClick={onClickYes}
+                className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
+              >
+                Yes
+              </a>
+            )}
           </div>
         )}
       </div>
