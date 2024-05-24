@@ -5,7 +5,7 @@ import RenderStep from './RenderSteps'
 
 export default function RenderHome() {
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <RenderHero />
       <RenderStep />
     </div>
