@@ -29,21 +29,13 @@ APP = A power user's move database
 2. yarn dev
 3. [http://localhost:3000](http://localhost:3000)
 
-## Doing PRs
-
-- "yarn format" to check prettier
-- "yarn format:fix" to autofix
-- "yarn ts" for fixing ts errors
-- "yarn lint" for fixing linter errors
-- Vercel accepts deployment in PR branch - has weird stuff that linter doesnt find
-- Check for conflicts - "git merge main"
-
-## Stack
+## Techs
 
 - React - nextjs
 - localstorage for db
+- immer - mutable for updating nested structures
 - Tailwind CSS
-- State management is not set. Zustand is installed but not currently used.
+- Zustand for localstorage management and state
 
 ## Deploy
 
