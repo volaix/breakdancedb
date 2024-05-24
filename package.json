@@ -12,7 +12,15 @@
     "ts": "tsc --noEmit --incremental",
     "ts:watch": "yarn ts --watch",
     "format": "prettier --check --ignore-path .gitignore .",
-    "format:fix": "prettier --write --ignore-path .gitignore ."
+    "format:fix": "prettier --write --ignore-path .gitignore .",
+    "precommit": "lint-staged --allow-empty",
+    "postinstall": "husky"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write"
+    ],
+    "*.tsx": "prettier --write"
   },
   "dependencies": {
     "immer": "^10.1.1",
@@ -31,6 +39,8 @@
     "@types/uuid": "^9.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.4",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",

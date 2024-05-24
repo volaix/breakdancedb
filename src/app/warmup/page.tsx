@@ -90,7 +90,7 @@ export default function RenderPageWarmup() {
             onChange={handleChange}
             defaultValue={list.join('\n')}
           ></textarea>
-          <pre className="w-1/2 rounded-lg bg-gray-100 p-4">
+          <pre className="w-1/2	 overflow-hidden rounded-lg bg-gray-100 p-4">
             {JSON.stringify(list, null, 2)}
           </pre>
         </div>

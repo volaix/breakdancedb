@@ -11,7 +11,7 @@ import {
   RenderEditButton,
   RenderAddButton,
   RenderRedDeleteButton,
-} from '../../_components/Svgs'
+} from '../../../_components/Svgs'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
 //------------------------------components-----------------------

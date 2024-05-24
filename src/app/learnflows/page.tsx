@@ -1,155 +1,288 @@
 'use client'
 // @format
-import RenderHeader from '@/app/_components/Header'
-import { useState, useEffect } from 'react'
-import { useLocalStorage } from '../_utils/lib'
-import { Flow } from '../_utils/localStorageTypes'
-import Image from 'next/image'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import {
+  Flow,
+  GlobalStateProperties,
+  lsBlowups,
+  lsDrops,
+  lsFloorwork,
+  lsFootwork,
+  lsFreezes,
+  lsMisc,
+  lsPower,
+  lsSuicides,
+  lsToprock,
+  lsUserMoves,
+} from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { Brand } from '../_utils/typehelpers'
+import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
+import { produce } from 'immer'
 
 //------------------------local utils------------------------------
-const getRandomItem = (items: string[]) =>
-  items[Math.floor(Math.random() * items.length)]
-
-//------------------------localtypes-------------------------------
-type Learning = Flow | null
-//------------------------components-------------------------------
-/**
- * Renders an Image with some text below for each one of the flows
- * @param
- * @returns
- */
-const RenderMove = ({ move }: { move: string }) => {
-  //----------------------------render-----------------------------
-  return (
-    <>
-      {move && (
-        <div className="flex w-full flex-col items-center bg-slate-300 py-3 dark:bg-gray-900">
-          <Image
-            width="600"
-            height="400"
-            className="w-5/6 w-full"
-            alt="move name"
-            src={'https://dummyimage.com/600x400/000/fff'}
-          />
-          <div className="capitalize text-black dark:text-white">{move}</div>
-        </div>
-      )}
-    </>
-  )
+const getRandomItem = (items: string[]): string => {
+  return items[Math.floor(Math.random() * items.length)]
 }
 
+//------------------------localtypes-------------------------------
+type Category = keyof GlobalStateProperties[typeof lsUserMoves]
+type SelectedCategoryState = Record<keyof Flow, Category>
 //----------------------------mainrender--------------------------
 /*
  * Renders 3 moves with 3 buttons at the bottom.
  */
 export default function RenderFlows() {
   //-----------------------------state-----------------------------
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  const [accessToLocalStorage, setAccessToLocalStorage] = useState(false)
-  const [userMoves, setUserMoves] = useState<string[]>([])
+  const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
-  const [learning, setLearning] = useState<Learning>(null)
-  const displayMoves = learning && userMoves.length > 0
-  const setLsFlows = useZustandStore((state) => state.setLsFlows)
-  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const [learning, setLearning] = useState<Flow | null>(null)
+  const [singleCategory, setSingleCategory] = useState<boolean>(true)
+  const displayMoves = learning && movesFromGlobalState.length > 0
+  const getLsUserMovesByKey = useZustandStore(
+    (state) => state.getLsUserMovesByKey,
+  )
+  const categories: Category[] = [
+    lsToprock,
+    lsFootwork,
+    lsPower,
+    lsFreezes,
+    lsFloorwork,
+    lsSuicides,
+    lsDrops,
+    lsBlowups,
+    lsMisc,
+  ]
+  const [selectedCategory, setSelectedCategory] =
+    useState<SelectedCategoryState>({
+      entryMove: lsToprock,
+      keyMove: lsToprock,
+      exitMove: lsToprock,
+    })
+
+  //----------------functions----------------
+  const shuffleLearning = useCallback(
+    (single?: keyof Flow) => {
+      if (single) {
+        setLearning((prevLearning) => {
+          if (!prevLearning) return null
+          return {
+            ...prevLearning,
+            [single]: getRandomItem(
+              getLsUserMovesByKey(selectedCategory[single]),
+            ),
+          }
+        })
+      } else {
+        setLearning({
+          entryMove: getRandomItem(
+            getLsUserMovesByKey(selectedCategory.entryMove),
+          ),
+          keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
+          exitMove: getRandomItem(
+            getLsUserMovesByKey(selectedCategory.exitMove),
+          ),
+        })
+      }
+    },
+    [getLsUserMovesByKey, selectedCategory],
+  )
 
   //---------------------------hooks---------------------------------
-  //checks if has access to localstorage
-  useLocalStorage(setAccessToLocalStorage)
-
   //Populate existing moves
   useEffect(() => {
-    setUserMoves(getLsUserMoves())
-  }, [accessToLocalStorage, getLsUserMoves])
+    setMovesFromGlobalState(getLsUserMovesByKey(lsToprock))
+  }, [getLsUserMovesByKey])
 
-  //sets learning to random
-  const setLearningToRandom = (moves: string[]) => {
-    setLearning({
-      entryMove: getRandomItem(moves),
-      keyMove: getRandomItem(moves),
-      exitMove: getRandomItem(moves),
-    })
-  }
-
-  //on mount setLearning
+  //on mount
   useEffect(() => {
-    setLearningToRandom(userMoves)
-  }, [userMoves])
+    shuffleLearning()
+  }, [shuffleLearning])
 
   //-------------------------handlers--------------------------------
+
+  //handle dropdown
+  const handleChange = (
+    e: ChangeEvent<HTMLSelectElement>,
+    dropdown: keyof SelectedCategoryState,
+  ) => {
+    setSelectedCategory({
+      ...selectedCategory,
+      [dropdown]: e.target.value as Category,
+    })
+  }
 
   //update local storage when user clicks yes
   const onClickYes = () => {
     //validation for if there is a flow displayed
     if (learning) {
       //updates localstorage with the added flow
-      setLsFlows([...getLsFlows(), learning])
+      // setLsFlows([...getLsFlows(), learning])
+      console.log('open modal')
     } else {
       console.log('cannot find move currently being learned')
     }
-
-    setLearningToRandom(userMoves)
-    //FEATURE: celebration UI element.
-    //FEATURE:  popup on 5 star rating for each move multi select
-    //FEATURE: have refresh UI feeling
+    shuffleLearning()
   }
   const onClickSkip = () => {
-    //FEATURE: have refresh UI feeling
-    setLearningToRandom(userMoves)
-  }
-  const onClickNo = () => {
-    setLearningToRandom(userMoves)
-    //FEATURE: have refresh UI feeling
-    //FEATURE: Have multiselect appear on where user could not complete. If none are selected then never show the flow combination again.
-    //FEATURE: Delete entry if you have it in flows
+    shuffleLearning()
   }
 
-  //FEATURE Filters for categories (not yet built)
-  //FEATURE Categories
+  //-----------------------render--------------------
   return (
     <main>
-      <RenderHeader />
-      <div
-        className="z-10 
-   mt-20 flex w-full max-w-xs flex-col items-center items-center justify-between font-mono text-sm dark:text-gray-600 "
-      >
-        <div className="mt-10">
-          {displayMoves && (
-            <>
-              <RenderMove move={learning['entryMove']} />
-              <RenderMove move={learning['keyMove']} />
-              <RenderMove move={learning['exitMove']} />
-            </>
-          )}
+      <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
+        <div className="mt-10 flex w-full flex-col">
+          <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
+            {/* ---------------------------TITLE SUBTITLE------------------------ */}
+            <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
+              Flows
+            </h1>
+            <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
+              {`Try play around with three moves. Dance with each move. Or go quickly through it. It's up to you. Ratings at the end with some notes.`}
+            </p>
+            {/* ---------------------------BUTTON SWITCH------------------------ */}
+            <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
+              <button
+                disabled={singleCategory}
+                onClick={() => setSingleCategory(true)}
+                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 
+                disabled:text-white dark:enabled:text-gray-300"
+              >
+                Single
+              </button>
+              <button
+                disabled={!singleCategory}
+                onClick={() => setSingleCategory(false)}
+                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
+              >
+                Custom
+              </button>
+            </div>
+          </div>
+          {/* //----------------------FLOW INFORMATION AREA----------------------- */}
+          <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
+            {(
+              ['entryMove', 'keyMove', 'exitMove'] as Array<
+                keyof SelectedCategoryState
+              >
+            ).map((dropdown, index) => (
+              <div key={index} className="relative flex">
+                {/* //-------------------------DROPDOWN------------------------- */}
+                <div className="w-1/2">
+                  {/* title */}
+                  <div>{dropdown}</div>
+                  {/* select */}
+                  <div className="relative">
+                    <select
+                      disabled={index !== 0 && singleCategory}
+                      className="focus:shadow-outline block w-full 
+                      appearance-none rounded-lg border border-gray-300
+                      bg-white px-4 py-2 pr-10 leading-tight 
+                       focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                      value={
+                        singleCategory
+                          ? selectedCategory['entryMove']
+                          : selectedCategory[dropdown]
+                      }
+                      onChange={(e) =>
+                        singleCategory
+                          ? setSelectedCategory({
+                              entryMove: e.target.value as Category,
+                              keyMove: e.target.value as Category,
+                              exitMove: e.target.value as Category,
+                            })
+                          : setSelectedCategory({
+                              ...selectedCategory,
+                              [dropdown]: e.target.value as Category,
+                            })
+                      }
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg
+                        className={`h-4 w-4 fill-current ${singleCategory && 'opacity-30'}`}
+                        fill="#000000"
+                        height="800px"
+                        width="800px"
+                        version="1.1"
+                        id="Layer_1"
+                        viewBox="0 0 407.437 407.437"
+                      >
+                        <polygon points="386.258,91.567 203.718,273.512 21.179,91.567 0,112.815 203.718,315.87 407.437,112.815 " />
+                      </svg>
+                    </div>
+                  </div>
+                  {/* end of select */}
+                </div>
+                {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
+                <div className="w-1/2">
+                  {displayMoves && (
+                    <div
+                      className="h-full w-full 
+                     dark:bg-gray-900 dark:text-white"
+                    >
+                      {`${selectedCategory[dropdown]} move`}
+                      <div
+                        className="
+                      relative flex w-full
+                      appearance-none justify-between overflow-hidden rounded-lg 
+                        border border-gray-300 p-2"
+                      >
+                        <h2 className="font-medium tracking-widest">
+                          {learning[dropdown]}
+                        </h2>
+                        <div className="flex">
+                          <div className="mr-1 h-4 w-4">
+                            <RenderRedoIcon
+                              onClick={() => shuffleLearning(dropdown)}
+                            />
+                          </div>
+                          {
+                            //im not convinced this is a useful feature
+                            false && (
+                              <span
+                                className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
+                          items-center justify-center rounded-full bg-gray-300 text-white"
+                              >
+                                <RenderGreyTick />
+                              </span>
+                            )
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
           {displayMoves || <div>No moves to display</div>}
         </div>
+        {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">
-            {/* FEATURE on click yes, pop up some celebration. also a rating system on how good it was overall
-          how good each move was
-          and how good each transition was
-          i.e. overall + ea move + ea trans = 7 ratings total 
-          */}
-            <a
-              onClick={onClickYes}
-              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white "
-            >
-              Yes
-            </a>
-
             <a
               onClick={onClickSkip}
-              className="rounded border border-violet-600 px-6 py-2 text-center text-violet-600"
+              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
             >
-              Skip
+              re-shuffle
             </a>
-            <a
-              onClick={onClickNo}
-              className="rounded border border-violet-600 bg-violet-600 px-6 py-2 text-center text-white"
-            >
-              No
-            </a>
+            {false && (
+              <a
+                //waiting for modal feature
+                onClick={onClickYes}
+                className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
+              >
+                Yes
+              </a>
+            )}
           </div>
         )}
       </div>
