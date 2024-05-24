@@ -24,7 +24,7 @@ import {
  * Default Properties on the Zustand Local Storage Global
  */
 export const initialState: GlobalStateProperties = {
-  [lsFlows]: [],
+  [lsFlows]: null,
   [lsUserMoves]: {
     [lsToprock]: [],
     [lsFootwork]: [],
@@ -61,6 +61,11 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         //============root level===============
         //-----Setters (Root Level Keys)-----
         setLsFlows: (flows) => set({ [lsFlows]: flows }),
+        setLsFlow: (flow, key) =>
+          set((state) => {
+            if (state[lsFlows] === null) return
+            state[lsFlows][key] = flow
+          }),
         setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
         setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
         setDanceList: (list) => set({ [lsDanceList]: list }),

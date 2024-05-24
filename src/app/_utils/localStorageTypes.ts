@@ -3,10 +3,6 @@ import { Brand } from './typehelpers'
 //----------------------------------------------
 //------------Local Storage Values ------------------
 
-/**
- * Flow Type. Undeveloped and ratings will be added to it in future.
-For now is just a record of RNG moves strung together.
- */
 export type BasicFlow = {
   entryMove: string
   keyMove: string
@@ -14,7 +10,7 @@ export type BasicFlow = {
 }
 
 export type FlowList = {
-  [key: string]: {
+  [key: FlowId]: {
     rating: number
     entryMove: {
       displayName: string
@@ -112,6 +108,7 @@ export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
+export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
 export const lsFlows = 'flows'
@@ -134,7 +131,7 @@ export type LocalStorageKeys = keyof GlobalStateProperties /**
  */
 
 export type GlobalStateProperties = {
-  [lsFlows]: BasicFlow[]
+  [lsFlows]: FlowList | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -170,12 +167,13 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
-  setLsFlows: (flows: BasicFlow[]) => void
+  setLsFlows: (flows: GlobalStateProperties[typeof lsFlows]) => void
+  setLsFlow: (flow: FlowList[keyof FlowList], key: FlowId) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
-  getLsFlows: () => BasicFlow[]
+  getLsFlows: () => GlobalStateProperties[typeof lsFlows]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]
