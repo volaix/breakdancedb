@@ -5,7 +5,8 @@ const steps = [
   {
     stepNumber: 1,
     stepTitle: 'STEP 1',
-    stepDescription: 'Learn to dance with your moves.',
+    stepDescription:
+      'Learn Moves. Systematically dance with your move. Be comfortable!',
     icon: (
       <svg
         fill="none"
@@ -22,7 +23,7 @@ const steps = [
   },
   {
     stepNumber: 2,
-    stepTitle: 'STEP 2',
+    stepTitle: 'STEP 2 (in development)',
     stepDescription: 'Transitions',
     icon: (
       <svg
@@ -41,7 +42,8 @@ const steps = [
   {
     stepNumber: 3,
     stepTitle: 'STEP 3',
-    stepDescription: 'Flows: make entry key moves exit moves',
+    stepDescription:
+      'Learn Flows. Solidify transitions and add your own style. Ready to cypher!',
     icon: (
       <svg
         fill="none"
@@ -59,7 +61,7 @@ const steps = [
   },
   {
     stepNumber: 4,
-    stepTitle: 'STEP 4',
+    stepTitle: 'STEP 4 (in development)',
     stepDescription:
       'Using the previous flow ratings, make combos and routines.',
     icon: (
@@ -79,9 +81,9 @@ const steps = [
   },
   {
     stepNumber: 5,
-    stepTitle: 'STEP 5',
+    stepTitle: 'STEP 5 (in development)',
     stepDescription:
-      'Time out your performance using your combos. Organise the rounds for your next battle!',
+      'Time out your performance using your combos. Organise the rounds. Ready to battle!',
     icon: (
       <svg
         fill="none"
@@ -99,8 +101,7 @@ const steps = [
   {
     stepNumber: 'FINISH',
     stepTitle: 'FINISH',
-    stepDescription:
-      'Enter the cypher and think of dancing with your move. Dancing with your transition. Dancing with the flow. Or dancing with the combo. You will likely find yourself dancing.',
+    stepDescription: '',
     icon: (
       <svg
         fill="none"
@@ -120,12 +121,12 @@ const steps = [
 export default function RenderSteps() {
   return (
     <section className="body-font text-gray-600">
-      <div className="container flex flex-wrap px-5 pb-24 pt-5">
+      <div className="container flex flex-wrap px-5 pb-24 pt-10">
         <div className="flex w-full flex-col flex-wrap content-center justify-center">
           <div className="text-xs md:w-1/2 md:py-6 md:pr-10 lg:w-2/5">
             {steps.map((step) => {
               return (
-                <div className="relative flex pb-12" key={step.stepNumber}>
+                <div className="relative flex pb-8" key={step.stepNumber}>
                   <div className="absolute inset-0 flex h-full w-10 items-center justify-center">
                     <div className="pointer-events-none h-full w-1 bg-gray-200"></div>
                   </div>
