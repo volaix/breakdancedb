@@ -121,8 +121,12 @@ const RenderYourMoves = () => {
   const handleChangeCategory = (
     category: keyof GlobalStateProperties[typeof lsUserMoves],
   ) => {
-    setSelectedKey(category)
-    setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(category)))
+    if (saveButtonActive) {
+      alert('save before changing categories')
+    } else {
+      setSelectedKey(category)
+      setMovesFromGlobalState(convertMoveArray(getLsUserMovesByKey(category)))
+    }
   }
 
   const onSaveCategory: SubmitHandler<Inputs> = (data) => {
