@@ -7,10 +7,29 @@ import { Brand } from './typehelpers'
  * Flow Type. Undeveloped and ratings will be added to it in future.
 For now is just a record of RNG moves strung together.
  */
-export type Flow = {
+export type BasicFlow = {
   entryMove: string
   keyMove: string
   exitMove: string
+}
+
+export type FlowList = {
+  [key: string]: {
+    rating: number
+    entryMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    keyMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    exitMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    notes?: string
+  }
 }
 
 /**
@@ -115,7 +134,7 @@ export type LocalStorageKeys = keyof GlobalStateProperties /**
  */
 
 export type GlobalStateProperties = {
-  [lsFlows]: Flow[]
+  [lsFlows]: BasicFlow[]
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -139,7 +158,7 @@ type ZustandMiddlewareMutators = [
   ['zustand/immer', never],
 ]
 export type GlobalStatePropertiesV0 = {
-  [lsFlows]: Flow[]
+  [lsFlows]: BasicFlow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
   [lsDanceList]: string[]
@@ -151,12 +170,12 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
-  setLsFlows: (flows: Flow[]) => void
+  setLsFlows: (flows: BasicFlow[]) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
-  getLsFlows: () => Flow[]
+  getLsFlows: () => BasicFlow[]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]

@@ -1,13 +1,15 @@
 import { LocalStorageValues, lsUserMoves } from './localStorageTypes'
 import { validate } from 'uuid'
-import { Flow, MoveId, Move } from './localStorageTypes'
+import { BasicFlow, MoveId, Move } from './localStorageTypes'
 import { initialState } from './zustandLocalStorage'
 import { GlobalStateProperties } from './localStorageTypes'
 
 /**
  * Checks if localStorageValue is a Flow[]
  */
-export const isFlowArr = (lsValue: LocalStorageValues): lsValue is Flow[] => {
+export const isFlowArr = (
+  lsValue: LocalStorageValues,
+): lsValue is BasicFlow[] => {
   if (Array.isArray(lsValue)) {
     if (lsValue.length === 0) {
       return true
@@ -66,12 +68,12 @@ export const isUserMoves = (val: unknown): val is string[] =>
 
  * Checks if the passed value is Flow
  */
-export const isFlow = (val: unknown): val is Flow => {
+export const isFlow = (val: unknown): val is BasicFlow => {
   //check if it's an object
   if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
-    const hasEntrymove = typeof (val as Flow).entryMove === 'string'
-    const hasKeyMove = typeof (val as Flow).keyMove === 'string'
-    const hasExitMove = typeof (val as Flow).exitMove === 'string'
+    const hasEntrymove = typeof (val as BasicFlow).entryMove === 'string'
+    const hasKeyMove = typeof (val as BasicFlow).keyMove === 'string'
+    const hasExitMove = typeof (val as BasicFlow).exitMove === 'string'
     return hasEntrymove && hasKeyMove && hasExitMove
   }
   return false
