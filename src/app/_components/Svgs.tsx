@@ -39,17 +39,10 @@ export const RenderRedDeleteButton = ({
  * renders a grey tick
  * @returns jsx
  */
-export const RenderGreyTick = ({
-  onClick,
-  id,
-}: {
-  onClick?: React.MouseEventHandler<SVGSVGElement>
-  id?: string
-}) => (
+export const RenderGreyTick = ({ ...props }) => (
   <>
     <svg
-      id={id}
-      onClick={onClick}
+      {...props}
       fill="none"
       stroke="currentColor"
       stroke-linecap="round"
@@ -67,15 +60,10 @@ export const RenderGreyTick = ({
  * renders a grey tick
  * @returns jsx
  */
-export const RenderRedoIcon = ({
-  onClick,
-  id,
-}: {
-  onClick?: React.MouseEventHandler<SVGSVGElement>
-  id?: string
-}) => (
+export const RenderRedoIcon = ({ ...props }) => (
   <>
     <svg
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       fill="#000000"
       viewBox="0 0 256 256"

@@ -18,6 +18,7 @@ import {
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { Brand } from '../_utils/typehelpers'
 import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
+import { produce } from 'immer'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]): string => {
@@ -25,7 +26,6 @@ const getRandomItem = (items: string[]): string => {
 }
 
 //------------------------localtypes-------------------------------
-type Learning = Flow | null
 type Category = keyof GlobalStateProperties[typeof lsUserMoves]
 type SelectedCategoryState = Record<keyof Flow, Category>
 //----------------------------mainrender--------------------------
@@ -36,11 +36,9 @@ export default function RenderFlows() {
   //-----------------------------state-----------------------------
   const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
-  const [learning, setLearning] = useState<Learning>(null)
+  const [learning, setLearning] = useState<Flow | null>(null)
   const [singleCategory, setSingleCategory] = useState<boolean>(true)
   const displayMoves = learning && movesFromGlobalState.length > 0
-  const setLsFlows = useZustandStore((state) => state.setLsFlows)
-  const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
@@ -62,18 +60,33 @@ export default function RenderFlows() {
       exitMove: lsToprock,
     })
 
-  const shuffleLearning = useCallback(() => {
-    setLearning({
-      entryMove: getRandomItem(getLsUserMovesByKey(selectedCategory.entryMove)),
-      keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
-      exitMove: getRandomItem(getLsUserMovesByKey(selectedCategory.exitMove)),
-    })
-  }, [
-    getLsUserMovesByKey,
-    selectedCategory.entryMove,
-    selectedCategory.exitMove,
-    selectedCategory.keyMove,
-  ])
+  //----------------functions----------------
+  const shuffleLearning = useCallback(
+    (single?: keyof Flow) => {
+      if (single) {
+        setLearning((prevLearning) => {
+          if (!prevLearning) return null
+          return {
+            ...prevLearning,
+            [single]: getRandomItem(
+              getLsUserMovesByKey(selectedCategory[single]),
+            ),
+          }
+        })
+      } else {
+        setLearning({
+          entryMove: getRandomItem(
+            getLsUserMovesByKey(selectedCategory.entryMove),
+          ),
+          keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
+          exitMove: getRandomItem(
+            getLsUserMovesByKey(selectedCategory.exitMove),
+          ),
+        })
+      }
+    },
+    [getLsUserMovesByKey, selectedCategory],
+  )
 
   //---------------------------hooks---------------------------------
   //Populate existing moves
@@ -112,9 +125,6 @@ export default function RenderFlows() {
     shuffleLearning()
   }
   const onClickSkip = () => {
-    shuffleLearning()
-  }
-  const onClickNo = () => {
     shuffleLearning()
   }
 
@@ -175,7 +185,18 @@ export default function RenderFlows() {
                           ? selectedCategory['entryMove']
                           : selectedCategory[dropdown]
                       }
-                      onChange={(e) => handleChange(e, dropdown)}
+                      onChange={(e) =>
+                        singleCategory
+                          ? setSelectedCategory({
+                              entryMove: e.target.value as Category,
+                              keyMove: e.target.value as Category,
+                              exitMove: e.target.value as Category,
+                            })
+                          : setSelectedCategory({
+                              ...selectedCategory,
+                              [dropdown]: e.target.value as Category,
+                            })
+                      }
                     >
                       {categories.map((category) => (
                         <option key={category} value={category}>
@@ -203,10 +224,10 @@ export default function RenderFlows() {
                 <div className="w-1/2">
                   {displayMoves && (
                     <div
-                      className="mt-4 h-full w-full 
+                      className="h-full w-full 
                      dark:bg-gray-900 dark:text-white"
                     >
-                      {/* // div so fits same size as dropdown */}
+                      {`${selectedCategory[dropdown]} move`}
                       <div
                         className="
                       relative flex w-full
@@ -218,14 +239,21 @@ export default function RenderFlows() {
                         </h2>
                         <div className="flex">
                           <div className="mr-1 h-4 w-4">
-                            <RenderRedoIcon />
+                            <RenderRedoIcon
+                              onClick={() => shuffleLearning(dropdown)}
+                            />
                           </div>
-                          <span
-                            className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
+                          {
+                            //im not convinced this is a useful feature
+                            false && (
+                              <span
+                                className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
                           items-center justify-center rounded-full bg-gray-300 text-white"
-                          >
-                            <RenderGreyTick />
-                          </span>
+                              >
+                                <RenderGreyTick />
+                              </span>
+                            )
+                          }
                         </div>
                       </div>
                     </div>
