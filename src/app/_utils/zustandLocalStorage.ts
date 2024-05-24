@@ -3,7 +3,6 @@ import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import {
   GlobalStateProperties,
-  isGlobalStateV0,
   lsBlowups,
   lsDanceList,
   lsDrops,
@@ -19,6 +18,7 @@ import {
   lsUserMoves,
   ZustandGlobalStore,
 } from './localStorageTypes'
+import { isGlobalStateV0, isGlobalStateV2 } from './migrationStates'
 
 /**
  * Default Properties on the Zustand Local Storage Global
@@ -101,11 +101,11 @@ export const useZustandStore = create<ZustandGlobalStore>()(
     //-------------persist options---------------
     {
       name: zustandLocalStorage,
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         console.log('persistedState: ', persistedState)
 
-        //migrating from 0 to current
+        //migrating from 0 to 2
         if (
           isGlobalStateV0(persistedState, version) &&
           migrationIsSafe(0, version)
@@ -113,8 +113,8 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           let base = {
             ...persistedState,
             [lsUserMoves]: {
-              //version0 = string[]. version2 = {[category]: string}
               ...initialState[lsUserMoves],
+              ...initialState[lsFlows],
             },
           }
           //if there's existing footwork, reuse it
@@ -122,6 +122,18 @@ export const useZustandStore = create<ZustandGlobalStore>()(
             base[lsUserMoves][lsFootwork] = persistedState[lsUserMoves]
           }
           return base
+        }
+        //migrating from 2 to 3
+        if (
+          isGlobalStateV2(persistedState, version) &&
+          migrationIsSafe(2, version)
+        ) {
+          return {
+            ...persistedState,
+            [lsUserMoves]: {
+              ...initialState[lsFlows],
+            },
+          }
         }
         return initialState
       },
@@ -133,6 +145,12 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 //-----------------------helpers-----------------------
 const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   if (oldVersion === 0 && currentVersion === 2) {
+    return true
+  }
+  if (oldVersion === 0 && currentVersion === 3) {
+    return true
+  }
+  if (oldVersion === 2 && currentVersion === 3) {
     return true
   }
   return false

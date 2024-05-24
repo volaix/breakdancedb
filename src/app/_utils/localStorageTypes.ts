@@ -195,18 +195,3 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   }) => void
   resetGlobalState: () => void
 }
-/**
- * validator if state is version 0 of globalstateproperties
- * @param state localstorage
- * @param version state version
- * @returns boolean
- */
-export const isGlobalStateV0 = (
-  state: unknown,
-  version: number,
-): state is GlobalStatePropertiesV0 => {
-  //wow this is a lazy validation. it'd be nice if zod was used in future to parse
-  if (version === 0) {
-    return true
-  } else return false
-}
