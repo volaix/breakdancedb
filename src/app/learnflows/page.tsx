@@ -19,6 +19,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { Brand } from '../_utils/typehelpers'
 import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
 import { produce } from 'immer'
+import Link from 'next/link'
 
 //------------------------local utils------------------------------
 const getRandomItem = (items: string[]): string => {
@@ -160,110 +161,124 @@ export default function RenderFlows() {
               </button>
             </div>
           </div>
+          {displayMoves || (
+            <div className="flex flex-col text-center">
+              No moves to display.
+              <Link href="/yourmoves">
+                <button
+                  className="bg-indigo-500 px-4 py-1 text-white
+                 focus:outline-none dark:text-gray-300"
+                >
+                  Add moves
+                </button>
+              </Link>
+            </div>
+          )}
           {/* //----------------------FLOW INFORMATION AREA----------------------- */}
-          <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
-            {(
-              ['entryMove', 'keyMove', 'exitMove'] as Array<
-                keyof SelectedCategoryState
-              >
-            ).map((dropdown, index) => (
-              <div key={index} className="relative flex">
-                {/* //-------------------------DROPDOWN------------------------- */}
-                <div className="w-1/2">
-                  {/* title */}
-                  <div>{dropdown}</div>
-                  {/* select */}
-                  <div className="relative">
-                    <select
-                      disabled={index !== 0 && singleCategory}
-                      className="focus:shadow-outline block w-full 
+          {displayMoves && (
+            <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
+              {(
+                ['entryMove', 'keyMove', 'exitMove'] as Array<
+                  keyof SelectedCategoryState
+                >
+              ).map((dropdown, index) => (
+                <div key={index} className="relative flex">
+                  {/* //-------------------------DROPDOWN------------------------- */}
+                  <div className="w-1/2">
+                    {/* title */}
+                    <div>{dropdown}</div>
+                    {/* select */}
+                    <div className="relative">
+                      <select
+                        disabled={index !== 0 && singleCategory}
+                        className="focus:shadow-outline block w-full 
                       appearance-none rounded-lg border border-gray-300
                       bg-white px-4 py-2 pr-10 leading-tight 
                        focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
-                      value={
-                        singleCategory
-                          ? selectedCategory['entryMove']
-                          : selectedCategory[dropdown]
-                      }
-                      onChange={(e) =>
-                        singleCategory
-                          ? setSelectedCategory({
-                              entryMove: e.target.value as Category,
-                              keyMove: e.target.value as Category,
-                              exitMove: e.target.value as Category,
-                            })
-                          : setSelectedCategory({
-                              ...selectedCategory,
-                              [dropdown]: e.target.value as Category,
-                            })
-                      }
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className={`h-4 w-4 fill-current ${singleCategory && 'opacity-30'}`}
-                        fill="#000000"
-                        height="800px"
-                        width="800px"
-                        version="1.1"
-                        id="Layer_1"
-                        viewBox="0 0 407.437 407.437"
+                        value={
+                          singleCategory
+                            ? selectedCategory['entryMove']
+                            : selectedCategory[dropdown]
+                        }
+                        onChange={(e) =>
+                          singleCategory
+                            ? setSelectedCategory({
+                                entryMove: e.target.value as Category,
+                                keyMove: e.target.value as Category,
+                                exitMove: e.target.value as Category,
+                              })
+                            : setSelectedCategory({
+                                ...selectedCategory,
+                                [dropdown]: e.target.value as Category,
+                              })
+                        }
                       >
-                        <polygon points="386.258,91.567 203.718,273.512 21.179,91.567 0,112.815 203.718,315.87 407.437,112.815 " />
-                      </svg>
+                        {categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg
+                          className={`h-4 w-4 fill-current ${singleCategory && 'opacity-30'}`}
+                          fill="#000000"
+                          height="800px"
+                          width="800px"
+                          version="1.1"
+                          id="Layer_1"
+                          viewBox="0 0 407.437 407.437"
+                        >
+                          <polygon points="386.258,91.567 203.718,273.512 21.179,91.567 0,112.815 203.718,315.87 407.437,112.815 " />
+                        </svg>
+                      </div>
                     </div>
+                    {/* end of select */}
                   </div>
-                  {/* end of select */}
-                </div>
-                {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
-                <div className="w-1/2">
-                  {displayMoves && (
-                    <div
-                      className="h-full w-full 
-                     dark:bg-gray-900 dark:text-white"
-                    >
-                      {`${selectedCategory[dropdown]} move`}
+                  {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
+                  <div className="w-1/2">
+                    {displayMoves && (
                       <div
-                        className="
+                        className="h-full w-full 
+                     dark:bg-gray-900 dark:text-white"
+                      >
+                        {`${selectedCategory[dropdown]} move`}
+                        <div
+                          className="
                       relative flex w-full
                       appearance-none justify-between overflow-hidden rounded-lg 
                         border border-gray-300 p-2"
-                      >
-                        <h2 className="font-medium tracking-widest">
-                          {learning[dropdown]}
-                        </h2>
-                        <div className="flex">
-                          <div className="mr-1 h-4 w-4">
-                            <RenderRedoIcon
-                              onClick={() => shuffleLearning(dropdown)}
-                            />
-                          </div>
-                          {
-                            //im not convinced this is a useful feature
-                            false && (
-                              <span
-                                className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
+                        >
+                          <h2 className="font-medium tracking-widest">
+                            {learning[dropdown]}
+                          </h2>
+                          <div className="flex">
+                            <div className="mr-1 h-4 w-4">
+                              <RenderRedoIcon
+                                onClick={() => shuffleLearning(dropdown)}
+                              />
+                            </div>
+                            {
+                              //im not convinced this is a useful feature
+                              false && (
+                                <span
+                                  className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
                           items-center justify-center rounded-full bg-gray-300 text-white"
-                              >
-                                <RenderGreyTick />
-                              </span>
-                            )
-                          }
+                                >
+                                  <RenderGreyTick />
+                                </span>
+                              )
+                            }
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
-          {displayMoves || <div>No moves to display</div>}
         </div>
         {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
         {displayMoves && (
