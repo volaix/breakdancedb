@@ -1,291 +1,139 @@
 'use client'
-// @format
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
-import {
-  Flow,
-  GlobalStateProperties,
-  lsBlowups,
-  lsDrops,
-  lsFloorwork,
-  lsFootwork,
-  lsFreezes,
-  lsMisc,
-  lsPower,
-  lsSuicides,
-  lsToprock,
-  lsUserMoves,
-} from '../_utils/localStorageTypes'
+//@format
+import { useEffect, useState } from 'react'
+import { BasicFlow } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { Brand } from '../_utils/typehelpers'
-import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
-import { produce } from 'immer'
+import Link from 'next/link'
 
-//------------------------local utils------------------------------
-const getRandomItem = (items: string[]): string => {
-  return items[Math.floor(Math.random() * items.length)]
+/**
+ * renders the flow box that displays 3 lines of text (the flow learned) and a lightning rating
+ * @param param0 Flow
+ * @returns jsx
+ */
+const FlowBox = ({ flow }: { flow: BasicFlow }) => {
+  //-----------------------------render-----------------------------------
+  return (
+    <div className="w-1/3 p-1">
+      <div
+        className="relative flex h-full flex-col overflow-hidden rounded-lg 
+     bg-gray-100 bg-opacity-75 
+      px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
+      >
+        <div className="flex flex-row-reverse">
+          {
+            //render 10 hearts
+            Array.from(Array(5)).map((a, i) => {
+              return (
+                <>
+                  <input
+                    //When heart is clicked, the input will update local state and localstorage
+                    onChange={(e) => {
+                      console.log('onchange')
+                    }}
+                    // checked={i === 10 - rating}
+                    type="radio"
+                    className="peer -ms-5 size-4 cursor-pointer
+                     appearance-none border-0 bg-transparent
+                      text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
+                    // id={'' + (10 - i)}
+                  />
+                  <label
+                    className="pointer-events-none text-gray-300 
+            peer-checked:text-yellow-400"
+                  >
+                    <svg
+                      className="size-4 flex-shrink-0"
+                      fill="currentColor"
+                      version="1.1"
+                      viewBox="0 0 560.317 560.316"
+                    >
+                      <g>
+                        <g>
+                          <path d="M207.523,560.316c0,0,194.42-421.925,194.444-421.986l10.79-23.997c-41.824,12.02-135.271,34.902-135.57,35.833    C286.96,122.816,329.017,0,330.829,0c-39.976,0-79.952,0-119.927,0l-12.167,57.938l-51.176,209.995l135.191-36.806    L207.523,560.316z" />
+                        </g>
+                      </g>
+                    </svg>
+                  </label>
+                </>
+              )
+            })
+          }
+        </div>
+
+        <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+          {[
+            { category: 'Footwork', displayText: '1 step' },
+            { category: 'Footwork', displayText: '3 step but circular' },
+            { category: 'Footwork', displayText: '6 step' },
+          ].map(({ category, displayText }) => {
+            return (
+              <div
+                key={displayText}
+                className="flex flex-col items-start overflow-hidden	text-ellipsis whitespace-nowrap"
+              >
+                <div className="text-[6px] text-gray-400 dark:text-gray-500">{`Footwork: `}</div>
+                <div>3 step but circular</div>
+              </div>
+            )
+          })}
+        </h1>
+        <p className="text-[6px]  leading-relaxed">
+          Addon notes about this flow. Hands are nice.
+        </p>
+      </div>
+    </div>
+  )
 }
 
-//------------------------localtypes-------------------------------
-type Category = keyof GlobalStateProperties[typeof lsUserMoves]
-type SelectedCategoryState = Record<keyof Flow, Category>
-//----------------------------mainrender--------------------------
-/*
- * Renders 3 moves with 3 buttons at the bottom.
+/**
+ * Renders all the completed flows the user has done. In future this will essentially be
+ * a "history page"
+ * @returns jsx
  */
-export default function RenderFlows() {
-  //-----------------------------state-----------------------------
-  const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
-  //learning refers to "what will be displayed" and is RNG set
-  const [learning, setLearning] = useState<Flow | null>(null)
-  const [singleCategory, setSingleCategory] = useState<boolean>(true)
-  const displayMoves = learning && movesFromGlobalState.length > 0
-  const getLsUserMovesByKey = useZustandStore(
-    (state) => state.getLsUserMovesByKey,
-  )
-  const categories: Category[] = [
-    lsToprock,
-    lsFootwork,
-    lsPower,
-    lsFreezes,
-    lsFloorwork,
-    lsSuicides,
-    lsDrops,
-    lsBlowups,
-    lsMisc,
-  ]
-  const [selectedCategory, setSelectedCategory] =
-    useState<SelectedCategoryState>({
-      entryMove: lsToprock,
-      keyMove: lsToprock,
-      exitMove: lsToprock,
-    })
+export default function RenderCompletedMoves() {
+  //------------------------------state---------------------------------
+  const [flows, setFlows] = useState<BasicFlow[] | null>(null)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
-  //----------------functions----------------
-  const shuffleLearning = useCallback(
-    (single?: keyof Flow) => {
-      if (single) {
-        setLearning((prevLearning) => {
-          if (!prevLearning) return null
-          return {
-            ...prevLearning,
-            [single]: getRandomItem(
-              getLsUserMovesByKey(selectedCategory[single]),
-            ),
-          }
-        })
-      } else {
-        setLearning({
-          entryMove: getRandomItem(
-            getLsUserMovesByKey(selectedCategory.entryMove),
-          ),
-          keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
-          exitMove: getRandomItem(
-            getLsUserMovesByKey(selectedCategory.exitMove),
-          ),
-        })
-      }
-    },
-    [getLsUserMovesByKey, selectedCategory],
-  )
+  //-----------------------------hooks-------------------------------
 
-  //---------------------------hooks---------------------------------
-  //Populate existing moves
+  //updates flows using localstorage
   useEffect(() => {
-    setMovesFromGlobalState(getLsUserMovesByKey(lsToprock))
-  }, [getLsUserMovesByKey])
+    setFlows([
+      { entryMove: 'test', keyMove: 'test', exitMove: 'test' },
+      { entryMove: 'test', keyMove: 'test', exitMove: 'test' },
+      { entryMove: 'test', keyMove: 'test', exitMove: 'test' },
+      { entryMove: 'test', keyMove: 'test', exitMove: 'test' },
+    ])
+  }, [])
 
-  //on mount
-  useEffect(() => {
-    shuffleLearning()
-  }, [shuffleLearning])
-
-  //-------------------------handlers--------------------------------
-
-  //handle dropdown
-  const handleChange = (
-    e: ChangeEvent<HTMLSelectElement>,
-    dropdown: keyof SelectedCategoryState,
-  ) => {
-    setSelectedCategory({
-      ...selectedCategory,
-      [dropdown]: e.target.value as Category,
-    })
-  }
-
-  //update local storage when user clicks yes
-  const onClickYes = () => {
-    //validation for if there is a flow displayed
-    if (learning) {
-      //updates localstorage with the added flow
-      // setLsFlows([...getLsFlows(), learning])
-      console.log('open modal')
-    } else {
-      console.log('cannot find move currently being learned')
-    }
-    shuffleLearning()
-  }
-  const onClickSkip = () => {
-    shuffleLearning()
-  }
-
-  //-----------------------render--------------------
+  //-----------------------------render---------------------------------
   return (
-    <main>
-      <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
-        <div className="mt-10 flex w-full flex-col">
-          <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
-            {/* ---------------------------TITLE SUBTITLE------------------------ */}
-            <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-              Flows
-            </h1>
-            <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-              {`Try play around with three moves. Dance with each move. Or go quickly through it. It's up to you. Ratings at the end with some notes.`}
-            </p>
-            {/* ---------------------------BUTTON SWITCH------------------------ */}
-            <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
-              <button
-                disabled={singleCategory}
-                onClick={() => setSingleCategory(true)}
-                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 
-                disabled:text-white dark:enabled:text-gray-300"
-              >
-                Single
-              </button>
-              <button
-                disabled={!singleCategory}
-                onClick={() => setSingleCategory(false)}
-                className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
-              >
-                Custom
-              </button>
-            </div>
-          </div>
-          {/* //----------------------FLOW INFORMATION AREA----------------------- */}
-          <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
-            {(
-              ['entryMove', 'keyMove', 'exitMove'] as Array<
-                keyof SelectedCategoryState
-              >
-            ).map((dropdown, index) => (
-              <div key={index} className="relative flex">
-                {/* //-------------------------DROPDOWN------------------------- */}
-                <div className="w-1/2">
-                  {/* title */}
-                  <div>{dropdown}</div>
-                  {/* select */}
-                  <div className="relative">
-                    <select
-                      disabled={index !== 0 && singleCategory}
-                      className="focus:shadow-outline block w-full 
-                      appearance-none rounded-lg border border-gray-300
-                      bg-white px-4 py-2 pr-10 leading-tight 
-                       focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
-                      value={
-                        singleCategory
-                          ? selectedCategory['entryMove']
-                          : selectedCategory[dropdown]
-                      }
-                      onChange={(e) =>
-                        singleCategory
-                          ? setSelectedCategory({
-                              entryMove: e.target.value as Category,
-                              keyMove: e.target.value as Category,
-                              exitMove: e.target.value as Category,
-                            })
-                          : setSelectedCategory({
-                              ...selectedCategory,
-                              [dropdown]: e.target.value as Category,
-                            })
-                      }
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className={`h-4 w-4 fill-current ${singleCategory && 'opacity-30'}`}
-                        fill="#000000"
-                        height="800px"
-                        width="800px"
-                        version="1.1"
-                        id="Layer_1"
-                        viewBox="0 0 407.437 407.437"
-                      >
-                        <polygon points="386.258,91.567 203.718,273.512 21.179,91.567 0,112.815 203.718,315.87 407.437,112.815 " />
-                      </svg>
-                    </div>
-                  </div>
-                  {/* end of select */}
-                </div>
-                {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
-                <div className="w-1/2">
-                  {displayMoves && (
-                    <div
-                      className="h-full w-full 
-                     dark:bg-gray-900 dark:text-white"
-                    >
-                      {`${selectedCategory[dropdown]} move`}
-                      <div
-                        className="
-                      relative flex w-full
-                      appearance-none justify-between overflow-hidden rounded-lg 
-                        border border-gray-300 p-2"
-                      >
-                        <h2 className="font-medium tracking-widest">
-                          {learning[dropdown]}
-                        </h2>
-                        <div className="flex">
-                          <div className="mr-1 h-4 w-4">
-                            <RenderRedoIcon
-                              onClick={() => shuffleLearning(dropdown)}
-                            />
-                          </div>
-                          {
-                            //im not convinced this is a useful feature
-                            false && (
-                              <span
-                                className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
-                          items-center justify-center rounded-full bg-gray-300 text-white"
-                              >
-                                <RenderGreyTick />
-                              </span>
-                            )
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
-          {displayMoves || <div>No moves to display</div>}
+    <div className="w-full dark:bg-gray-900">
+      <div className="mt-20">
+        <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
+          <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
+            Learn Flows
+          </h1>
+          <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
+            Manage your flows here.
+          </p>
         </div>
-        {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
-        {displayMoves && (
-          <div className="flex justify-evenly px-2 py-5">
-            <a
-              onClick={onClickSkip}
-              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
-            >
-              re-shuffle
-            </a>
-            {false && (
-              <a
-                //waiting for modal feature
-                onClick={onClickYes}
-                className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
-              >
-                Yes
-              </a>
-            )}
-          </div>
-        )}
+        <div className="flex flex-wrap pt-10">
+          {flows &&
+            flows.map((flow) => {
+              return (
+                <FlowBox
+                  key={flow.entryMove + flow.keyMove + flow.exitMove}
+                  flow={flow}
+                />
+              )
+            })}
+        </div>
+        <button className="ml-10 mt-10 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
+          <Link href="/addflow">Add Flow</Link>
+        </button>
       </div>
-    </main>
+    </div>
   )
 }
