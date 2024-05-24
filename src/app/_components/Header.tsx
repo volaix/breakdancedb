@@ -83,12 +83,7 @@ export default function RenderHeader() {
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/dblist">(old)All Moves</a>
-                    </li>
-                  )}
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/completed">History</a>
+                      <a href="/dblist">View DB</a>
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
