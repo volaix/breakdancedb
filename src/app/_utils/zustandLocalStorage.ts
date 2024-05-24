@@ -103,13 +103,14 @@ export const useZustandStore = create<ZustandGlobalStore>()(
       name: zustandLocalStorage,
       version: 3,
       migrate: (persistedState, version) => {
-        console.log('persistedState: ', persistedState)
+        console.log('about to try migrate this data: ', persistedState)
 
         //migrating from 0 to 2
         if (
           isGlobalStateV0(persistedState, version) &&
           migrationIsSafe(0, version)
         ) {
+          console.log('data migrating from v0 to v3')
           let base = {
             ...persistedState,
             [lsUserMoves]: {
@@ -128,6 +129,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           isGlobalStateV2(persistedState, version) &&
           migrationIsSafe(2, version)
         ) {
+          console.log('data migrating from v2 to v3')
           return {
             ...persistedState,
             [lsUserMoves]: {
@@ -135,6 +137,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
             },
           }
         }
+        console.log('data wiped and replaced to initialstate')
         return initialState
       },
     },
