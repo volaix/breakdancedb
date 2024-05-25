@@ -20,6 +20,8 @@ import {
 } from './localStorageTypes'
 import { isGlobalStateV0, isGlobalStateV2 } from './migrationStates'
 
+const currentVersion: number = 3
+
 /**
  * Default Properties on the Zustand Local Storage Global
  */
@@ -94,14 +96,20 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //=================================
         //------Reinitialization----------
-        replaceGlobalState: (zustandState) => set(zustandState.state),
+        replaceGlobalState: (importedState) => {
+          if (importedState.version === currentVersion) {
+            return set(importedState.state)
+          } else {
+            alert('version does not match. state not replaced.')
+          }
+        },
         resetGlobalState: () => set(initialState),
       }),
     ),
     //-------------persist options---------------
     {
       name: zustandLocalStorage,
-      version: 3,
+      version: currentVersion,
       migrate: (persistedState, version) => {
         console.log('about to try migrate this data: ', persistedState)
 
