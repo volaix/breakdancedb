@@ -2,7 +2,7 @@
 // @format
 import { makeFlowId } from '@/app/_utils/lsMakers'
 import { useCallback, useEffect, useState } from 'react'
-import { RenderRedoIcon } from '../../_components/Svgs'
+import { RenderRedoIcon } from '../_components/Svgs'
 import {
   BasicFlow,
   GlobalStateProperties,
@@ -16,9 +16,9 @@ import {
   lsSuicides,
   lsToprock,
   lsUserMoves,
-} from '../../_utils/localStorageTypes'
-import { useZustandStore } from '../../_utils/zustandLocalStorage'
-import RenderChilli from '../RenderChilli'
+} from '../_utils/localStorageTypes'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
+import RenderChilli from '../_components/RenderChilli'
 
 const categories: Category[] = [
   lsToprock,
