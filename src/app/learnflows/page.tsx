@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { BasicFlow } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import Link from 'next/link'
+import RenderChilli from './RenderChilli'
 
 /**
  * renders the flow box that displays 3 lines of text (the flow learned) and a lightning rating
@@ -20,44 +21,9 @@ const FlowBox = ({ flow }: { flow: BasicFlow }) => {
       px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
       >
         <div className="flex flex-row-reverse">
-          {
-            //render 10 hearts
-            Array.from(Array(5)).map((a, i) => {
-              return (
-                <>
-                  <input
-                    //When heart is clicked, the input will update local state and localstorage
-                    onChange={(e) => {
-                      console.log('onchange')
-                    }}
-                    // checked={i === 10 - rating}
-                    type="radio"
-                    className="peer -ms-5 size-4 cursor-pointer
-                     appearance-none border-0 bg-transparent
-                      text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
-                    // id={'' + (10 - i)}
-                  />
-                  <label
-                    className="pointer-events-none text-gray-300 
-            peer-checked:text-yellow-400"
-                  >
-                    <svg
-                      className="size-4 flex-shrink-0"
-                      fill="currentColor"
-                      version="1.1"
-                      viewBox="0 0 560.317 560.316"
-                    >
-                      <g>
-                        <g>
-                          <path d="M207.523,560.316c0,0,194.42-421.925,194.444-421.986l10.79-23.997c-41.824,12.02-135.271,34.902-135.57,35.833    C286.96,122.816,329.017,0,330.829,0c-39.976,0-79.952,0-119.927,0l-12.167,57.938l-51.176,209.995l135.191-36.806    L207.523,560.316z" />
-                        </g>
-                      </g>
-                    </svg>
-                  </label>
-                </>
-              )
-            })
-          }
+          {Array.from(Array(5)).map((a, i) => {
+            return <RenderChilli key={i} />
+          })}
         </div>
 
         <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
@@ -131,7 +97,7 @@ export default function RenderCompletedMoves() {
             })}
         </div>
         <button className="ml-10 mt-10 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
-          <Link href="/addflow">Add Flow</Link>
+          <Link href="/learnflows/addflow">Add Flow</Link>
         </button>
       </div>
     </div>
