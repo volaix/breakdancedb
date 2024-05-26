@@ -3,14 +3,29 @@ import { Brand } from './typehelpers'
 //----------------------------------------------
 //------------Local Storage Values ------------------
 
-/**
- * Flow Type. Undeveloped and ratings will be added to it in future.
-For now is just a record of RNG moves strung together.
- */
-export type Flow = {
+export type BasicFlow = {
   entryMove: string
   keyMove: string
   exitMove: string
+}
+
+export type FlowList = {
+  [key: FlowId]: {
+    rating: number
+    entryMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    keyMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    exitMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    notes?: string
+  }
 }
 
 /**
@@ -93,6 +108,7 @@ export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
+export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
 export const lsFlows = 'flows'
@@ -115,7 +131,7 @@ export type LocalStorageKeys = keyof GlobalStateProperties /**
  */
 
 export type GlobalStateProperties = {
-  [lsFlows]: Flow[]
+  [lsFlows]: FlowList | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -139,7 +155,7 @@ type ZustandMiddlewareMutators = [
   ['zustand/immer', never],
 ]
 export type GlobalStatePropertiesV0 = {
-  [lsFlows]: Flow[]
+  [lsFlows]: BasicFlow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
   [lsDanceList]: string[]
@@ -151,12 +167,13 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
-  setLsFlows: (flows: Flow[]) => void
+  setLsFlows: (flows: GlobalStateProperties[typeof lsFlows]) => void
+  setLsFlow: (flow: FlowList[keyof FlowList], key: FlowId) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
-  getLsFlows: () => Flow[]
+  getLsFlows: () => GlobalStateProperties[typeof lsFlows]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]
@@ -177,19 +194,4 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     version: number
   }) => void
   resetGlobalState: () => void
-}
-/**
- * validator if state is version 0 of globalstateproperties
- * @param state localstorage
- * @param version state version
- * @returns boolean
- */
-export const isGlobalStateV0 = (
-  state: unknown,
-  version: number,
-): state is GlobalStatePropertiesV0 => {
-  //wow this is a lazy validation. it'd be nice if zod was used in future to parse
-  if (version === 0) {
-    return true
-  } else return false
 }

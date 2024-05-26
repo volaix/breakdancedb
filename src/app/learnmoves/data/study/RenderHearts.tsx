@@ -293,8 +293,8 @@ export const RenderHearts = ({
             <ol className="mt-2 list-decimal">
               <li>tried to go to the position </li>
               <li> can go to the position </li>
-              <li>tried to control the position</li>
-              <li> can control the position </li>
+              <li>tried to control the position w/list</li>
+              <li> can control the position w/list</li>
               <li>tried to move 60bpm w/list</li>
               <li> can move 60bpm w/ list </li>
               <li>can move 200bpm half list</li>
