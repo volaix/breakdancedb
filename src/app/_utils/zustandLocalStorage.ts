@@ -65,8 +65,11 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         setLsFlows: (flows) => set({ [lsFlows]: flows }),
         setLsFlow: (flow, key) =>
           set((state) => {
-            if (state[lsFlows] === null) return
-            state[lsFlows][key] = flow
+            if (state[lsFlows] === null) {
+              state[lsFlows] = { [key]: flow }
+            } else {
+              state[lsFlows][key] = flow
+            }
           }),
         setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
         setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
@@ -97,6 +100,8 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         //=================================
         //------Reinitialization----------
         replaceGlobalState: (importedState) => {
+          console.log('comparing imported version of', importedState.version)
+          console.log('to current version', currentVersion)
           if (importedState.version === currentVersion) {
             return set(importedState.state)
           } else {
