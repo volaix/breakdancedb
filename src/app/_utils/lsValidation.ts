@@ -5,24 +5,6 @@ import { initialState } from './zustandLocalStorage'
 import { GlobalStateProperties } from './localStorageTypes'
 
 /**
- * Checks if localStorageValue is a Flow[]
- */
-export const isFlowArr = (
-  lsValue: LocalStorageValues,
-): lsValue is BasicFlow[] => {
-  if (Array.isArray(lsValue)) {
-    if (lsValue.length === 0) {
-      return true
-    } else if (isFlow(lsValue[0])) {
-      return true
-    }
-  } else {
-    return false
-  }
-  return false
-}
-
-/**
  * Checks if the passed value is a typeof moveid
  */
 const isMoveId = (val: unknown): val is MoveId =>
