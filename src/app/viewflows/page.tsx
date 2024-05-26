@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { BasicFlow } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import Link from 'next/link'
-import RenderChilli from './RenderChilli'
+import RenderChilli from '../learnflows/RenderChilli'
 
 /**
  * renders the flow box that displays 3 lines of text (the flow learned) and a lightning rating
