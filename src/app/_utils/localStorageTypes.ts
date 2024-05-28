@@ -108,6 +108,7 @@ export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
+export type ComboId = Brand<string, 'ComboId'>
 export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
@@ -115,6 +116,7 @@ export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
+export const lsCombos = 'combos'
 
 export const lsToprock = 'toprock'
 export const lsFootwork = 'footwork'
@@ -132,7 +134,24 @@ export type LocalStorageKeys = keyof GlobalStateProperties /**
 
 export type MoveCategories = keyof GlobalStateProperties[typeof lsUserMoves]
 
+type ComboMove = {
+  moves: string[]
+  id: MoveId | FlowId | TransitionId | 'custom'
+  type: 'move' | 'flow' | 'transition' | 'custom'
+}
+
+export type ComboList = {
+  [key: ComboId]: {
+    displayName: string
+    notes: string
+    physical: number //how physically difficult is this combo
+    mental: number //how easy is it to do it
+    moves: ComboMove[]
+  }
+}
+
 export type GlobalStateProperties = {
+  [lsCombos]?: ComboList
   [lsFlows]: FlowList | null
   [lsUserMoves]: {
     [lsToprock]: string[]
