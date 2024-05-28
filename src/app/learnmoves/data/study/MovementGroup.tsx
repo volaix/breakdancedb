@@ -1,8 +1,10 @@
-import DefaultStyledInput from '@/app/_components/DefaultStyledInput'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { MovementGroup } from '@/app/_utils/localStorageTypes'
-import { Position, Transition } from '@/app/_utils/localStorageTypes'
-import { Move } from '@/app/_utils/localStorageTypes'
+import {
+  Move,
+  MovementGroup,
+  Position,
+  Transition,
+} from '@/app/_utils/localStorageTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,
@@ -10,19 +12,18 @@ import {
   makePositionId,
   makeTransitionId,
 } from '@/app/_utils/lsMakers'
-import { MouseEventHandler, useState } from 'react'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, MouseEventHandler, SetStateAction, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
+import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
+import { create } from 'zustand'
 import {
+  RenderAddButton,
   RenderEditButton,
   RenderRedDeleteButton,
 } from '../../../_components/Svgs'
-import { RenderAddButton } from '../../../_components/Svgs'
-import { MovementType } from './pagetypes'
 import { RenderHearts } from './RenderHearts'
-import { create } from 'zustand'
-import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
+import { MovementType } from './pagetypes'
 // ----------------------store-----------------------------
 export interface DataLearnState {
   //note key for isEditing is actually a number from an index array fnc. however in js all keys are strings.
@@ -346,10 +347,20 @@ export default function RenderMovementGroup({
           isEditing !== null && isEditing[indexNumber] && (
             <>
               <form onSubmit={handleSubmit(onSubmitNewMoveName(indexNumber))}>
-                <DefaultStyledInput
-                  registerName={`${indexNumber}`}
+                <input
+                  className="
+            w-full rounded
+            border
+            border-gray-300
+            bg-gray-100
+            bg-opacity-50 px-3 py-1
+            text-base leading-8 text-gray-700 outline-none
+            transition-colors duration-200 ease-in-out
+            focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
+                dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                  type="text"
                   defaultValue={movement.displayName}
-                  register={register}
+                  {...register(`${indexNumber}`)}
                 />
                 <button type="submit">
                   <div className="ml-1 w-2">
