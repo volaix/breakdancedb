@@ -1,6 +1,8 @@
 import { v4 } from 'uuid'
 
 import {
+  ComboId,
+  FlowId,
   MoveId,
   MovementGroup,
   MovementId,
@@ -16,8 +18,14 @@ import {
 export const makeMoveId = (): MoveId => {
   return v4() as MoveId
 }
+export const makeFlowId = (): FlowId => {
+  return v4() as FlowId
+}
 export const makePositionId = (): PositionId => {
   return v4() as PositionId
+}
+export const makeComboId = (): ComboId => {
+  return v4() as ComboId
 }
 export const makeTransitionId = (): TransitionId => {
   return v4() as TransitionId

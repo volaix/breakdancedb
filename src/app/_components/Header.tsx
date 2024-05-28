@@ -21,7 +21,7 @@ export default function RenderHeader() {
    border-b border-slate-300 bg-gradient-to-b
    from-slate-200 pb-2 pt-4 backdrop-blur-2xl
    lg:static lg:w-auto
-   lg:rounded-xl lg:border lg:bg-slate-200  lg:p-4
+   lg:border lg:bg-slate-200  lg:p-4
    dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
     >
       <Link className="font-mono font-bold" href={{ pathname: '/' }}>
@@ -73,22 +73,21 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/learnflows">Learn Flows</a>
                   </li>
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/combos">Learn Combos</a>
-                    </li>
-                  )}
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/viewflows">View Flows</a>
+                  </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/combos">Make Combos</a>
+                  </li>
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/viewcombos">View Combos</a>
+                  </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/yourmoves">Your Moves</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/dblist">(old)All Moves</a>
-                    </li>
-                  )}
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/completed">History</a>
+                      <a href="/dblist">View DB</a>
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">

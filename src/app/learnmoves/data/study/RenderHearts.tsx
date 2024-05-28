@@ -1,21 +1,20 @@
 'use client'
-import { SetStateAction, Dispatch, useState } from 'react'
 import {
+  Move,
   MovementGroup,
   PositionId,
   TransitionId,
 } from '@/app/_utils/localStorageTypes'
-import { Move } from '@/app/_utils/localStorageTypes'
-import { MovementType, MovementKeys } from './pagetypes'
-import { useLocalStorage } from '@/app/_utils/lib'
 import {
   makeDefaultPosition,
   makeDefaultTransition,
   makePositionId,
   makeTransitionId,
 } from '@/app/_utils/lsMakers'
-import { produce } from 'immer'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
+import { produce } from 'immer'
+import { Dispatch, SetStateAction, useState } from 'react'
+import { MovementKeys, MovementType } from './pagetypes'
 
 //--------------local utils--------------
 
@@ -294,8 +293,8 @@ export const RenderHearts = ({
             <ol className="mt-2 list-decimal">
               <li>tried to go to the position </li>
               <li> can go to the position </li>
-              <li>tried to control the position</li>
-              <li> can control the position </li>
+              <li>tried to control the position w/list</li>
+              <li> can control the position w/list</li>
               <li>tried to move 60bpm w/list</li>
               <li> can move 60bpm w/ list </li>
               <li>can move 200bpm half list</li>

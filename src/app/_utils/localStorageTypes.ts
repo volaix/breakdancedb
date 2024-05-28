@@ -3,14 +3,29 @@ import { Brand } from './typehelpers'
 //----------------------------------------------
 //------------Local Storage Values ------------------
 
-/**
- * Flow Type. Undeveloped and ratings will be added to it in future.
-For now is just a record of RNG moves strung together.
- */
-export type Flow = {
+export type BasicFlow = {
   entryMove: string
   keyMove: string
   exitMove: string
+}
+
+export type FlowDictionary = {
+  [key: FlowId]: {
+    rating: number
+    entryMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    keyMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    exitMove: {
+      displayName: string
+      category: keyof GlobalStateProperties[typeof lsUserMoves]
+    }
+    notes?: string
+  }
 }
 
 /**
@@ -93,12 +108,15 @@ export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
+export type ComboId = Brand<string, 'ComboId'>
+export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
 export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
+export const lsCombos = 'combos'
 
 export const lsToprock = 'toprock'
 export const lsFootwork = 'footwork'
@@ -110,12 +128,31 @@ export const lsDrops = 'drops'
 export const lsBlowups = 'blowups'
 export const lsMisc = 'misc'
 
-export type LocalStorageKeys = keyof GlobalStateProperties /**
+export type LocalStorageKeys = keyof GlobalStateProperties
+
+/**
  * Types of Properties on the Zustand Local Storage Global
  */
+export type MoveCategories = keyof GlobalStateProperties[typeof lsUserMoves]
+
+export type ComboMove = {
+  moves: string[]
+  id: MoveId | FlowId | TransitionId | 'custom'
+  type: 'move' | 'flow' | 'transition' | 'custom'
+}
+
+export type ComboDictionary = {
+  [key: ComboId]: {
+    displayName: string
+    notes: string
+    execution: number //how easy is it to do it
+    sequence: ComboMove[]
+  }
+}
 
 export type GlobalStateProperties = {
-  [lsFlows]: Flow[]
+  [lsCombos]?: ComboDictionary
+  [lsFlows]: FlowDictionary | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -139,7 +176,7 @@ type ZustandMiddlewareMutators = [
   ['zustand/immer', never],
 ]
 export type GlobalStatePropertiesV0 = {
-  [lsFlows]: Flow[]
+  [lsFlows]: BasicFlow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]
   [lsDanceList]: string[]
@@ -151,12 +188,18 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
-  setLsFlows: (flows: Flow[]) => void
+  setLsCombos: (
+    combo: NonNullable<ComboDictionary[keyof ComboDictionary]>,
+    comboId: ComboId,
+  ) => void
+  setLsFlows: (flows: GlobalStateProperties[typeof lsFlows]) => void
+  setLsFlow: (flow: FlowDictionary[keyof FlowDictionary], key: FlowId) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
-  getLsFlows: () => Flow[]
+  getLsFlows: () => GlobalStateProperties[typeof lsFlows]
+  getLsCombos: () => GlobalStateProperties[typeof lsCombos]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]
@@ -177,19 +220,4 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     version: number
   }) => void
   resetGlobalState: () => void
-}
-/**
- * validator if state is version 0 of globalstateproperties
- * @param state localstorage
- * @param version state version
- * @returns boolean
- */
-export const isGlobalStateV0 = (
-  state: unknown,
-  version: number,
-): state is GlobalStatePropertiesV0 => {
-  //wow this is a lazy validation. it'd be nice if zod was used in future to parse
-  if (version === 0) {
-    return true
-  } else return false
 }
