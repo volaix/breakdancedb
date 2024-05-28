@@ -79,6 +79,9 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/combos">Make Combos</a>
                   </li>
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/viewcombos">View Combos</a>
+                  </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/yourmoves">Your Moves</a>
                   </li>
