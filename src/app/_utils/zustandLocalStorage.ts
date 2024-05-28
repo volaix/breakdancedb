@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import {
   GlobalStateProperties,
+  isGlobalStateV0,
   lsBlowups,
   lsDanceList,
   lsDrops,
@@ -18,15 +19,12 @@ import {
   lsUserMoves,
   ZustandGlobalStore,
 } from './localStorageTypes'
-import { isGlobalStateV0, isGlobalStateV2 } from './migrationStates'
-
-const currentVersion: number = 3
 
 /**
  * Default Properties on the Zustand Local Storage Global
  */
 export const initialState: GlobalStateProperties = {
-  [lsFlows]: null,
+  [lsFlows]: [],
   [lsUserMoves]: {
     [lsToprock]: [],
     [lsFootwork]: [],
@@ -63,14 +61,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         //============root level===============
         //-----Setters (Root Level Keys)-----
         setLsFlows: (flows) => set({ [lsFlows]: flows }),
-        setLsFlow: (flow, key) =>
-          set((state) => {
-            if (state[lsFlows] === null) {
-              state[lsFlows] = { [key]: flow }
-            } else {
-              state[lsFlows][key] = flow
-            }
-          }),
         setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
         setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
         setDanceList: (list) => set({ [lsDanceList]: list }),
@@ -99,36 +89,27 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //=================================
         //------Reinitialization----------
-        replaceGlobalState: (importedState) => {
-          console.log('comparing imported version of', importedState.version)
-          console.log('to current version', currentVersion)
-          if (importedState.version === currentVersion) {
-            return set(importedState.state)
-          } else {
-            alert('version does not match. state not replaced.')
-          }
-        },
+        replaceGlobalState: (zustandState) => set(zustandState.state),
         resetGlobalState: () => set(initialState),
       }),
     ),
     //-------------persist options---------------
     {
       name: zustandLocalStorage,
-      version: currentVersion,
+      version: 2,
       migrate: (persistedState, version) => {
-        console.log('about to try migrate this data: ', persistedState)
+        console.log('persistedState: ', persistedState)
 
-        //migrating from 0 to 2
+        //migrating from 0 to current
         if (
           isGlobalStateV0(persistedState, version) &&
           migrationIsSafe(0, version)
         ) {
-          console.log('data migrating from v0 to v3')
           let base = {
             ...persistedState,
             [lsUserMoves]: {
+              //version0 = string[]. version2 = {[category]: string}
               ...initialState[lsUserMoves],
-              ...initialState[lsFlows],
             },
           }
           //if there's existing footwork, reuse it
@@ -137,20 +118,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           }
           return base
         }
-        //migrating from 2 to 3
-        if (
-          isGlobalStateV2(persistedState, version) &&
-          migrationIsSafe(2, version)
-        ) {
-          console.log('data migrating from v2 to v3')
-          return {
-            ...persistedState,
-            [lsUserMoves]: {
-              ...initialState[lsFlows],
-            },
-          }
-        }
-        console.log('data wiped and replaced to initialstate')
         return initialState
       },
     },
@@ -161,12 +128,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 //-----------------------helpers-----------------------
 const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   if (oldVersion === 0 && currentVersion === 2) {
-    return true
-  }
-  if (oldVersion === 0 && currentVersion === 3) {
-    return true
-  }
-  if (oldVersion === 2 && currentVersion === 3) {
     return true
   }
   return false

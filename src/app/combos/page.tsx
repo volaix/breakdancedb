@@ -3,7 +3,7 @@
 import RenderHeader from '@/app/_components/Header'
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { BasicFlow } from '../_utils/localStorageTypes'
+import { Flow } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
@@ -11,7 +11,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
  * @param param0 Flow
  * @returns jsx
  */
-const FlowBox = ({ flow }: { flow: BasicFlow }) => {
+const FlowBox = ({ flow }: { flow: Flow }) => {
   //-----------------------------render-----------------------------------
   return (
     <div className="w-1/3 p-2">
@@ -93,7 +93,7 @@ const FlowBox = ({ flow }: { flow: BasicFlow }) => {
  */
 export default function RenderCompletedMoves() {
   //------------------------------state---------------------------------
-  const [flows, setFlows] = useState<BasicFlow[] | null>(null)
+  const [flows, setFlows] = useState<Flow[] | null>(null)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //-----------------------------hooks-------------------------------

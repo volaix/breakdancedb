@@ -1,10 +1,8 @@
 'use client'
 // @format
-import { makeFlowId } from '@/app/_utils/lsMakers'
-import { useCallback, useEffect, useState } from 'react'
-import { RenderRedoIcon } from '../_components/Svgs'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import {
-  BasicFlow,
+  Flow,
   GlobalStateProperties,
   lsBlowups,
   lsDrops,
@@ -18,77 +16,71 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import RenderChilli from '../_components/RenderChilli'
-
-const categories: Category[] = [
-  lsToprock,
-  lsFootwork,
-  lsPower,
-  lsFreezes,
-  lsFloorwork,
-  lsSuicides,
-  lsDrops,
-  lsBlowups,
-  lsMisc,
-]
+import { Brand } from '../_utils/typehelpers'
+import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
+import { produce } from 'immer'
+import Link from 'next/link'
 
 //------------------------local utils------------------------------
-const pickRandomString = (items: string[]): string => {
+const getRandomItem = (items: string[]): string => {
   return items[Math.floor(Math.random() * items.length)]
 }
 
 //------------------------localtypes-------------------------------
 type Category = keyof GlobalStateProperties[typeof lsUserMoves]
-type SelectedCategoryState = Record<keyof BasicFlow, Category>
-
+type SelectedCategoryState = Record<keyof Flow, Category>
 //----------------------------mainrender--------------------------
 /*
  * Renders 3 moves with 3 buttons at the bottom.
  */
 export default function RenderFlows() {
   //-----------------------------state-----------------------------
+  const [movesFromGlobalState, setMovesFromGlobalState] = useState<string[]>([])
   //learning refers to "what will be displayed" and is RNG set
-  const [learning, setLearning] = useState<BasicFlow | null>(null)
-  const [visible, setVisible] = useState(false)
-  const [notificationMessage, setNotificationMessage] = useState<string>('')
-  const [textAreaValue, setTextAreaValue] = useState<string>('')
+  const [learning, setLearning] = useState<Flow | null>(null)
   const [singleCategory, setSingleCategory] = useState<boolean>(true)
+  const displayMoves = learning && movesFromGlobalState.length > 0
+  const getLsUserMovesByKey = useZustandStore(
+    (state) => state.getLsUserMovesByKey,
+  )
+  const categories: Category[] = [
+    lsToprock,
+    lsFootwork,
+    lsPower,
+    lsFreezes,
+    lsFloorwork,
+    lsSuicides,
+    lsDrops,
+    lsBlowups,
+    lsMisc,
+  ]
   const [selectedCategory, setSelectedCategory] =
     useState<SelectedCategoryState>({
       entryMove: lsToprock,
       keyMove: lsToprock,
       exitMove: lsToprock,
     })
-  const [ratingVal, setRatingVal] = useState<number>(1)
-
-  const displayMoves = !!learning
-  const setLsFlow = useZustandStore((state) => state.setLsFlow)
-  const getLsUserMovesByKey = useZustandStore(
-    (state) => state.getLsUserMovesByKey,
-  )
 
   //----------------functions----------------
   const shuffleLearning = useCallback(
-    (single?: keyof BasicFlow) => {
+    (single?: keyof Flow) => {
       if (single) {
         setLearning((prevLearning) => {
           if (!prevLearning) return null
           return {
             ...prevLearning,
-            [single]: pickRandomString(
+            [single]: getRandomItem(
               getLsUserMovesByKey(selectedCategory[single]),
             ),
           }
         })
       } else {
         setLearning({
-          entryMove: pickRandomString(
+          entryMove: getRandomItem(
             getLsUserMovesByKey(selectedCategory.entryMove),
           ),
-          keyMove: pickRandomString(
-            getLsUserMovesByKey(selectedCategory.keyMove),
-          ),
-          exitMove: pickRandomString(
+          keyMove: getRandomItem(getLsUserMovesByKey(selectedCategory.keyMove)),
+          exitMove: getRandomItem(
             getLsUserMovesByKey(selectedCategory.exitMove),
           ),
         })
@@ -98,46 +90,40 @@ export default function RenderFlows() {
   )
 
   //---------------------------hooks---------------------------------
+  //Populate existing moves
+  useEffect(() => {
+    setMovesFromGlobalState(getLsUserMovesByKey(lsToprock))
+  }, [getLsUserMovesByKey])
+
   //on mount
   useEffect(() => {
     shuffleLearning()
   }, [shuffleLearning])
 
-  //Show Notifcation for 2 seconds
-  useEffect(() => {
-    const fadeOutTimer = setTimeout(() => setVisible(false), 2000)
-    return () => clearTimeout(fadeOutTimer)
-  }, [visible])
   //-------------------------handlers--------------------------------
+
+  //handle dropdown
+  const handleChange = (
+    e: ChangeEvent<HTMLSelectElement>,
+    dropdown: keyof SelectedCategoryState,
+  ) => {
+    setSelectedCategory({
+      ...selectedCategory,
+      [dropdown]: e.target.value as Category,
+    })
+  }
 
   //update local storage when user clicks yes
   const onClickYes = () => {
+    //validation for if there is a flow displayed
     if (learning) {
-      setLsFlow(
-        {
-          entryMove: {
-            displayName: learning.entryMove,
-            category: selectedCategory.entryMove,
-          },
-          keyMove: {
-            displayName: learning.keyMove,
-            category: selectedCategory.keyMove,
-          },
-          exitMove: {
-            displayName: learning.exitMove,
-            category: selectedCategory.exitMove,
-          },
-          rating: ratingVal,
-          notes: textAreaValue,
-        },
-        makeFlowId(),
-      )
+      //updates localstorage with the added flow
+      // setLsFlows([...getLsFlows(), learning])
+      console.log('open modal')
     } else {
       console.log('cannot find move currently being learned')
     }
     shuffleLearning()
-    setNotificationMessage('Saved and re-shuffled')
-    setVisible(true)
   }
   const onClickSkip = () => {
     shuffleLearning()
@@ -146,15 +132,15 @@ export default function RenderFlows() {
   //-----------------------render--------------------
   return (
     <main>
-      <div className="mt-12 flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
+      <div className="flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
         <div className="mt-10 flex w-full flex-col">
           <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
             {/* ---------------------------TITLE SUBTITLE------------------------ */}
             <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-              New Flow
+              Flows
             </h1>
             <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-              {`Play around with these three moves. Dance through it. Try be you.`}
+              {`Try play around with three moves. Dance with each move. Or go quickly through it. It's up to you. Ratings at the end with some notes.`}
             </p>
             {/* ---------------------------BUTTON SWITCH------------------------ */}
             <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
@@ -261,59 +247,40 @@ export default function RenderFlows() {
                           className="
                       relative flex w-full
                       appearance-none justify-between overflow-hidden rounded-lg 
-                        border border-gray-300 p-2 dark:border-indigo-500"
-                      >
-                        <h2 className="font-medium tracking-widest">
-                          {learning[dropdown]}
-                        </h2>
-                        <div className="flex">
-                          <div className="mr-1 h-4 w-4">
-                            <RenderRedoIcon
-                              className="fill-black dark:fill-indigo-500"
-                              onClick={() => shuffleLearning(dropdown)}
-                            />
+                        border border-gray-300 p-2"
+                        >
+                          <h2 className="font-medium tracking-widest">
+                            {learning[dropdown]}
+                          </h2>
+                          <div className="flex">
+                            <div className="mr-1 h-4 w-4">
+                              <RenderRedoIcon
+                                onClick={() => shuffleLearning(dropdown)}
+                              />
+                            </div>
+                            {
+                              //im not convinced this is a useful feature
+                              false && (
+                                <span
+                                  className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
+                          items-center justify-center rounded-full bg-gray-300 text-white"
+                                >
+                                  <RenderGreyTick />
+                                </span>
+                              )
+                            }
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
-          {displayMoves || <div>No moves to display</div>}
-        </div>
-        <h2 className="pb-2">I like this</h2>
-        <div className="flex flex-row-reverse pb-10">
-          {Array.from(Array(5)).map((a, i) => {
-            return (
-              <RenderChilli
-                id={5 - i + ''}
-                checked={i === 5 - ratingVal}
-                onChange={(e) => {
-                  setRatingVal(Number(e.target.id))
-                }}
-                key={i}
-                size="size-10"
-              />
-            )
-          })}
-        </div>
-        <h2>Notes</h2>
-        <div className="w-full px-4">
-          <textarea
-            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
-    shadow-sm focus:border-transparent focus:outline-none
-    focus:ring-2 focus:ring-blue-400"
-            rows={3}
-            cols={30}
-            value={textAreaValue}
-            onChange={(e) => setTextAreaValue(e.target.value)}
-          />
         </div>
         {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
-        <Notification visible={visible} message={notificationMessage} />
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5">
             <a
@@ -322,33 +289,18 @@ export default function RenderFlows() {
             >
               re-shuffle
             </a>
-
-            <a
-              onClick={onClickYes}
-              className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
-            >
-              Save
-            </a>
+            {false && (
+              <a
+                //waiting for modal feature
+                onClick={onClickYes}
+                className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
+              >
+                Yes
+              </a>
+            )}
           </div>
         )}
       </div>
     </main>
-  )
-}
-
-interface NotificationProps {
-  message: string
-  visible: boolean
-}
-
-const Notification: React.FC<NotificationProps> = ({ message, visible }) => {
-  return (
-    <div
-      className={`transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}
-    >
-      {visible && (
-        <div className="rounded bg-blue-500 p-4 text-white">{message}</div>
-      )}
-    </div>
   )
 }
