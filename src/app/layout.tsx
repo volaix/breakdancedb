@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <RenderHeader />
-        <div className="body-font container relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
+        <div className="body-font w-xs container relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
           {children}
         </div>
       </body>
