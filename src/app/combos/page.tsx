@@ -1,7 +1,7 @@
 'use client'
 //@format
 import { Suspense, useEffect, useState } from 'react'
-import RenderChilli from '../_components/RenderChilli'
+import RenderThunder from '../_components/RenderChilli'
 import {
   FlowList,
   MoveCategories,
@@ -10,7 +10,7 @@ import {
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { produce } from 'immer'
 import LoadingFallback from '../_components/LoadingFallback'
-import { RenderRedDeleteButton } from '../_components/Svgs'
+import { RenderRedDeleteButton, RenderThumbIcon } from '../_components/Svgs'
 import { useForm } from 'react-hook-form'
 
 //-----------------local types-------------
@@ -34,6 +34,7 @@ type Inputs = {
 
 const RenderCompletedMoves = () => {
   //------------------------------state---------------------------------
+  const [rating, setRating] = useState<number>(1)
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
   const [flows, setFlows] = useState<FlowList | null>(null)
@@ -153,8 +154,8 @@ const RenderCompletedMoves = () => {
                 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
           type="text"
           value={title}
+          placeholder="Super Combo 9000"
           onChange={(e) => setTitle(e.target.value)}
-          defaultValue={'Super Combo 9000'}
         />
       </article>
       {/* --------------------combo sequence------------------ */}
@@ -311,7 +312,7 @@ const RenderCompletedMoves = () => {
                             <section className="flex flex-row-reverse">
                               {Array.from(Array(5)).map((_, i) => {
                                 return (
-                                  <RenderChilli
+                                  <RenderThunder
                                     key={i}
                                     checked={i === 5 - rating}
                                   />
@@ -492,6 +493,26 @@ const RenderCompletedMoves = () => {
                 </>
               </label>
             )}
+          </article>
+          {/* ------------------how much do you like it?----------------- */}
+          <article className="mt-10">
+            <label className="">How well can you execute this?</label>
+            <section className="mt-5 flex flex-row-reverse place-content-center">
+              {Array.from(Array(5)).map((_, i) => {
+                return (
+                  <RenderThunder
+                    id={5 - i + ''}
+                    checked={i === 5 - rating}
+                    onChange={(e) => {
+                      setRating(Number(e.target.id))
+                    }}
+                    color="peer-checked:text-indigo-500"
+                    key={i}
+                    size="size-10"
+                  />
+                )
+              })}
+            </section>
           </article>
           {/* --------------------notes----------------------- */}
           <section className="mt-5">
