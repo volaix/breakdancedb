@@ -25,7 +25,7 @@ const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
   ComboMove['id']
 > = {
-  flow: makeFlowId(),
+  flow: makeFlowId(), //only used as safety
   move: makeMoveId(),
   custom: 'custom',
 }
@@ -547,11 +547,14 @@ const RenderMakeCombo = () => {
                     displayName: title,
                     execution: rating,
                     sequence: Object.keys(selectedComboSeq).map((key) => {
+                      const comboSeq = selectedComboSeq[Number(key)]
                       return {
-                        type: selectedComboSeq[Number(key)].type,
+                        type: comboSeq.type,
                         id:
-                          idMap[selectedComboSeq[Number(key)].type] || 'custom',
-                        moves: selectedComboSeq[Number(key)].moves,
+                          (comboSeq.type === 'flow' && comboSeq.id) ||
+                          idMap[comboSeq.type] ||
+                          'custom',
+                        moves: comboSeq.moves,
                       }
                     }),
                     notes: notes,
