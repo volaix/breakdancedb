@@ -1,6 +1,6 @@
 import { ChangeEventHandler } from 'react'
 
-export default function RenderChilli({
+export default function RenderThunder({
   checked,
   size,
   onChange,

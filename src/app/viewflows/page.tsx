@@ -2,7 +2,7 @@
 //@format
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import RenderChilli from '../_components/RenderChilli'
+import RenderThunder from '../_components/RenderChilli'
 import { FlowList } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -53,7 +53,7 @@ export default function RenderCompletedMoves() {
                       <div className="flex flex-row-reverse">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
-                            <RenderChilli key={i} checked={i === 5 - rating} />
+                            <RenderThunder key={i} checked={i === 5 - rating} />
                           )
                         })}
                       </div>

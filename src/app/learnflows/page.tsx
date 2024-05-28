@@ -18,7 +18,7 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import RenderChilli from '../_components/RenderChilli'
+import RenderThunder from '../_components/RenderChilli'
 
 const categories: Category[] = [
   lsToprock,
@@ -274,7 +274,7 @@ export default function RenderFlows() {
         <div className="flex flex-row-reverse pb-10">
           {Array.from(Array(5)).map((a, i) => {
             return (
-              <RenderChilli
+              <RenderThunder
                 id={5 - i + ''}
                 checked={i === 5 - ratingVal}
                 onChange={(e) => {
