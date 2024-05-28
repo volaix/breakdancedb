@@ -75,6 +75,7 @@ const RenderPageNewMove = () => {
 
   //When clicking the savebutton
   const onSave = () => {
+    //FEATURE Display Transitions next to positions. If a transition is named, automatically update position name to "Pre transitionname or post". e.g. Pre Sweep and Post Sweep if transition p1-p2 is called Sweep.
     console.log('onsave run')
     if (accessToLocalStorage) {
       const lsPositions = makePositions(positions.map((p) => p.displayName))

@@ -1,13 +1,11 @@
 import { ChangeEventHandler } from 'react'
 
-export default function RenderThunder({
+export default function RenderChilli({
   checked,
   size,
   onChange,
   id,
-  color,
 }: {
-  color?: string
   id?: string
   size?: string
   onChange?: ChangeEventHandler<HTMLInputElement>
@@ -25,7 +23,8 @@ export default function RenderThunder({
                       text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
       />
       <label
-        className={`pointer-events-none text-gray-300 ${color || 'peer-checked:text-yellow-400'}`}
+        className="pointer-events-none text-gray-300 
+            peer-checked:text-yellow-400"
       >
         <svg
           className={`

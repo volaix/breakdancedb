@@ -2,8 +2,8 @@
 //@format
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import RenderThunder from '../_components/RenderChilli'
-import { FlowDictionary } from '../_utils/localStorageTypes'
+import RenderChilli from '../_components/RenderChilli'
+import { FlowList } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
@@ -13,7 +13,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
  */
 export default function RenderCompletedMoves() {
   //------------------------------state---------------------------------
-  const [flows, setFlows] = useState<FlowDictionary | null>(null)
+  const [flows, setFlows] = useState<FlowList | null>(null)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //-----------------------------hooks-------------------------------
@@ -53,7 +53,7 @@ export default function RenderCompletedMoves() {
                       <div className="flex flex-row-reverse">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
-                            <RenderThunder key={i} checked={i === 5 - rating} />
+                            <RenderChilli key={i} checked={i === 5 - rating} />
                           )
                         })}
                       </div>

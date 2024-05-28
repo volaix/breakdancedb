@@ -4,7 +4,6 @@ import { immer } from 'zustand/middleware/immer'
 import {
   GlobalStateProperties,
   lsBlowups,
-  lsCombos,
   lsDanceList,
   lsDrops,
   lsFloorwork,
@@ -63,14 +62,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //============root level===============
         //-----Setters (Root Level Keys)-----
-        setLsCombos: (combo, comboId) =>
-          set((state) => {
-            if (state[lsCombos]) {
-              state[lsCombos][comboId] = combo
-            } else {
-              state[lsCombos] = { [comboId]: combo }
-            }
-          }),
         setLsFlows: (flows) => set({ [lsFlows]: flows }),
         setLsFlow: (flow, key) =>
           set((state) => {
@@ -86,7 +77,6 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //-----Getters (Root level keys )------
         getLsFlows: () => get()[lsFlows],
-        getLsCombos: () => get()[lsCombos],
         getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],

@@ -18,8 +18,7 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import RenderThunder from '../_components/RenderChilli'
-import { Notification } from '../_components/Notification'
+import RenderChilli from '../_components/RenderChilli'
 
 const categories: Category[] = [
   lsToprock,
@@ -289,7 +288,7 @@ export default function RenderFlows() {
         <div className="flex flex-row-reverse pb-10">
           {Array.from(Array(5)).map((a, i) => {
             return (
-              <RenderThunder
+              <RenderChilli
                 id={5 - i + ''}
                 checked={i === 5 - ratingVal}
                 onChange={(e) => {
@@ -334,5 +333,22 @@ export default function RenderFlows() {
         )}
       </div>
     </main>
+  )
+}
+
+interface NotificationProps {
+  message: string
+  visible: boolean
+}
+
+const Notification: React.FC<NotificationProps> = ({ message, visible }) => {
+  return (
+    <div
+      className={`transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}
+    >
+      {visible && (
+        <div className="rounded bg-blue-500 p-4 text-white">{message}</div>
+      )}
+    </div>
   )
 }

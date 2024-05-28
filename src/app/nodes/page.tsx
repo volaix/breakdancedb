@@ -1,6 +1,9 @@
 import RenderHeader from '@/app/_components/Header'
 
 const Page = () => {
+  //FEATURE This page isn't in MVP and probably wont be developed for a long time
+  // Set the value received from the local storage to a local state
+
   return (
     <>
       <RenderHeader />

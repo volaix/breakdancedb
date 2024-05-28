@@ -9,7 +9,7 @@ export type BasicFlow = {
   exitMove: string
 }
 
-export type FlowDictionary = {
+export type FlowList = {
   [key: FlowId]: {
     rating: number
     entryMove: {
@@ -108,7 +108,6 @@ export type PositionId = Brand<string, 'PositionId'>
 export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
-export type ComboId = Brand<string, 'ComboId'>
 export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
@@ -116,7 +115,6 @@ export const lsFlows = 'flows'
 export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
-export const lsCombos = 'combos'
 
 export const lsToprock = 'toprock'
 export const lsFootwork = 'footwork'
@@ -128,31 +126,12 @@ export const lsDrops = 'drops'
 export const lsBlowups = 'blowups'
 export const lsMisc = 'misc'
 
-export type LocalStorageKeys = keyof GlobalStateProperties
-
-/**
+export type LocalStorageKeys = keyof GlobalStateProperties /**
  * Types of Properties on the Zustand Local Storage Global
  */
-export type MoveCategories = keyof GlobalStateProperties[typeof lsUserMoves]
-
-export type ComboMove = {
-  moves: string[]
-  id: MoveId | FlowId | TransitionId | 'custom'
-  type: 'move' | 'flow' | 'transition' | 'custom'
-}
-
-export type ComboDictionary = {
-  [key: ComboId]: {
-    displayName: string
-    notes: string
-    execution: number //how easy is it to do it
-    sequence: ComboMove[]
-  }
-}
 
 export type GlobalStateProperties = {
-  [lsCombos]?: ComboDictionary
-  [lsFlows]: FlowDictionary | null
+  [lsFlows]: FlowList | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -188,18 +167,13 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
-  setLsCombos: (
-    combo: NonNullable<ComboDictionary[keyof ComboDictionary]>,
-    comboId: ComboId,
-  ) => void
   setLsFlows: (flows: GlobalStateProperties[typeof lsFlows]) => void
-  setLsFlow: (flow: FlowDictionary[keyof FlowDictionary], key: FlowId) => void
+  setLsFlow: (flow: FlowList[keyof FlowList], key: FlowId) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
   getLsFlows: () => GlobalStateProperties[typeof lsFlows]
-  getLsCombos: () => GlobalStateProperties[typeof lsCombos]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]
