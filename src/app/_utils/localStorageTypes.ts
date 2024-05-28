@@ -144,8 +144,7 @@ export type ComboList = {
   [key: ComboId]: {
     displayName: string
     notes: string
-    physical: number //how physically difficult is this combo
-    mental: number //how easy is it to do it
+    execution: number //how easy is it to do it
     moves: ComboMove[]
   }
 }
