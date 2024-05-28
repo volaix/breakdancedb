@@ -19,6 +19,7 @@ import {
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
+import { Notification } from '../_components/Notification'
 
 const categories: Category[] = [
   lsToprock,
@@ -319,22 +320,5 @@ export default function RenderFlows() {
         )}
       </div>
     </main>
-  )
-}
-
-interface NotificationProps {
-  message: string
-  visible: boolean
-}
-
-const Notification: React.FC<NotificationProps> = ({ message, visible }) => {
-  return (
-    <div
-      className={`transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}
-    >
-      {visible && (
-        <div className="rounded bg-blue-500 p-4 text-white">{message}</div>
-      )}
-    </div>
   )
 }

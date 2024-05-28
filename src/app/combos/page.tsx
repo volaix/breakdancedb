@@ -20,6 +20,7 @@ import {
   makeMoveId,
   makePositionId,
 } from '../_utils/lsMakers'
+import { Notification } from '../_components/Notification'
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
@@ -51,6 +52,10 @@ const RenderMakeCombo = () => {
   const [rating, setRating] = useState<number>(1)
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
+  const [notification, setNotification] = useState<null | {
+    visible?: boolean
+    message?: string
+  }>(null)
   const [flows, setFlows] = useState<FlowDictionary | null>(null)
   const [selectedMoveKey, setSelectedMoveKey] =
     useState<MoveCategories>(lsToprock)
@@ -69,6 +74,16 @@ const RenderMakeCombo = () => {
   const currentIndex = selectedComboNumber.indexOf(true)
 
   //-----------------------------hooks-------------------------------
+
+  //Show Notifcation for 2 seconds
+  useEffect(() => {
+    const fadeOutTimer = setTimeout(
+      () => setNotification({ visible: false }),
+      2000,
+    )
+    return () => clearTimeout(fadeOutTimer)
+  }, [notification?.visible])
+
   //EDGECASE: when user selects usemove for the very first time show default move
   useEffect(() => {
     if (
@@ -537,6 +552,10 @@ const RenderMakeCombo = () => {
               className="h-32 w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
             />
           </section>
+          <Notification
+            visible={!!notification?.visible}
+            message={notification?.message || ''}
+          />
           {/* -------------------save button----------------- */}
           <button
             onClick={(_) => {
@@ -561,6 +580,7 @@ const RenderMakeCombo = () => {
                   },
                   comboId,
                 )
+                setNotification({ visible: true, message: 'Combo Saved!' })
               } else {
                 console.log('theres no selectedComboSeq')
               }
