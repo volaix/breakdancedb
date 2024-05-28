@@ -130,6 +130,8 @@ export type LocalStorageKeys = keyof GlobalStateProperties /**
  * Types of Properties on the Zustand Local Storage Global
  */
 
+export type MoveCategories = keyof GlobalStateProperties[typeof lsUserMoves]
+
 export type GlobalStateProperties = {
   [lsFlows]: FlowList | null
   [lsUserMoves]: {

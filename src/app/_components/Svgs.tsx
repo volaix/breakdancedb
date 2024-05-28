@@ -1,27 +1,24 @@
+import { SVGProps } from 'react'
+
 /**
  *
  * Render a delete button
  * @returns jsx
  */
 export const RenderRedDeleteButton = ({
-  onClick,
-  id,
-}: {
-  onClick?: React.MouseEventHandler<SVGSVGElement>
-  id?: string
-}) => {
+  ...props
+}: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      id={id}
+      {...props}
       className="dark:fill-gray-500"
-      onClick={onClick}
       height="100%"
       width="100%"
       viewBox="0 0 496.158 496.158"
     >
       <path
         pointerEvents={'none'}
-        fill="#E04F5F"
+        className="fill-red-400"
         d="M0,248.085C0,111.063,111.069,0.003,248.075,0.003c137.013,0,248.083,111.061,248.083,248.082
 	c0,137.002-111.07,248.07-248.083,248.07C111.069,496.155,0,385.087,0,248.085z"
       />
