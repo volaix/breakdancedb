@@ -199,6 +199,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   setDanceList: (list: string[]) => void
   //-----Getters (Root level keys )------
   getLsFlows: () => GlobalStateProperties[typeof lsFlows]
+  getLsCombos: () => GlobalStateProperties[typeof lsCombos]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]

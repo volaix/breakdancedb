@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import { FlowDictionary } from '../_utils/localStorageTypes'
+import { ComboDictionary, FlowDictionary } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
@@ -13,77 +13,70 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
  */
 export default function RenderViewCombos() {
   //------------------------------state---------------------------------
-  const [flows, setFlows] = useState<FlowDictionary | null>(null)
-  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const [combos, setCombos] = useState<ComboDictionary | null>(null)
+  const getLsCombos = useZustandStore((state) => state.getLsCombos)
 
   //-----------------------------hooks-------------------------------
 
   //updates flows using localstorage
   useEffect(() => {
-    setFlows(getLsFlows())
-  }, [getLsFlows])
+    setCombos(getLsCombos() || null)
+  }, [getLsCombos])
 
   //-----------------------------render---------------------------------
 
   return (
     <div className="w-full dark:bg-gray-900">
       <div className="mt-20">
-        <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
+        <div className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
           {/* ------------title------------- */}
           <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
             View Combos
           </h1>
           {/* ---------------subtitle---------- */}
           <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-            Review combos for practice and comfortability.
+            Drill this list. Review your combos for practice and comfortability.
           </p>
         </div>
-        <div className="flex flex-wrap pt-10">
-          {/* ---------render flow boxes ------------ */}
-          {flows &&
-            Object.entries(flows).map(
-              ([key, { entryMove, exitMove, keyMove, rating, notes }], i) => {
+        <div className="flex flex-wrap pt-5">
+          {/* ---------render combo boxes ------------ */}
+          {combos &&
+            Object.entries(combos).map(
+              ([comboId, { displayName, notes, execution, sequence }], i) => {
                 return (
-                  <div className="w-1/3 p-1" key={key}>
-                    <div
-                      className="relative flex h-full flex-col overflow-hidden rounded-lg 
-     bg-gray-100 bg-opacity-75 
-      px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
-                    >
-                      <div className="flex flex-row-reverse">
+                  <div className="w-1/3 p-1" key={comboId}>
+                    <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                      <h2 className="bold text-xs dark:text-white">
+                        {displayName}
+                      </h2>
+                      <div className="mt-2 flex flex-row-reverse">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
-                            <RenderThunder key={i} checked={i === 5 - rating} />
+                            <RenderThunder
+                              key={i}
+                              checked={i === 5 - execution}
+                            />
                           )
                         })}
                       </div>
+                      <label className="text-[9px]">Execution</label>
 
                       <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                        {[
-                          {
-                            category: entryMove.category,
-                            displayText: entryMove.displayName,
-                          },
-                          {
-                            category: keyMove.category,
-                            displayText: keyMove.displayName,
-                          },
-                          {
-                            category: exitMove.category,
-                            displayText: exitMove.displayName,
-                          },
-                        ].map(({ category, displayText }) => {
+                        {sequence.map(({ moves }, index) => {
                           return (
                             <div
-                              key={displayText}
-                              className="flex flex-col items-start overflow-hidden	text-ellipsis whitespace-nowrap"
+                              key={moves.toString()}
+                              className="flex flex-col items-start text-ellipsis"
                             >
-                              <div className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</div>
-                              <div>{displayText}</div>
+                              <div className="text-[6px] text-gray-400 dark:text-gray-500">
+                                {index + 1}
+                              </div>
+                              <div>{moves.join(' -> ')}</div>
                             </div>
                           )
                         })}
                       </h1>
+                      <label className="text-[9px]">Notes</label>
                       <p className="text-[6px]  leading-relaxed">{notes}</p>
                     </div>
                   </div>
