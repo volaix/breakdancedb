@@ -1,17 +1,33 @@
 'use client'
 //@format
+import { produce } from 'immer'
 import { Suspense, useEffect, useState } from 'react'
+import LoadingFallback from '../_components/LoadingFallback'
 import RenderThunder from '../_components/RenderChilli'
+import { RenderRedDeleteButton } from '../_components/Svgs'
 import {
+  ComboDictionary,
+  ComboMove,
   FlowList,
   MoveCategories,
   lsToprock,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { produce } from 'immer'
-import LoadingFallback from '../_components/LoadingFallback'
-import { RenderRedDeleteButton, RenderThumbIcon } from '../_components/Svgs'
-import { useForm } from 'react-hook-form'
+import {
+  makeComboId,
+  makeFlowId,
+  makeMoveId,
+  makePositionId,
+} from '../_utils/lsMakers'
+
+const idMap: Record<
+  SelectedComboSeq[keyof SelectedComboSeq]['type'],
+  ComboMove['id']
+> = {
+  flow: makeFlowId(),
+  move: makeMoveId(),
+  custom: 'custom',
+}
 
 //-----------------local types-------------
 
@@ -28,11 +44,7 @@ type Checked = {
   custom?: true
 }
 
-type Inputs = {
-  singleMove: string
-}
-
-const RenderCompletedMoves = () => {
+const RenderMakeCombo = () => {
   //------------------------------state---------------------------------
   const [rating, setRating] = useState<number>(1)
   const [notes, setNotes] = useState<string>('')
@@ -49,6 +61,7 @@ const RenderCompletedMoves = () => {
     useState<SelectedComboSeq | null>(null)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const setLsCombos = useZustandStore((state) => state.setLsCombos)
 
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
@@ -58,7 +71,7 @@ const RenderCompletedMoves = () => {
   useEffect(() => {
     if (
       checked.useMoves &&
-      selectedComboSeq?.[currentIndex].type === 'move' &&
+      selectedComboSeq?.[currentIndex]?.type === 'move' &&
       !selectedComboSeq?.[currentIndex].moves[0]
     ) {
       setSelectedComboSeq((prev) => ({
@@ -426,7 +439,6 @@ const RenderCompletedMoves = () => {
                               moves: [e.target.value],
                             },
                           }))
-                          console.log('e.target.value', e.target.value)
                         }}
                       >
                         {userMoves[selectedMoveKey].map((value) => {
@@ -526,15 +538,27 @@ const RenderCompletedMoves = () => {
           {/* -------------------save button----------------- */}
           <button
             onClick={(_) => {
-              console.log('lets set an obj')
-              const obj = {
-                name: title,
-                //i wanna put in the flowid
-                //also maybe a moveid?
-                sequence: selectedComboSeq,
-                notes: notes,
+              const comboId = makeComboId()
+              if (selectedComboSeq) {
+                setLsCombos(
+                  {
+                    displayName: title,
+                    execution: rating,
+                    sequence: Object.keys(selectedComboSeq).map((key) => {
+                      return {
+                        type: selectedComboSeq[Number(key)].type,
+                        id:
+                          idMap[selectedComboSeq[Number(key)].type] || 'custom',
+                        moves: selectedComboSeq[Number(key)].moves,
+                      }
+                    }),
+                    notes: notes,
+                  },
+                  comboId,
+                )
+              } else {
+                console.log('theres no selectedComboSeq')
               }
-              console.log('obj', obj)
             }}
             className="mt-5 inline-flex rounded border-0
            bg-indigo-500 px-6 py-2 text-xs 
@@ -548,10 +572,10 @@ const RenderCompletedMoves = () => {
   )
 }
 
-export default function RenderPageCompletedMoves() {
+export default function RenderPageMakeCombo() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <RenderCompletedMoves />
+      <RenderMakeCombo />
     </Suspense>
   )
 }
