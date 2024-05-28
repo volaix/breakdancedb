@@ -8,7 +8,8 @@ import { RenderRedDeleteButton } from '../_components/Svgs'
 import {
   ComboDictionary,
   ComboMove,
-  FlowList,
+  FlowId,
+  FlowDictionary,
   MoveCategories,
   lsToprock,
 } from '../_utils/localStorageTypes'
@@ -36,6 +37,7 @@ type SelectedComboSeq = {
   [key: number]: {
     type: 'flow' | 'move' | 'custom'
     moves: string[]
+    id?: FlowId
   }
 }
 type Checked = {
@@ -49,7 +51,7 @@ const RenderMakeCombo = () => {
   const [rating, setRating] = useState<number>(1)
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
-  const [flows, setFlows] = useState<FlowList | null>(null)
+  const [flows, setFlows] = useState<FlowDictionary | null>(null)
   const [selectedMoveKey, setSelectedMoveKey] =
     useState<MoveCategories>(lsToprock)
   const [customInputVal, setCustomInputVal] = useState<string>('')
@@ -130,7 +132,7 @@ const RenderMakeCombo = () => {
     }
   }, [checked.custom, customInputVal, selectedComboNumber, selectedComboSeq])
 
-  //updates flows using localstorage
+  //gets flows on mount
   useEffect(() => {
     setFlows(getLsFlows())
   }, [getLsFlows])
@@ -288,15 +290,14 @@ const RenderMakeCombo = () => {
                     ) => {
                       const indexOfCurCombo = selectedComboNumber.indexOf(true)
                       const isSelected =
-                        selectedComboSeq &&
-                        selectedComboSeq[indexOfCurCombo] &&
-                        selectedComboSeq[indexOfCurCombo].type === 'flow' &&
+                        selectedComboSeq?.[indexOfCurCombo]?.type === 'flow' &&
                         selectedComboSeq[indexOfCurCombo].moves.join('') ===
                           [
                             entryMove.displayName,
                             keyMove.displayName,
                             exitMove.displayName,
                           ].join('')
+
                       return (
                         <button
                           className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
@@ -307,6 +308,7 @@ const RenderMakeCombo = () => {
                                 ...prevState,
                                 [indexOfCurCombo]: {
                                   type: 'flow',
+                                  id: key as FlowId,
                                   moves: [
                                     entryMove.displayName,
                                     keyMove.displayName,
