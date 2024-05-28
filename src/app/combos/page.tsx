@@ -21,6 +21,7 @@ import {
   makePositionId,
 } from '../_utils/lsMakers'
 import { Notification } from '../_components/Notification'
+import { useRouter } from 'next/navigation'
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
@@ -72,6 +73,7 @@ const RenderMakeCombo = () => {
 
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
+  const router = useRouter()
 
   //-----------------------------hooks-------------------------------
 
@@ -581,6 +583,7 @@ const RenderMakeCombo = () => {
                   comboId,
                 )
                 setNotification({ visible: true, message: 'Combo Saved!' })
+                router.push('/viewcombos')
               } else {
                 console.log('theres no selectedComboSeq')
               }
