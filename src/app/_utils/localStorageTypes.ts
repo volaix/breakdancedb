@@ -9,7 +9,7 @@ export type BasicFlow = {
   exitMove: string
 }
 
-export type FlowList = {
+export type FlowDictionary = {
   [key: FlowId]: {
     rating: number
     entryMove: {
@@ -152,7 +152,7 @@ export type ComboDictionary = {
 
 export type GlobalStateProperties = {
   [lsCombos]?: ComboDictionary
-  [lsFlows]: FlowList | null
+  [lsFlows]: FlowDictionary | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]
@@ -193,7 +193,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     comboId: ComboId,
   ) => void
   setLsFlows: (flows: GlobalStateProperties[typeof lsFlows]) => void
-  setLsFlow: (flow: FlowList[keyof FlowList], key: FlowId) => void
+  setLsFlow: (flow: FlowDictionary[keyof FlowDictionary], key: FlowId) => void
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void

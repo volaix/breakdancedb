@@ -1,7 +1,7 @@
 import {
   GlobalStatePropertiesV0,
   lsFlows,
-  FlowList,
+  FlowDictionary,
   lsUserMoves,
   lsToprock,
   lsFootwork,
@@ -45,7 +45,7 @@ export const isGlobalStateV2 = (
   state: unknown,
   version: number,
 ): state is {
-  [lsFlows]: FlowList | null
+  [lsFlows]: FlowDictionary | null
   [lsUserMoves]: {
     [lsToprock]: string[]
     [lsFootwork]: string[]

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import { FlowList } from '../_utils/localStorageTypes'
+import { FlowDictionary } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
@@ -13,7 +13,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
  */
 export default function RenderViewCombos() {
   //------------------------------state---------------------------------
-  const [flows, setFlows] = useState<FlowList | null>(null)
+  const [flows, setFlows] = useState<FlowDictionary | null>(null)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
   //-----------------------------hooks-------------------------------
