@@ -207,10 +207,10 @@ const RenderYourMoves = () => {
                       {/* -----------------left textarea------------------- */}
                       <textarea
                         {...register('categoryMoves')}
-                        className="h-32 w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+                        className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
                       />
                       {/* --------------------right json view-------------------- */}
-                      <pre className="h-32 w-1/2 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs">
+                      <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs">
                         {JSON.stringify(
                           unsavedMoveList.split(/\r\n|\r|\n/),
                           null,
