@@ -79,6 +79,9 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/combos">🤖 Combos 🤖</a>
                   </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/battle">🥊 Battle 🥊</a>
+                  </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
                       <a href="/dblist">View DB</a>
