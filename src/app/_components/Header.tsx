@@ -63,7 +63,10 @@ export default function RenderHeader() {
                 </div>
                 <ul className="flex	min-h-[250px] flex-col items-center justify-between text-black">
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">Learn Moves</a>
+                    <a href="/yourmoves">📚 Your Moves 📚</a>
+                  </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/learnmoves">🎷 Dance Better 🎷</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
@@ -71,16 +74,13 @@ export default function RenderHeader() {
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnflows">Do Flows</a>
+                    <a href="/learnflows">💪 Do Flows 💪</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
                     <a href="/viewflows">View Flows</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/combos">Combos</a>
-                  </li>
-                  <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/yourmoves">Your Moves</a>
+                    <a href="/combos">🤖 Combos 🤖</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
