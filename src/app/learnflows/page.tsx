@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
-import { RenderGreyTick, RenderRedoIcon } from '../_components/Svgs'
+import { RenderRedoIcon } from '../_components/Svgs'
 import {
   BasicFlow,
   GlobalStateProperties,
@@ -206,10 +206,7 @@ export default function RenderFlows() {
                     <div className="relative">
                       <select
                         disabled={index !== 0 && singleCategory}
-                        className="focus:shadow-outline block w-full 
-                      appearance-none rounded-lg border border-gray-300
-                      bg-white px-4 py-2 pr-10 leading-tight 
-                       focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                        className="focus:shadow-outline block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                         value={
                           singleCategory
                             ? selectedCategory['entryMove']
@@ -253,37 +250,19 @@ export default function RenderFlows() {
                   {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
                   <div className="w-1/2">
                     {displayMoves && (
-                      <div
-                        className="h-full w-full 
-                     dark:bg-gray-900 dark:text-white"
-                      >
+                      <div className="h-full w-full dark:bg-gray-900 dark:text-white">
                         {`${selectedCategory[dropdown]} move`}
-                        <div
-                          className="
-                      relative flex w-full
-                      appearance-none justify-between overflow-hidden rounded-lg 
-                        border border-gray-300 p-2"
-                        >
+                        <div className=" relative flex w-full appearance-none justify-between overflow-hidden rounded-lg border border-gray-300 p-2 dark:border-indigo-500">
                           <h2 className="font-medium tracking-widest">
                             {learning[dropdown]}
                           </h2>
                           <div className="flex">
                             <div className="mr-1 h-4 w-4">
                               <RenderRedoIcon
+                                className="fill-black dark:fill-indigo-500"
                                 onClick={() => shuffleLearning(dropdown)}
                               />
                             </div>
-                            {
-                              //im not convinced this is a useful feature
-                              false && (
-                                <span
-                                  className="mr-1 inline-flex h-4 w-4 flex-shrink-0 
-                          items-center justify-center rounded-full bg-gray-300 text-white"
-                                >
-                                  <RenderGreyTick />
-                                </span>
-                              )
-                            }
                           </div>
                         </div>
                       </div>
@@ -294,6 +273,34 @@ export default function RenderFlows() {
             </div>
           )}
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
+        </div>
+        <h2 className="pb-2">I like this</h2>
+        <div className="flex flex-row-reverse pb-10">
+          {Array.from(Array(5)).map((a, i) => {
+            return (
+              <RenderThunder
+                id={5 - i + ''}
+                checked={i === 5 - ratingVal}
+                onChange={(e) => {
+                  setRatingVal(Number(e.target.id))
+                }}
+                key={i}
+                size="size-10"
+              />
+            )
+          })}
+        </div>
+        <h2>Notes</h2>
+        <div className="w-full px-4">
+          <textarea
+            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
+    shadow-sm focus:border-transparent focus:outline-none
+    focus:ring-2 focus:ring-blue-400"
+            rows={3}
+            cols={30}
+            value={textAreaValue}
+            onChange={(e) => setTextAreaValue(e.target.value)}
+          />
         </div>
         <h2 className="pb-2">I like this</h2>
         <div className="flex flex-row-reverse pb-10">
