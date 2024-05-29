@@ -109,6 +109,7 @@ export type MovementId = Brand<string, 'MovementId'>
 export type TransitionId = Brand<string, 'TransitionId'>
 export type MoveId = Brand<string, 'MoveId'>
 export type ComboId = Brand<string, 'ComboId'>
+export type RoundId = Brand<string, 'RoundId'>
 export type FlowId = Brand<string, 'FlowId'>
 
 // ----------- Local Storage Keys -----------------
