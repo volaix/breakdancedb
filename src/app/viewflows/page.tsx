@@ -50,7 +50,8 @@ export default function RenderCompletedMoves() {
      bg-gray-100 bg-opacity-75 
       px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
                     >
-                      <div className="flex flex-row-reverse">
+                      <label className="text-[8px]">Likeable</label>
+                      <div className="flex flex-row-reverse justify-center">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
                             <RenderThunder key={i} checked={i === 5 - rating} />
@@ -84,7 +85,14 @@ export default function RenderCompletedMoves() {
                           )
                         })}
                       </h1>
-                      <p className="text-[6px]  leading-relaxed">{notes}</p>
+                      {notes && (
+                        <section>
+                          <label className="text-[8px] leading-none">
+                            Notes
+                          </label>
+                          <p className="text-[6px] leading-none">{notes}</p>
+                        </section>
+                      )}
                     </div>
                   </div>
                 )
