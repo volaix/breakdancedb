@@ -254,7 +254,8 @@ export default function RenderFlows() {
                         {`${selectedCategory[dropdown]} move`}
                         <div className=" relative flex w-full appearance-none justify-between overflow-hidden rounded-lg border border-gray-300 p-2 dark:border-indigo-500">
                           <h2 className="font-medium tracking-widest">
-                            {learning[dropdown]}
+                            {' '}
+                            {learning[dropdown]}{' '}
                           </h2>
                           <div className="flex">
                             <div className="mr-1 h-4 w-4">
@@ -273,6 +274,34 @@ export default function RenderFlows() {
             </div>
           )}
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
+        </div>
+        <h2 className="pb-2">I like this</h2>
+        <div className="flex flex-row-reverse pb-10">
+          {Array.from(Array(5)).map((a, i) => {
+            return (
+              <RenderThunder
+                id={5 - i + ''}
+                checked={i === 5 - ratingVal}
+                onChange={(e) => {
+                  setRatingVal(Number(e.target.id))
+                }}
+                key={i}
+                size="size-10"
+              />
+            )
+          })}
+        </div>
+        <h2>Notes</h2>
+        <div className="w-full px-4">
+          <textarea
+            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
+    shadow-sm focus:border-transparent focus:outline-none
+    focus:ring-2 focus:ring-blue-400"
+            rows={3}
+            cols={30}
+            value={textAreaValue}
+            onChange={(e) => setTextAreaValue(e.target.value)}
+          />
         </div>
         <h2 className="pb-2">I like this</h2>
         <div className="flex flex-row-reverse pb-10">
