@@ -71,16 +71,13 @@ export default function RenderHeader() {
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnflows">Learn Flows</a>
+                    <a href="/learnflows">Do Flows</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
                     <a href="/viewflows">View Flows</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/combos">Make Combos</a>
-                  </li>
-                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
-                    <a href="/viewcombos">View Combos</a>
+                    <a href="/combos">Combos</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/yourmoves">Your Moves</a>
