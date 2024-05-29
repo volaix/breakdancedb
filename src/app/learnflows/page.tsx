@@ -197,16 +197,16 @@ export default function RenderFlows() {
                 ['entryMove', 'keyMove', 'exitMove'] as Array<
                   keyof SelectedCategoryState
                 >
-              ).map((dropdown, index) => (
-                <div key={index} className="relative flex">
+              ).map((movePosition, i) => (
+                <div key={i} className="relative flex">
                   {/* //-------------------------DROPDOWN------------------------- */}
                   <article className="w-1/2">
                     {/* title */}
-                    <div>{dropdown}</div>
+                    <div>{movePosition}</div>
                     {/* select */}
                     <div className="relative">
                       <select
-                        disabled={index !== 0 && singleCategory}
+                        disabled={i !== 0 && singleCategory}
                         className="focus:shadow-outline block w-full 
                       appearance-none rounded-lg border border-gray-300
                       bg-white px-4 py-2 pr-10 leading-tight 
@@ -214,7 +214,7 @@ export default function RenderFlows() {
                         value={
                           singleCategory
                             ? selectedCategory['entryMove']
-                            : selectedCategory[dropdown]
+                            : selectedCategory[movePosition]
                         }
                         onChange={(e) =>
                           singleCategory
@@ -225,7 +225,7 @@ export default function RenderFlows() {
                               })
                             : setSelectedCategory({
                                 ...selectedCategory,
-                                [dropdown]: e.target.value as Category,
+                                [movePosition]: e.target.value as Category,
                               })
                         }
                       >
@@ -254,20 +254,47 @@ export default function RenderFlows() {
                   {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
                   <article className="w-1/2">
                     {displayMoves && (
-                      <div className="h-full w-full dark:bg-gray-900 dark:text-white">
-                        {`${selectedCategory[dropdown]} move`}
-                        <div className=" relative flex w-full appearance-none justify-between overflow-hidden rounded-lg border border-gray-300 p-2 dark:border-indigo-500">
-                          <label className="font-medium tracking-widest">
-                            {learning[dropdown]}
-                          </label>
+                      <section className="h-full w-full dark:bg-gray-900 dark:text-white">
+                        <label>{`${selectedCategory[movePosition]} move`}</label>
+                        <div className=" relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300 dark:border-indigo-500">
+                          <select
+                            className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-white 
+                            py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                            value={learning[movePosition]}
+                            onChange={(e) => {
+                              setLearning((prev) => {
+                                if (prev) {
+                                  return {
+                                    ...prev,
+                                    [movePosition]: e.target.value,
+                                  }
+                                } else {
+                                  return {
+                                    entryMove: '',
+                                    keyMove: '',
+                                    exitMove: '',
+                                    [movePosition]: e.target.value,
+                                  }
+                                }
+                              })
+                            }}
+                          >
+                            {getLsUserMovesByKey(
+                              selectedCategory[movePosition],
+                            ).map((moveStr) => (
+                              <option key={moveStr} value={moveStr}>
+                                {moveStr}
+                              </option>
+                            ))}
+                          </select>
                           <div className="mr-1 h-4 w-4">
                             <RenderRedoIcon
                               className="fill-black dark:fill-indigo-500"
-                              onClick={() => shuffleLearning(dropdown)}
+                              onClick={() => shuffleLearning(movePosition)}
                             />
                           </div>
                         </div>
-                      </div>
+                      </section>
                     )}
                   </article>
                 </div>
