@@ -336,7 +336,13 @@ export default function RenderFlows() {
         {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
         <Notification visible={visible} message={notificationMessage} />
         {displayMoves && (
-          <div className="flex justify-evenly px-2 py-5">
+          <div className="flex justify-evenly px-2 py-5 text-xs">
+            <Link
+              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
+              href="/viewflows"
+            >
+              View Flows
+            </Link>
             <a
               onClick={onClickSkip}
               className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
