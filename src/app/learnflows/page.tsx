@@ -200,7 +200,7 @@ export default function RenderFlows() {
               ).map((dropdown, index) => (
                 <div key={index} className="relative flex">
                   {/* //-------------------------DROPDOWN------------------------- */}
-                  <div className="w-1/2">
+                  <article className="w-1/2">
                     {/* title */}
                     <div>{dropdown}</div>
                     {/* select */}
@@ -250,36 +250,26 @@ export default function RenderFlows() {
                       </div>
                     </div>
                     {/* end of select */}
-                  </div>
+                  </article>
                   {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
-                  <div className="w-1/2">
+                  <article className="w-1/2">
                     {displayMoves && (
-                      <div
-                        className="h-full w-full 
-                     dark:bg-gray-900 dark:text-white"
-                      >
+                      <div className="h-full w-full dark:bg-gray-900 dark:text-white">
                         {`${selectedCategory[dropdown]} move`}
-                        <div
-                          className="
-                      relative flex w-full
-                      appearance-none justify-between overflow-hidden rounded-lg 
-                        border border-gray-300 p-2 dark:border-indigo-500"
-                        >
-                          <h2 className="font-medium tracking-widest">
+                        <div className=" relative flex w-full appearance-none justify-between overflow-hidden rounded-lg border border-gray-300 p-2 dark:border-indigo-500">
+                          <label className="font-medium tracking-widest">
                             {learning[dropdown]}
-                          </h2>
-                          <div className="flex">
-                            <div className="mr-1 h-4 w-4">
-                              <RenderRedoIcon
-                                className="fill-black dark:fill-indigo-500"
-                                onClick={() => shuffleLearning(dropdown)}
-                              />
-                            </div>
+                          </label>
+                          <div className="mr-1 h-4 w-4">
+                            <RenderRedoIcon
+                              className="fill-black dark:fill-indigo-500"
+                              onClick={() => shuffleLearning(dropdown)}
+                            />
                           </div>
                         </div>
                       </div>
                     )}
-                  </div>
+                  </article>
                 </div>
               ))}
             </div>
