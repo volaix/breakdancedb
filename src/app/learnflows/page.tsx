@@ -275,6 +275,7 @@ export default function RenderFlows() {
           )}
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
         </div>
+        {/* //--------------------------I LIKE THIS METER------------------------------- */}
         <h2 className="pb-2">I like this</h2>
         <div className="flex flex-row-reverse pb-10">
           {Array.from(Array(5)).map((a, i) => {
@@ -291,62 +292,7 @@ export default function RenderFlows() {
             )
           })}
         </div>
-        <h2>Notes</h2>
-        <div className="w-full px-4">
-          <textarea
-            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
-    shadow-sm focus:border-transparent focus:outline-none
-    focus:ring-2 focus:ring-blue-400"
-            rows={3}
-            cols={30}
-            value={textAreaValue}
-            onChange={(e) => setTextAreaValue(e.target.value)}
-          />
-        </div>
-        <h2 className="pb-2">I like this</h2>
-        <div className="flex flex-row-reverse pb-10">
-          {Array.from(Array(5)).map((a, i) => {
-            return (
-              <RenderThunder
-                id={5 - i + ''}
-                checked={i === 5 - ratingVal}
-                onChange={(e) => {
-                  setRatingVal(Number(e.target.id))
-                }}
-                key={i}
-                size="size-10"
-              />
-            )
-          })}
-        </div>
-        <h2>Notes</h2>
-        <div className="w-full px-4">
-          <textarea
-            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
-    shadow-sm focus:border-transparent focus:outline-none
-    focus:ring-2 focus:ring-blue-400"
-            rows={3}
-            cols={30}
-            value={textAreaValue}
-            onChange={(e) => setTextAreaValue(e.target.value)}
-          />
-        </div>
-        <h2 className="pb-2">I like this</h2>
-        <div className="flex flex-row-reverse pb-10">
-          {Array.from(Array(5)).map((a, i) => {
-            return (
-              <RenderThunder
-                id={5 - i + ''}
-                checked={i === 5 - ratingVal}
-                onChange={(e) => {
-                  setRatingVal(Number(e.target.id))
-                }}
-                key={i}
-                size="size-10"
-              />
-            )
-          })}
-        </div>
+        {/* ---------------------------------Notes----------------------------------- */}
         <h2>Notes</h2>
         <div className="w-full px-4">
           <textarea
