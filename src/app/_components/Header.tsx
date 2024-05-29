@@ -66,7 +66,7 @@ export default function RenderHeader() {
                     <a href="/yourmoves">📚 Your Moves 📚</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">🎷 Dance Better 🎷</a>
+                    <a href="/learnmoves">🎷 Learn Moves 🎷</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
@@ -75,9 +75,6 @@ export default function RenderHeader() {
                   )}
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/learnflows">💪 Do Flows 💪</a>
-                  </li>
-                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
-                    <a href="/viewflows">View Flows</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/combos">🤖 Combos 🤖</a>
@@ -88,10 +85,10 @@ export default function RenderHeader() {
                     </li>
                   )}
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
-                    <a href="/importexport">Import / Export</a>
+                    <a href="/importexport"> Import / Export </a>
                   </li>
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
-                    <a href="/warmup">Warmup Protocol</a>
+                    <a href="/warmup">Warmup Protocol‍</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">

@@ -8,6 +8,7 @@ import { Notification } from '../../_components/Notification'
 import RenderThunder from '../../_components/RenderChilli'
 import { RenderRedDeleteButton } from '../../_components/Svgs'
 import {
+  ComboId,
   ComboMove,
   FlowDictionary,
   FlowId,
@@ -45,6 +46,7 @@ type Checked = {
 const RenderMakeCombo = () => {
   //------------------------------state---------------------------------
   const [rating, setRating] = useState<number>(1)
+  const [hideUsedFlows, setHideUsedFlows] = useState<boolean>(true)
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
   const [notification, setNotification] = useState<null | {
@@ -64,6 +66,7 @@ const RenderMakeCombo = () => {
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
+  const getLsCombos = useZustandStore((state) => state.getLsCombos)
 
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
@@ -292,94 +295,122 @@ const RenderMakeCombo = () => {
               />
             </label>
             {checked.flows && (
-              <section className="flex overflow-scroll">
-                {flows &&
-                  Object.entries(flows).map(
-                    (
-                      [key, { entryMove, exitMove, keyMove, rating, notes }],
-                      i,
-                    ) => {
-                      const indexOfCurCombo = selectedComboNumber.indexOf(true)
-                      const isSelected =
-                        selectedComboSeq?.[indexOfCurCombo]?.type === 'flow' &&
-                        selectedComboSeq[indexOfCurCombo].moves.join('') ===
+              <section className="flex flex-col ">
+                <section className="ml-2 mt-1 flex">
+                  <label className="text-xs">Hide Used</label>
+                  <input
+                    className="ml-2"
+                    checked={hideUsedFlows}
+                    onClick={() => setHideUsedFlows(!hideUsedFlows)}
+                    type="checkbox"
+                  />
+                </section>
+                <section className="mt-2 flex overflow-x-scroll">
+                  {flows &&
+                    Object.entries(flows)
+                      .sort(([_, a], [__, b]) => b.rating - a.rating)
+                      .map(
+                        (
                           [
-                            entryMove.displayName,
-                            keyMove.displayName,
-                            exitMove.displayName,
-                          ].join('')
+                            flowId,
+                            { entryMove, exitMove, keyMove, rating, notes },
+                          ],
+                          _,
+                        ) => {
+                          const combos = getLsCombos()
 
-                      return (
-                        <button
-                          className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
-                          key={key}
-                          onClick={() =>
-                            setSelectedComboSeq((prevState) => {
-                              return {
-                                ...prevState,
-                                [indexOfCurCombo]: {
-                                  type: 'flow',
-                                  id: key as FlowId,
-                                  moves: [
-                                    entryMove.displayName,
-                                    keyMove.displayName,
-                                    exitMove.displayName,
-                                  ],
-                                },
+                          //checks if flowId exists in one of the combos
+                          const flowIsUsed = Object.values(combos || {}).some(
+                            (a) => a.sequence.some((b) => b.id === flowId),
+                          )
+
+                          //hide used flows if checkbox ticked
+                          if (flowIsUsed && hideUsedFlows) return
+
+                          const indexOfCurCombo =
+                            selectedComboNumber.indexOf(true)
+                          const isSelected =
+                            selectedComboSeq?.[indexOfCurCombo]?.type ===
+                              'flow' &&
+                            selectedComboSeq[indexOfCurCombo].moves.join('') ===
+                              [
+                                entryMove.displayName,
+                                keyMove.displayName,
+                                exitMove.displayName,
+                              ].join('')
+
+                          return (
+                            <button
+                              className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
+                              key={flowId}
+                              onClick={() =>
+                                setSelectedComboSeq((prevState) => {
+                                  return {
+                                    ...prevState,
+                                    [indexOfCurCombo]: {
+                                      type: 'flow',
+                                      id: flowId as FlowId,
+                                      moves: [
+                                        entryMove.displayName,
+                                        keyMove.displayName,
+                                        exitMove.displayName,
+                                      ],
+                                    },
+                                  }
+                                })
                               }
-                            })
-                          }
-                        >
-                          <div
-                            className="relative flex h-full flex-col overflow-hidden rounded-lg 
+                            >
+                              <div
+                                className="relative flex h-full flex-col overflow-hidden rounded-lg 
      bg-gray-100 bg-opacity-75 
       p-3 text-center dark:bg-gray-800 dark:bg-opacity-40"
-                          >
-                            <section className="flex flex-row-reverse">
-                              {Array.from(Array(5)).map((_, i) => {
-                                return (
-                                  <RenderThunder
-                                    key={i}
-                                    checked={i === 5 - rating}
-                                  />
-                                )
-                              })}
-                            </section>
+                              >
+                                <section className="flex flex-row-reverse">
+                                  {Array.from(Array(5)).map((_, i) => {
+                                    return (
+                                      <RenderThunder
+                                        key={i}
+                                        checked={i === 5 - rating}
+                                      />
+                                    )
+                                  })}
+                                </section>
 
-                            <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                              {[
-                                {
-                                  category: entryMove.category,
-                                  displayText: entryMove.displayName,
-                                },
-                                {
-                                  category: keyMove.category,
-                                  displayText: keyMove.displayName,
-                                },
-                                {
-                                  category: exitMove.category,
-                                  displayText: exitMove.displayName,
-                                },
-                              ].map(({ category, displayText }) => {
-                                return (
-                                  <section
-                                    key={displayText}
-                                    className="flex	 flex-col items-start overflow-hidden text-ellipsis	whitespace-nowrap leading-none"
-                                  >
-                                    <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
-                                    <p>{displayText}</p>
-                                  </section>
-                                )
-                              })}
-                            </section>
-                            <p className="text-[6px]  leading-relaxed">
-                              {notes}
-                            </p>
-                          </div>
-                        </button>
-                      )
-                    },
-                  )}
+                                <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+                                  {[
+                                    {
+                                      category: entryMove.category,
+                                      displayText: entryMove.displayName,
+                                    },
+                                    {
+                                      category: keyMove.category,
+                                      displayText: keyMove.displayName,
+                                    },
+                                    {
+                                      category: exitMove.category,
+                                      displayText: exitMove.displayName,
+                                    },
+                                  ].map(({ category, displayText }) => {
+                                    return (
+                                      <section
+                                        key={displayText}
+                                        className="flex	 flex-col items-start overflow-hidden text-ellipsis	whitespace-nowrap leading-none"
+                                      >
+                                        <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
+                                        <p>{displayText}</p>
+                                      </section>
+                                    )
+                                  })}
+                                </section>
+                                <p className="text-[6px]  leading-relaxed">
+                                  {notes}
+                                </p>
+                              </div>
+                            </button>
+                          )
+                        },
+                      )}
+                </section>
               </section>
             )}
           </article>
