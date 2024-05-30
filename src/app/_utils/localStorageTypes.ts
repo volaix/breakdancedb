@@ -118,6 +118,7 @@ export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
 export const lsCombos = 'combos'
+export const lsBattle = 'battle'
 
 export const lsToprock = 'toprock'
 export const lsFootwork = 'footwork'
@@ -151,8 +152,20 @@ export type ComboDictionary = {
   }
 }
 
+export type Round = {
+  displayName: string
+  rating: number
+  combos: Array<ComboId | ''> | null
+  id: RoundId
+}
+
 export type GlobalStateProperties = {
   [lsCombos]?: ComboDictionary
+  [lsBattle]?: {
+    categoryName: string
+    rounds: Round[]
+    notes: string
+  }
   [lsFlows]: FlowDictionary | null
   [lsUserMoves]: {
     [lsToprock]: string[]
@@ -198,7 +211,9 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   setLsUserMoves: (moves: GlobalStateProperties[typeof lsUserMoves]) => void
   setLsUserLearning: (learning: Move[]) => void
   setDanceList: (list: string[]) => void
+  setLsBattle: (battle: GlobalStateProperties[typeof lsBattle]) => void
   //-----Getters (Root level keys )------
+  getLsBattle: () => GlobalStateProperties[typeof lsBattle]
   getLsFlows: () => GlobalStateProperties[typeof lsFlows]
   getLsCombos: () => GlobalStateProperties[typeof lsCombos]
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]

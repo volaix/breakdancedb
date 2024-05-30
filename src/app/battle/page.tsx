@@ -4,17 +4,15 @@ import { produce } from 'immer'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { RenderAddButtonSVG, RenderBrainSvg } from '../_components/Svgs'
-import { ComboDictionary, ComboId, RoundId } from '../_utils/localStorageTypes'
+import {
+  ComboDictionary,
+  ComboId,
+  Round,
+  RoundId,
+} from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { Notification } from '../_components/Notification'
-
-type Round = {
-  displayName: string
-  rating: number
-  combos: Array<ComboId | ''> | null
-  id: RoundId
-}
 
 /**
  * Battle Page
@@ -30,6 +28,7 @@ export default function RenderBattlePage() {
     message?: string
   }>(null)
   const [roundName, setRoundName] = useState<string>('Round')
+  const [notes, setNotes] = useState<string>('')
   const [yourRounds, setYourRounds] = useState<Round[]>([
     {
       displayName: roundName + ' 1',
@@ -39,6 +38,8 @@ export default function RenderBattlePage() {
     },
   ])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
+  const getLsBattle = useZustandStore((state) => state.getLsBattle)
+  const setLsBattle = useZustandStore((state) => state.setLsBattle)
 
   //-----------------------------hooks-------------------------------
   //Show Notifcation for 2 seconds
@@ -54,6 +55,16 @@ export default function RenderBattlePage() {
   useEffect(() => {
     setLsCombos(getLsCombos() || null)
   }, [getLsCombos])
+
+  //onMount get data from localstorage
+  useEffect(() => {
+    const data = getLsBattle()
+    if (!data) return
+
+    setRoundName(data.categoryName)
+    setYourRounds(data.rounds)
+    setNotes(data.notes)
+  }, [getLsBattle])
 
   //-----------------------------render---------------------------------
   return (
@@ -124,6 +135,7 @@ export default function RenderBattlePage() {
                         <section className="flex">
                           <label>{comboIndex}</label>
                           <select
+                            value={comboId}
                             onChange={(e) =>
                               setYourRounds((prevRounds) =>
                                 produce(prevRounds, (newRounds) => {
@@ -146,9 +158,9 @@ export default function RenderBattlePage() {
                             <option value={''}>Choose Combo</option>
                             {lsCombos &&
                               Object.entries(lsCombos).map(
-                                ([comboId, comboDetails], i) => {
+                                ([lsComboId, comboDetails], i) => {
                                   return (
-                                    <option value={comboId} key={i}>
+                                    <option value={lsComboId} key={i}>
                                       {comboDetails.displayName}
                                     </option>
                                   )
@@ -191,8 +203,11 @@ export default function RenderBattlePage() {
               <article>
                 <section className="flex flex-col">
                   <label className="text-[9px]">Notes</label>
-                  <textarea className="w-full text-[8px] leading-relaxed">
-                    {}
+                  <textarea
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full text-[8px] leading-relaxed"
+                  >
+                    {notes}
                   </textarea>
                 </section>
               </article>
@@ -203,10 +218,8 @@ export default function RenderBattlePage() {
       </article>
       {/* --------------------END OF ROUNDS------------------- */}
       <section className="mt-5 flex">
-        <label className="text-[9px]">Add {roundName}</label>
-
-        <RenderAddButtonSVG
-          className="ml-1 size-2 fill-slate-500"
+        <button
+          className="flex items-center justify-center "
           onClick={() =>
             setYourRounds((prevRounds) =>
               produce(prevRounds, (newRounds) => {
@@ -219,7 +232,10 @@ export default function RenderBattlePage() {
               }),
             )
           }
-        />
+        >
+          <label className="text-[9px]">Add {roundName}</label>
+          <RenderAddButtonSVG className="ml-1 size-2 fill-slate-500" />
+        </button>
       </section>
       <article className="flex ">
         <section>
@@ -229,6 +245,11 @@ export default function RenderBattlePage() {
           />
           <button
             onClick={(_) => {
+              setLsBattle({
+                categoryName: roundName,
+                rounds: yourRounds,
+                notes,
+              })
               console.log('saved')
             }}
             className="mt-5 inline-flex rounded border-0

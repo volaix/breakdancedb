@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import {
   GlobalStateProperties,
+  lsBattle,
   lsBlowups,
   lsCombos,
   lsDanceList,
@@ -83,9 +84,11 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         setLsUserMoves: (moves) => set({ [lsUserMoves]: moves }),
         setLsUserLearning: (learning) => set({ [lsUserLearning]: learning }),
         setDanceList: (list) => set({ [lsDanceList]: list }),
+        setLsBattle: (battle) => set({ [lsBattle]: battle }),
 
         //-----Getters (Root level keys )------
         getLsFlows: () => get()[lsFlows],
+        getLsBattle: () => get()[lsBattle],
         getLsCombos: () => get()[lsCombos],
         getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
