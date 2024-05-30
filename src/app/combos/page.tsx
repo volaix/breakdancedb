@@ -44,12 +44,12 @@ export default function RenderViewCombos() {
             Object.entries(combos).map(
               ([comboId, { displayName, notes, execution, sequence }], i) => {
                 return (
-                  <div className="w-1/3 p-1" key={comboId}>
-                    <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                  <div className="h-fit w-1/3 p-1" key={comboId}>
+                    <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
                       <h2 className="bold text-xs dark:text-white">
                         {displayName}
                       </h2>
-                      <div className="mt-2 flex flex-row-reverse">
+                      <div className="mt-2 flex flex-row-reverse justify-center">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
                             <RenderThunder
