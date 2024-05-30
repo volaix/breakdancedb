@@ -391,7 +391,13 @@ export default function RenderBattlePage() {
         })}
       </article>
       {/* --------------------END OF ROUNDS------------------- */}
+      <Notification
+        visible={!!notification?.visible}
+        message={notification?.message || ''}
+      />
+      {/* ------------------BUTTONS--------------- */}
       <section className="flex justify-center">
+        {/* -----------new round------------- */}
         <button
           className="flex h-fit items-center justify-center rounded border border-indigo-500
           px-3 py-2 text-center text-xs text-indigo-500"
@@ -411,11 +417,8 @@ export default function RenderBattlePage() {
           <label className="text-xs leading-none">Add {roundName}</label>
           <RenderAddButtonSVG className="ml-1 size-2 fill-slate-500" />
         </button>
+        {/* --------------save--------------- */}
         <section>
-          <Notification
-            visible={!!notification?.visible}
-            message={notification?.message || ''}
-          />
           <button
             onClick={(_) => {
               setLsBattle({
@@ -423,6 +426,7 @@ export default function RenderBattlePage() {
                 rounds: yourRounds,
                 notes,
               })
+              setNotification({ visible: true, message: 'Battle Saved' })
               console.log('saved')
             }}
             className="inline-flex h-fit rounded border-0
@@ -433,8 +437,8 @@ export default function RenderBattlePage() {
           </button>
         </section>
       </section>
+      {/* -----------ADVANCED OPTIONS---------- */}
       <article className="flex ">
-        {/* -----------ADVANCED OPTIONS---------- */}
         <section className="px-5 py-2 text-xs">
           <h2 className="bold mb-2">Advanced Options</h2>
           <button
