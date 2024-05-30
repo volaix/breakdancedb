@@ -360,11 +360,7 @@ const RenderMakeCombo = () => {
                                 })
                               }
                             >
-                              <div
-                                className="relative flex h-full flex-col overflow-hidden rounded-lg 
-     bg-gray-100 bg-opacity-75 
-      p-3 text-center dark:bg-gray-800 dark:bg-opacity-40"
-                              >
+                              <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-3 text-center dark:bg-gray-800 dark:bg-opacity-40">
                                 <section className="flex flex-row-reverse">
                                   {Array.from(Array(5)).map((_, i) => {
                                     return (
@@ -394,7 +390,7 @@ const RenderMakeCombo = () => {
                                     return (
                                       <section
                                         key={displayText}
-                                        className="flex	 flex-col items-start overflow-hidden text-ellipsis	whitespace-nowrap leading-none"
+                                        className="flex	flex-col items-start overflow-hidden text-ellipsis	whitespace-nowrap leading-none"
                                       >
                                         <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
                                         <p>{displayText}</p>
@@ -506,7 +502,7 @@ const RenderMakeCombo = () => {
           {/* ---------------------custom------------------ */}
           <article>
             <label className="flex  rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
-              CUSTOM{' '}
+              CUSTOM
               <input
                 className="ml-2"
                 checked={!!checked.custom}
@@ -613,9 +609,7 @@ const RenderMakeCombo = () => {
                 console.log('theres no selectedComboSeq')
               }
             }}
-            className="mt-5 inline-flex rounded border-0
-           bg-indigo-500 px-6 py-2 text-xs 
-           text-white hover:bg-indigo-600 focus:outline-none"
+            className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
           >
             SAVE
           </button>

@@ -9,7 +9,7 @@ import Link from 'next/link'
 import LoadingFallback from '@/app/_components/LoadingFallback'
 import {
   RenderEditButton,
-  RenderAddButton,
+  RenderAddButtonSVG,
   RenderRedDeleteButton,
 } from '../../../_components/Svgs'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
@@ -166,8 +166,9 @@ const RenderPositions = () => {
                           // disable ability to delete or add moves when currently editing.
                           !editing[index] && (
                             <div className="flex">
-                              <RenderAddButton
+                              <RenderAddButtonSVG
                                 onClick={onClickAdd(index + 1)}
+                                className="dark:fill-gray-500"
                               />
                               <RenderEditButton onClick={onClickEdit(index)} />
                               <div onClick={onClickDelete(index)}>
@@ -177,7 +178,10 @@ const RenderPositions = () => {
                           )
                         }
                         {editing[index] && (
-                          <RenderEditButton onClick={onClickEdit(index)} />
+                          <RenderEditButton
+                            className="dark:fill-gray-500"
+                            onClick={onClickEdit(index)}
+                          />
                         )}
                       </a>
                     )
@@ -188,7 +192,10 @@ const RenderPositions = () => {
                 !move?.positions?.length && (
                   <a>
                     There are no positions. Please add one.
-                    <RenderAddButton onClick={onClickAdd(0)} />
+                    <RenderAddButtonSVG
+                      onClick={onClickAdd(0)}
+                      className="dark:fill-gray-500"
+                    />
                   </a>
                 )
               }

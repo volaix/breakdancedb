@@ -207,10 +207,12 @@ export default function RenderFlows() {
                     <div className="relative">
                       <select
                         disabled={i !== 0 && singleCategory}
-                        className="focus:shadow-outline block w-full 
-                      appearance-none rounded-lg border border-gray-300
-                      bg-white px-4 py-2 pr-10 leading-tight 
-                       focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                        className="focus:shadow-outline block w-full appearance-none
+                      rounded-lg border border-gray-300 bg-white px-4
+                      py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 
+                       dark:border-indigo-500 dark:bg-transparent dark:bg-none
+                      dark:text-white dark:disabled:opacity-10 
+                       "
                         value={
                           singleCategory
                             ? selectedCategory['entryMove']
@@ -237,7 +239,7 @@ export default function RenderFlows() {
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg
-                          className={`h-4 w-4 fill-current ${singleCategory && 'opacity-30'}`}
+                          className={`h-4 w-4 fill-current dark:fill-indigo-500 ${singleCategory && i !== 0 && 'opacity-30'}`}
                           fill="#000000"
                           height="800px"
                           width="800px"
@@ -258,8 +260,8 @@ export default function RenderFlows() {
                         <label>{`${selectedCategory[movePosition]} move`}</label>
                         <div className=" relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300 dark:border-indigo-500">
                           <select
-                            className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-white 
-                            py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                            className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent 
+                             py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                             value={learning[movePosition]}
                             onChange={(e) => {
                               setLearning((prev) => {
@@ -324,9 +326,7 @@ export default function RenderFlows() {
         <h2>Notes</h2>
         <div className="w-full px-4">
           <textarea
-            className="w-full rounded-lg border border-gray-300 px-4 py-1 text-xs
-    shadow-sm focus:border-transparent focus:outline-none
-    focus:ring-2 focus:ring-blue-400"
+            className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
             rows={3}
             cols={30}
             value={textAreaValue}
@@ -338,21 +338,21 @@ export default function RenderFlows() {
         {displayMoves && (
           <div className="flex justify-evenly px-2 py-5 text-xs">
             <Link
-              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
+              className="rounded border border-indigo-500 px-3 py-2 text-center text-indigo-500"
               href="/viewflows"
             >
               View Flows
             </Link>
             <a
               onClick={onClickSkip}
-              className="rounded border border-indigo-500 px-6 py-2 text-center text-indigo-500"
+              className="rounded border border-indigo-500 px-3 py-2 text-center text-indigo-500"
             >
               re-shuffle
             </a>
             {/* --------------SAVE------------------- */}
             <a
               onClick={onClickYes}
-              className="rounded border border-indigo-500 bg-indigo-500 px-6 py-2 text-center text-white "
+              className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 text-center text-white "
             >
               Save
             </a>

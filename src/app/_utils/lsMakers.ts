@@ -8,6 +8,7 @@ import {
   MovementId,
   Position,
   PositionId,
+  RoundId,
   Transition,
   TransitionId,
   Transitions,
@@ -26,6 +27,9 @@ export const makePositionId = (): PositionId => {
 }
 export const makeComboId = (): ComboId => {
   return v4() as ComboId
+}
+export const makeRoundId = (): RoundId => {
+  return v4() as RoundId
 }
 export const makeTransitionId = (): TransitionId => {
   return v4() as TransitionId

@@ -18,7 +18,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 import { create } from 'zustand'
 import {
-  RenderAddButton,
+  RenderAddButtonSVG,
   RenderEditButton,
   RenderRedDeleteButton,
 } from '../../../_components/Svgs'
@@ -315,15 +315,17 @@ export default function RenderMovementGroup({
               <div className="ml-2 flex items-center">
                 <div className="w-2">
                   <RenderEditButton
+                    className="dark:fill-gray-500"
                     onClick={() => {
                       setIsEditing({ [indexNumber]: true })
                     }}
                   />
                 </div>
                 <div className="ml-2 w-2">
-                  <RenderAddButton
+                  <RenderAddButtonSVG
                     id={movement.movementId}
                     onClick={onClickAddMovement}
+                    className="dark:fill-gray-500"
                   />
                 </div>
                 {
@@ -364,7 +366,7 @@ export default function RenderMovementGroup({
                 />
                 <button type="submit">
                   <div className="ml-1 w-2">
-                    <RenderEditButton />
+                    <RenderEditButton className="dark:fill-gray-500" />
                   </div>
                 </button>
               </form>
