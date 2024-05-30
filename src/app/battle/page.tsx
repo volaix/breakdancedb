@@ -11,7 +11,12 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
+import {
+  ComboDictionary,
+  ComboId,
+  Round,
+  lsCombos,
+} from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -29,6 +34,7 @@ export default function RenderBattlePage() {
   //------------------------------state---------------------------------
   const [lsCombos, setLsCombos] = useState<ComboDictionary | null>(null)
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
+  const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
@@ -234,7 +240,62 @@ export default function RenderBattlePage() {
                           </select>
                           {/* dropdown */}
                           <section className="w-1/6">
-                            <RenderInfoSVG className="size-4 text-gray-600" />
+                            {
+                              //don't display info if user hasn't chosen a combo yet
+                              comboId && (
+                                <RenderInfoSVG
+                                  onClick={(_) => {
+                                    setOpenInfo({ [comboId as ComboId]: true })
+                                  }}
+                                  className="size-4 text-gray-600"
+                                />
+                              )
+                            }
+                            {
+                              //user wants to view info
+                              openInfo?.[comboId as ComboId] && (
+                                <button onClick={() => setOpenInfo({})}>
+                                  {/* -----translucent help window---- */}
+                                  <section className="absolute left-0 top-0 h-full w-full content-center bg-gray-100 bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-40">
+                                    {lsCombos &&
+                                      (() => {
+                                        const { displayName, sequence } =
+                                          lsCombos[comboId as ComboId] || {}
+                                        return (
+                                          //------title-----
+                                          <section>
+                                            <h3 className="text-xs">{`Combo Name: displayName`}</h3>
+                                            {sequence &&
+                                              sequence.map(
+                                                ({ moves, type }, i) => {
+                                                  //-------type--------
+                                                  return (
+                                                    <section
+                                                      key={i}
+                                                      className="mt-1"
+                                                    >
+                                                      <label className="bold">{`Sequence Type: ${type}`}</label>
+                                                      {/* -------moves-------- */}
+                                                      <ol>
+                                                        {moves.map(
+                                                          (move, i) => (
+                                                            <li
+                                                              key={i}
+                                                            >{`${i + 1}. ${move}`}</li>
+                                                          ),
+                                                        )}
+                                                      </ol>
+                                                    </section>
+                                                  )
+                                                },
+                                              )}
+                                          </section>
+                                        )
+                                      })()}
+                                  </section>
+                                </button>
+                              )
+                            }
                           </section>
                         </section>
                       </article>
