@@ -18,7 +18,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 import { create } from 'zustand'
 import {
-  RenderAddButton,
+  RenderAddButtonSVG,
   RenderEditButton,
   RenderRedDeleteButton,
 } from '../../../_components/Svgs'
@@ -321,7 +321,7 @@ export default function RenderMovementGroup({
                   />
                 </div>
                 <div className="ml-2 w-2">
-                  <RenderAddButton
+                  <RenderAddButtonSVG
                     id={movement.movementId}
                     onClick={onClickAddMovement}
                   />
