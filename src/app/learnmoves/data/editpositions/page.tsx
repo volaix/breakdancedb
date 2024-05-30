@@ -178,7 +178,10 @@ const RenderPositions = () => {
                           )
                         }
                         {editing[index] && (
-                          <RenderEditButton onClick={onClickEdit(index)} />
+                          <RenderEditButton
+                            className="dark:fill-gray-500"
+                            onClick={onClickEdit(index)}
+                          />
                         )}
                       </a>
                     )

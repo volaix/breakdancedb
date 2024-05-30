@@ -315,6 +315,7 @@ export default function RenderMovementGroup({
               <div className="ml-2 flex items-center">
                 <div className="w-2">
                   <RenderEditButton
+                    className="dark:fill-gray-500"
                     onClick={() => {
                       setIsEditing({ [indexNumber]: true })
                     }}
@@ -365,7 +366,7 @@ export default function RenderMovementGroup({
                 />
                 <button type="submit">
                   <div className="ml-1 w-2">
-                    <RenderEditButton />
+                    <RenderEditButton className="dark:fill-gray-500" />
                   </div>
                 </button>
               </form>
