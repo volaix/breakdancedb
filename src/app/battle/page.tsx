@@ -11,12 +11,7 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import {
-  ComboDictionary,
-  ComboId,
-  Round,
-  lsCombos,
-} from '../_utils/localStorageTypes'
+import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -327,6 +322,21 @@ export default function RenderBattlePage() {
                             }
                           </section>
                           {/* --------end of info--------- */}
+                          <section>
+                            <RenderDeleteButtonSVG
+                              className="size-4 self-end fill-slate-500 text-slate-600"
+                              onClick={(_) =>
+                                setYourRounds((prevRounds) =>
+                                  produce(prevRounds, (newRounds) => {
+                                    newRounds[battleIndex].combos?.splice(
+                                      comboIndex,
+                                      1,
+                                    )
+                                  }),
+                                )
+                              }
+                            />
+                          </section>
                         </section>
                       </article>
                     )
