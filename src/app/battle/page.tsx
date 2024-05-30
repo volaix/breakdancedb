@@ -3,7 +3,13 @@
 import { produce } from 'immer'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { RenderAddButtonSVG, RenderBrainSvg } from '../_components/Svgs'
+import {
+  RenderAddButtonSVG,
+  RenderBrainSvg,
+  RenderDeleteButtonSVG,
+  RenderEditButton,
+  RenderInfoSVG,
+} from '../_components/Svgs'
 import {
   ComboDictionary,
   ComboId,
@@ -84,10 +90,21 @@ export default function RenderBattlePage() {
           return (
             // --------------single battle round------------
             <article
-              className="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-1 px-3 pb-6 pt-2 dark:bg-gray-800 dark:bg-opacity-40"
+              className="relative mb-5 flex h-full w-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-1 px-3 pb-6 pt-2 dark:bg-gray-800 dark:bg-opacity-40"
               key={id}
             >
-              <h2 className="bold text-xs dark:text-white">{displayName}</h2>
+              <RenderDeleteButtonSVG
+                className="size-4 self-end"
+                onClick={(_) =>
+                  setYourRounds((prevRounds) =>
+                    prevRounds.filter((_, i) => i !== battleIndex),
+                  )
+                }
+              />
+              <section className="flex items-center">
+                <h2 className="bold text-xs dark:text-white">{displayName}</h2>
+                <RenderEditButton className="ml-1 size-2 fill-gray-600 dark:fill-gray-500" />
+              </section>
               {/* -------------- 5 brains ------------------ */}
               <article>
                 <section className="mt-2 flex flex-row-reverse justify-end">
@@ -133,7 +150,9 @@ export default function RenderBattlePage() {
                     return (
                       <article key={comboIndex}>
                         <section className="flex">
-                          <label>{comboIndex}</label>
+                          {/* ----------number-------- */}
+                          <label>{comboIndex + 1}</label>
+                          {/* ------select-------- */}
                           <select
                             value={comboId}
                             onChange={(e) =>
@@ -167,6 +186,10 @@ export default function RenderBattlePage() {
                                 },
                               )}
                           </select>
+                          {/* dropdown */}
+                          <section className="w-1/6">
+                            <RenderInfoSVG className="size-4 text-gray-600" />
+                          </section>
                         </section>
                       </article>
                     )
