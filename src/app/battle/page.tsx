@@ -40,6 +40,7 @@ export default function RenderBattlePage() {
   }>({ hideUsedCombos: true, roundName: 'Round' })
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
+  const [usedComboIds, setUsedComboIds] = useState<Set<ComboId>>()
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
@@ -59,6 +60,20 @@ export default function RenderBattlePage() {
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
 
   //-----------------------------hooks-------------------------------
+
+  //Updates usedComboIds
+  useEffect(() => {
+    if (!hideUsedCombos) return
+    setUsedComboIds(
+      new Set<ComboId>(
+        yourRounds
+          .map((round) => round.combos)
+          .flat()
+          .filter((a) => a !== '' && a !== null) as ComboId[],
+      ),
+    )
+  }, [hideUsedCombos, yourRounds])
+
   //Show Notifcation for 2 seconds
   useEffect(() => {
     const fadeOutTimer = setTimeout(
@@ -230,19 +245,29 @@ export default function RenderBattlePage() {
                             }
                             className="w-full"
                           >
+                            {/* -------------select options----------------- */}
                             <option value={''}>Choose Combo</option>
                             {lsCombos &&
                               Object.entries(lsCombos).map(
                                 ([lsComboId, comboDetails], i) => {
-                                  return (
-                                    <option value={lsComboId} key={i}>
-                                      {comboDetails.displayName}
-                                    </option>
-                                  )
+                                  //FEATURE: Avoid setting duplicate combos
+                                  if (
+                                    hideUsedCombos &&
+                                    comboId !== lsComboId && //always show the selected combo
+                                    usedComboIds?.has(lsComboId as ComboId)
+                                  ) {
+                                    return null
+                                  } else {
+                                    return (
+                                      <option value={lsComboId} key={i}>
+                                        {comboDetails.displayName}
+                                      </option>
+                                    )
+                                  }
                                 },
                               )}
                           </select>
-                          {/* dropdown */}
+                          {/* ------Info------ */}
                           <section className="w-1/6">
                             {
                               //don't display info if user hasn't chosen a combo yet
@@ -301,6 +326,7 @@ export default function RenderBattlePage() {
                               )
                             }
                           </section>
+                          {/* --------end of info--------- */}
                         </section>
                       </article>
                     )
