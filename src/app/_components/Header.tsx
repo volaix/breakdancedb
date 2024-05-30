@@ -20,8 +20,6 @@ export default function RenderHeader() {
       className="fixed left-0 top-0 z-10 flex w-full justify-center
    border-b border-slate-300 bg-gradient-to-b
    from-slate-200 pb-2 pt-4 backdrop-blur-2xl
-   lg:static lg:w-auto
-   lg:border lg:bg-slate-200  lg:p-4
    dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
     >
       <Link className="font-mono font-bold" href={{ pathname: '/' }}>
@@ -29,7 +27,8 @@ export default function RenderHeader() {
       </Link>
 
       <div className="fixed left-2 top-3">
-        <div className="fixed flex w-4/5 items-center justify-between">
+        {/* TODO when is selected then left-0 top-0 */}
+        <div className="fixed flex w-4/5 max-w-xs items-center justify-between">
           <nav>
             <section className="flex">
               <div
@@ -43,6 +42,7 @@ export default function RenderHeader() {
                 </div>
               </div>
 
+              {/* //TODO convert to tailwind classes */}
               <div className={isNavOpen ? 'showMenuNav' : 'hideMenuNav'}>
                 <div
                   className="absolute right-0 top-0 px-8 py-8"
