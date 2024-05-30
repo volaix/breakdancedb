@@ -29,10 +29,11 @@ type Inputs = {
 export default function RenderBattlePage() {
   //------------------------------state---------------------------------
   const [lsCombos, setLsCombos] = useState<ComboDictionary | null>(null)
-  const [{ hideUsedCombos, roundName }, setAdvancedOptions] = useState<{
+  const [{ hideUsedCombos, roundName, show }, setAdvancedOptions] = useState<{
+    show: boolean
     hideUsedCombos: boolean
     roundName: string
-  }>({ hideUsedCombos: true, roundName: 'Round' })
+  }>({ hideUsedCombos: true, roundName: 'Round', show: false })
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
   const [usedComboIds, setUsedComboIds] = useState<Set<ComboId>>()
@@ -245,16 +246,19 @@ export default function RenderBattlePage() {
                             {lsCombos &&
                               Object.entries(lsCombos).map(
                                 ([lsComboId, comboDetails], i) => {
-                                  //FEATURE: Avoid setting duplicate combos
                                   if (
                                     hideUsedCombos &&
-                                    comboId !== lsComboId && //always show the selected combo
+                                    comboId !== lsComboId &&
                                     usedComboIds?.has(lsComboId as ComboId)
                                   ) {
                                     return null
                                   } else {
                                     return (
-                                      <option value={lsComboId} key={i}>
+                                      <option
+                                        className="dark:text-white"
+                                        value={lsComboId}
+                                        key={i}
+                                      >
                                         {comboDetails.displayName}
                                       </option>
                                     )
@@ -387,9 +391,10 @@ export default function RenderBattlePage() {
         })}
       </article>
       {/* --------------------END OF ROUNDS------------------- */}
-      <section className="mt-5 flex">
+      <section className="flex justify-center">
         <button
-          className="flex items-center justify-center "
+          className="flex h-fit items-center justify-center rounded border border-indigo-500
+          px-3 py-2 text-center text-xs text-indigo-500"
           onClick={() =>
             setYourRounds((prevRounds) =>
               produce(prevRounds, (newRounds) => {
@@ -403,11 +408,9 @@ export default function RenderBattlePage() {
             )
           }
         >
-          <label className="text-[9px]">Add {roundName}</label>
+          <label className="text-xs leading-none">Add {roundName}</label>
           <RenderAddButtonSVG className="ml-1 size-2 fill-slate-500" />
         </button>
-      </section>
-      <article className="flex ">
         <section>
           <Notification
             visible={!!notification?.visible}
@@ -422,48 +425,76 @@ export default function RenderBattlePage() {
               })
               console.log('saved')
             }}
-            className="mt-5 inline-flex rounded border-0
+            className="inline-flex h-fit rounded border-0
            bg-indigo-500 px-6 py-2 text-xs 
            text-white hover:bg-indigo-600 focus:outline-none"
           >
             SAVE
           </button>
         </section>
+      </section>
+      <article className="flex ">
+        {/* -----------ADVANCED OPTIONS---------- */}
         <section className="px-5 py-2 text-xs">
           <h2 className="bold mb-2">Advanced Options</h2>
-          <section>
-            <label>hide used combos</label>
-            <input
-              checked={hideUsedCombos}
-              onChange={() =>
-                setAdvancedOptions((prev) => ({
-                  ...prev,
-                  hideUsedCombos: !hideUsedCombos,
-                }))
-              }
-              type="checkbox"
-            />
-          </section>
-          <section className="mt-5 ">
-            <form
-              onSubmit={handleSubmit((data) => {
-                setAdvancedOptions((prev) => ({
-                  ...prev,
-                  roundName: data.categoryName,
-                }))
-                reset()
-              })}
-            >
-              <label>Update Category Name</label>
-              <input
-                className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
-                type="text"
-                defaultValue={roundName}
-                {...register('categoryName')}
-              />
-              <input type="submit" />
-            </form>
-          </section>
+          <button
+            onClick={() =>
+              setAdvancedOptions((prev) => ({ ...prev, show: !prev.show }))
+            }
+            className="text-[7px] text-indigo-500"
+          >
+            Show/Hide
+          </button>
+          {show && (
+            <article>
+              {/* ---------hide used combos--------- */}
+              <section>
+                <label>hide used combos</label>
+                <input
+                  checked={hideUsedCombos}
+                  onChange={() =>
+                    setAdvancedOptions((prev) => ({
+                      ...prev,
+                      hideUsedCombos: !hideUsedCombos,
+                    }))
+                  }
+                  type="checkbox"
+                />
+              </section>
+              {/* ---------update category name--------- */}
+              <section className="mt-5 bg-slate-100">
+                <form
+                  onSubmit={handleSubmit((data) => {
+                    setAdvancedOptions((prev) => ({
+                      ...prev,
+                      roundName: data.categoryName,
+                    }))
+                    reset()
+                  })}
+                >
+                  <label>Update Category Name</label>
+                  <input
+                    className="w-full rounded border 
+                border-gray-300 bg-gray-100 
+                bg-opacity-50 px-1 
+                py-0.5 text-xs leading-none 
+                text-gray-700 outline-none 
+                transition-colors duration-200 
+                ease-in-out focus:border-indigo-500 
+                focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                    type="text"
+                    defaultValue={roundName}
+                    {...register('categoryName')}
+                  />
+                  <input
+                    value={'update'}
+                    type="submit"
+                    className=" rounded-lg bg-indigo-500 text-[8px] text-white"
+                  />
+                </form>
+              </section>
+            </article>
+          )}
         </section>
       </article>
     </main>
