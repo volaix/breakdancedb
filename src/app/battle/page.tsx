@@ -22,6 +22,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 type Inputs = {
   tempText: string //displayName
+  categoryName: string
 }
 
 /**
@@ -33,13 +34,16 @@ type Inputs = {
 export default function RenderBattlePage() {
   //------------------------------state---------------------------------
   const [lsCombos, setLsCombos] = useState<ComboDictionary | null>(null)
+  const [{ hideUsedCombos, roundName }, setAdvancedOptions] = useState<{
+    hideUsedCombos: boolean
+    roundName: string
+  }>({ hideUsedCombos: true, roundName: 'Round' })
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
-  const [roundName, setRoundName] = useState<string>('Round')
   const [notes, setNotes] = useState<string>('')
   const [yourRounds, setYourRounds] = useState<Round[]>([
     {
@@ -74,7 +78,7 @@ export default function RenderBattlePage() {
     const data = getLsBattle()
     if (!data) return
 
-    setRoundName(data.categoryName)
+    setAdvancedOptions((prev) => ({ ...prev, roundName: data.categoryName }))
     setYourRounds(data.rounds)
     setNotes(data.notes)
   }, [getLsBattle])
@@ -393,10 +397,36 @@ export default function RenderBattlePage() {
           <h2 className="bold mb-2">Advanced Options</h2>
           <section>
             <label>hide used combos</label>
-            <input type="checkbox" />
+            <input
+              checked={hideUsedCombos}
+              onChange={() =>
+                setAdvancedOptions((prev) => ({
+                  ...prev,
+                  hideUsedCombos: !hideUsedCombos,
+                }))
+              }
+              type="checkbox"
+            />
           </section>
-          <section>
-            <label>Update Category Name</label>
+          <section className="mt-5 ">
+            <form
+              onSubmit={handleSubmit((data) => {
+                setAdvancedOptions((prev) => ({
+                  ...prev,
+                  roundName: data.categoryName,
+                }))
+                reset()
+              })}
+            >
+              <label>Update Category Name</label>
+              <input
+                className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                type="text"
+                defaultValue={roundName}
+                {...register('categoryName')}
+              />
+              <input type="submit" />
+            </form>
           </section>
         </section>
       </article>
