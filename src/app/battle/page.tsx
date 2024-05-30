@@ -221,6 +221,7 @@ export default function RenderBattlePage() {
                           <label>{comboIndex + 1}</label>
                           {/* ------select-------- */}
                           <select
+                            className="ml-1 w-full rounded-md border border-indigo-500 dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
                             value={comboId}
                             onChange={(e) =>
                               setYourRounds((prevRounds) =>
@@ -239,7 +240,6 @@ export default function RenderBattlePage() {
                                 }),
                               )
                             }
-                            className="w-full"
                           >
                             {/* -------------select options----------------- */}
                             <option value={''}>Choose Combo</option>
@@ -284,7 +284,7 @@ export default function RenderBattlePage() {
                               openInfo?.[comboId as ComboId] && (
                                 <button onClick={() => setOpenInfo({})}>
                                   {/* -----translucent help window---- */}
-                                  <section className="absolute left-0 top-0 h-full w-full content-center bg-gray-100 bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-40">
+                                  <section className="absolute left-0 top-0 h-full w-full content-center bg-gray-100 bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-90">
                                     {lsCombos &&
                                       (() => {
                                         const { displayName, sequence } =
@@ -292,7 +292,7 @@ export default function RenderBattlePage() {
                                         return (
                                           //------title-----
                                           <section>
-                                            <h3 className="text-xs">{`Combo Name: displayName`}</h3>
+                                            <h3 className="text-xs">{`Combo Name: ${displayName}`}</h3>
                                             {sequence &&
                                               sequence.map(
                                                 ({ moves, type }, i) => {

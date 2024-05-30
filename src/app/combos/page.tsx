@@ -14,6 +14,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 export default function RenderViewCombos() {
   //------------------------------state---------------------------------
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
+  const [isChecked, setIsChecked] = useState<boolean>(false)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
 
   //-----------------------------hooks-------------------------------
@@ -31,20 +32,44 @@ export default function RenderViewCombos() {
         <div className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
           {/* ------------title------------- */}
           <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-            View Combos
+            Combos
           </h1>
           {/* ---------------subtitle---------- */}
           <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
             Drill this list. Review your combos for practice and comfortability.
           </p>
         </div>
-        <div className="flex flex-wrap pt-5">
-          {/* ---------render combo boxes ------------ */}
+        {/* ------------save-------------- */}
+        <section className="flex justify-center">
+          <button className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
+            <Link href="/combos/make">Add Combo</Link>
+          </button>
+        </section>
+        {
+          //in development
+          false && (
+            <section>
+              <label>view used</label>
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => setIsChecked(!isChecked)}
+                className="form-checkbox"
+              />
+            </section>
+          )
+        }
+        {/* ---------render combo boxes ------------ */}
+        <div className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
           {combos &&
             Object.entries(combos).map(
               ([comboId, { displayName, notes, execution, sequence }], i) => {
                 return (
-                  <div className="h-fit w-1/3 p-1" key={comboId}>
+                  <div
+                    className="break-inside-avoid-column"
+                    // className="h-fit w-1/3 p-1"
+                    key={comboId}
+                  >
                     <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
                       <h2 className="bold text-xs dark:text-white">
                         {displayName}
@@ -84,9 +109,7 @@ export default function RenderViewCombos() {
               },
             )}
         </div>
-        <button className="ml-10 mt-10 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
-          <Link href="/combos/make">Add Combo</Link>
-        </button>
+        {/* -------------------end of combos--------------------- */}
       </div>
     </div>
   )

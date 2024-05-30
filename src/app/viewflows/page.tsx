@@ -31,24 +31,24 @@ export default function RenderCompletedMoves() {
         <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
           {/* ------------title------------- */}
           <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-            View Flows
+            Flows
           </h1>
           {/* ---------------subtitle---------- */}
           <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
             Review completed flows here.
           </p>
         </div>
-        <div className="flex flex-wrap pt-10">
+        <div className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
           {/* ---------render flow boxes ------------ */}
           {flows &&
             Object.entries(flows).map(
               ([key, { entryMove, exitMove, keyMove, rating, notes }], i) => {
                 return (
-                  <div className="w-1/3 p-1" key={key}>
+                  <div className="break-inside-avoid-column" key={key}>
                     <div
                       className="relative flex h-full flex-col overflow-hidden rounded-lg 
      bg-gray-100 bg-opacity-75 
-      px-3 pb-6 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
+      px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
                     >
                       <label className="text-[8px]">Likeable</label>
                       <div className="flex flex-row-reverse justify-center">
