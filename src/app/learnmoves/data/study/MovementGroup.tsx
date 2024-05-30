@@ -324,6 +324,7 @@ export default function RenderMovementGroup({
                   <RenderAddButtonSVG
                     id={movement.movementId}
                     onClick={onClickAddMovement}
+                    className="dark:fill-gray-500"
                   />
                 </div>
                 {

@@ -168,6 +168,7 @@ const RenderPositions = () => {
                             <div className="flex">
                               <RenderAddButtonSVG
                                 onClick={onClickAdd(index + 1)}
+                                className="dark:fill-gray-500"
                               />
                               <RenderEditButton onClick={onClickEdit(index)} />
                               <div onClick={onClickDelete(index)}>
@@ -188,7 +189,10 @@ const RenderPositions = () => {
                 !move?.positions?.length && (
                   <a>
                     There are no positions. Please add one.
-                    <RenderAddButtonSVG onClick={onClickAdd(0)} />
+                    <RenderAddButtonSVG
+                      onClick={onClickAdd(0)}
+                      className="dark:fill-gray-500"
+                    />
                   </a>
                 )
               }
