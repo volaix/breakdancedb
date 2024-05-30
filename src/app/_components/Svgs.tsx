@@ -177,7 +177,7 @@ export const RenderDeleteButtonSVG = ({
  * @param param onclick
  * @returns
  */
-export const RenderEditButton = ({ ...props }) => {
+export const RenderEditButton = ({ ...props }: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="100%"

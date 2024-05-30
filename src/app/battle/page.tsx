@@ -19,6 +19,11 @@ import {
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { Notification } from '../_components/Notification'
+import { useForm } from 'react-hook-form'
+
+type Inputs = {
+  tempText: string //displayName
+}
 
 /**
  * Battle Page
@@ -29,6 +34,7 @@ import { Notification } from '../_components/Notification'
 export default function RenderBattlePage() {
   //------------------------------state---------------------------------
   const [lsCombos, setLsCombos] = useState<ComboDictionary | null>(null)
+  const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
@@ -43,6 +49,7 @@ export default function RenderBattlePage() {
       id: makeRoundId(),
     },
   ])
+  const { register, handleSubmit } = useForm<Inputs>()
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
@@ -101,9 +108,47 @@ export default function RenderBattlePage() {
                   )
                 }
               />
+              {/* --------------Round Title----------------- */}
               <section className="flex items-center">
-                <h2 className="bold text-xs dark:text-white">{displayName}</h2>
-                <RenderEditButton className="ml-1 size-2 fill-gray-600 dark:fill-gray-500" />
+                {openEdit?.[battleIndex] || (
+                  <>
+                    <h2 className="bold text-xs dark:text-white">
+                      {displayName}
+                    </h2>
+                    <RenderEditButton
+                      onClick={() => {
+                        setOpenEdit({ [battleIndex]: true })
+                      }}
+                      className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
+                    />
+                  </>
+                )}
+                {openEdit && openEdit[battleIndex] && (
+                  <form
+                    onSubmit={handleSubmit((data) => {
+                      setOpenEdit({})
+                      setYourRounds((prevRounds) =>
+                        produce(prevRounds, (newRounds) => {
+                          newRounds[battleIndex].displayName = data.tempText
+                        }),
+                      )
+                    })}
+                  >
+                    <input
+                      className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                      type="text"
+                      defaultValue={displayName}
+                      {...register('tempText')}
+                    />
+                    <label>
+                      <input type="submit" className="hidden" />
+                      <RenderEditButton
+                        type="submit"
+                        className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
+                      />
+                    </label>
+                  </form>
+                )}
               </section>
               {/* -------------- 5 brains ------------------ */}
               <article>
