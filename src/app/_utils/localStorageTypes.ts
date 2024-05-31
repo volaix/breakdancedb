@@ -159,7 +159,6 @@ type ListOrder =
 export type Round = {
   displayName: string
   rating: number
-  // combos?: Array<ComboId | ''> | null //depreciated
   id: RoundId
   comboList?: ListOrder[]
 }
