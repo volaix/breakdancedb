@@ -11,7 +11,12 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
+import {
+  ComboDictionary,
+  ComboId,
+  ListOrder,
+  Round,
+} from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -37,6 +42,7 @@ export default function RenderBattlePage() {
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
   const [usedComboIds, setUsedComboIds] = useState<Set<ComboId>>()
+
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
@@ -46,7 +52,7 @@ export default function RenderBattlePage() {
     {
       displayName: roundName + ' 1',
       rating: 1,
-      combos: null,
+      // combos: null,
       id: makeRoundId(),
     },
   ])
@@ -56,18 +62,18 @@ export default function RenderBattlePage() {
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
 
   //-----------------------------hooks-------------------------------
-
-  //Updates usedComboIds
+  //Set usedComboIds
   useEffect(() => {
     if (!hideUsedCombos) return
-    setUsedComboIds(
-      new Set<ComboId>(
-        yourRounds
-          .map((round) => round.combos)
-          .flat()
-          .filter((a) => a !== '' && a !== null) as ComboId[],
+    const everyComboIdUsed: Set<ComboId> = new Set(
+      yourRounds.flatMap(
+        (round) =>
+          round.comboList
+            ?.filter((item) => item.type === 'combo' && item.id !== undefined)
+            .map((item) => item.id as ComboId) || [],
       ),
     )
+    setUsedComboIds(everyComboIdUsed)
   }, [hideUsedCombos, yourRounds])
 
   //Show Notifcation for 2 seconds
@@ -108,287 +114,369 @@ export default function RenderBattlePage() {
       </article>
       {/* ---------render battle rounds ------------ */}
       <article className="flex flex-wrap pt-5">
-        {yourRounds.map(({ id, displayName, combos, rating }, battleIndex) => {
-          return (
-            // --------------single battle round------------
-            <article
-              className="relative mb-5 flex h-full w-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-1 px-3 pb-6 pt-2 dark:bg-gray-800 dark:bg-opacity-40"
-              key={id}
-            >
-              <RenderDeleteButtonSVG
-                className="size-4 self-end"
-                onClick={(_) =>
-                  setYourRounds((prevRounds) =>
-                    prevRounds.filter((_, i) => i !== battleIndex),
-                  )
-                }
-              />
-              {/* --------------Round Title----------------- */}
-              <section className="flex items-center">
-                {
-                  // display displayName by default
-                  openEdit?.[battleIndex] || (
-                    <>
-                      <h2 className="bold text-xs dark:text-white">
-                        {displayName}
-                      </h2>
-                      <RenderEditButton
-                        onClick={() => {
-                          setOpenEdit({ [battleIndex]: true })
-                        }}
-                        className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
-                      />
-                    </>
-                  )
-                }
-                {
-                  // if editing displayName
-                  openEdit && openEdit[battleIndex] && (
-                    <form
-                      onSubmit={handleSubmit((data) => {
-                        setOpenEdit({})
-                        setYourRounds((prevRounds) =>
-                          produce(prevRounds, (newRounds) => {
-                            newRounds[battleIndex].displayName = data.tempText
-                          }),
-                        )
-                        reset()
-                      })}
-                    >
-                      <input
-                        className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
-                        type="text"
-                        defaultValue={displayName}
-                        {...register('tempText')}
-                      />
-                      <label>
-                        <input type="submit" className="hidden" />
+        {yourRounds.map(
+          ({ id, displayName, rating, comboList }, roundIndex) => {
+            return (
+              // --------------single battle round------------
+              <article
+                className="relative mb-5 flex h-full w-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-1 px-3 pb-6 pt-2 dark:bg-gray-800 dark:bg-opacity-40"
+                key={id}
+              >
+                <RenderDeleteButtonSVG
+                  className="size-4 self-end"
+                  onClick={(_) =>
+                    setYourRounds((prevRounds) =>
+                      prevRounds.filter((_, i) => i !== roundIndex),
+                    )
+                  }
+                />
+                {/* --------------Round Title----------------- */}
+                <section className="flex items-center">
+                  {
+                    // display displayName by default
+                    openEdit?.[roundIndex] || (
+                      <>
+                        <h2 className="bold text-xs dark:text-white">
+                          {displayName}
+                        </h2>
                         <RenderEditButton
-                          type="submit"
+                          onClick={() => {
+                            setOpenEdit({ [roundIndex]: true })
+                          }}
                           className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
                         />
-                      </label>
-                    </form>
-                  )
-                }
-              </section>
-              {/* -------------- 5 brains ------------------ */}
-              <article>
-                <section className="mt-2 flex flex-row-reverse justify-end">
-                  {Array.from(Array(5)).map((_, brainIndex) => {
-                    const size = '8'
-                    return (
-                      <>
-                        <input
-                          onChange={(e) => {
-                            setYourRounds((rounds) =>
-                              produce(rounds, (newRounds) => {
-                                newRounds[battleIndex].rating = Number(
-                                  e.target.id,
-                                )
-                              }),
-                            )
-                          }}
-                          checked={brainIndex === 5 - rating}
-                          type="radio"
-                          id={5 - brainIndex + ''}
-                          className={`peer -ms-${size} size-${size} cursor-pointer appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
-                        />
-                        <label
-                          className={` text-gray-300 peer-checked:text-pink-400`}
-                        >
-                          <RenderBrainSvg
-                            className={`size-${size}`}
-                            fill="currentcolor"
-                          />
-                        </label>
                       </>
                     )
-                  })}
+                  }
+                  {
+                    // if editing displayName
+                    openEdit && openEdit[roundIndex] && (
+                      <form
+                        onSubmit={handleSubmit((data) => {
+                          setOpenEdit({})
+                          setYourRounds((prevRounds) =>
+                            produce(prevRounds, (newRounds) => {
+                              newRounds[roundIndex].displayName = data.tempText
+                            }),
+                          )
+                          reset()
+                        })}
+                      >
+                        <input
+                          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                          type="text"
+                          defaultValue={displayName}
+                          {...register('tempText')}
+                        />
+                        <label>
+                          <input type="submit" className="hidden" />
+                          <RenderEditButton
+                            type="submit"
+                            className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
+                          />
+                        </label>
+                      </form>
+                    )
+                  }
                 </section>
-                <label className="-mt-2 text-[9px]">Memorised</label>
-              </article>
-
-              <article className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                {/* -----------show combos selected------------ */}
-                <h2>Combo List</h2>
-                {combos && combos.length > 0 ? (
-                  combos.map((comboId, comboIndex) => {
-                    return (
-                      <article key={comboIndex}>
-                        <section className="flex">
-                          {/* ----------number-------- */}
-                          <label>{comboIndex + 1}</label>
-                          {/* ------select-------- */}
-                          <select
-                            className="ml-1 w-full rounded-md border border-indigo-500 dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
-                            value={comboId}
-                            onChange={(e) =>
-                              setYourRounds((prevRounds) =>
-                                produce(prevRounds, (newRounds) => {
-                                  if (!lsCombos) return
-                                  const optionVal = e.target.value as
-                                    | ComboId
-                                    | ''
-                                  if (newRounds[battleIndex].combos) {
-                                    //TODO find a better solution than non-null assertion operator
-                                    newRounds[battleIndex].combos![comboIndex] =
-                                      optionVal
-                                  } else {
-                                    newRounds[battleIndex].combos = [optionVal]
-                                  }
+                {/* -------------- 5 brains ------------------ */}
+                <article>
+                  <section className="mt-2 flex flex-row-reverse justify-end">
+                    {Array.from(Array(5)).map((_, brainIndex) => {
+                      const size = '8'
+                      return (
+                        <>
+                          <input
+                            onChange={(e) => {
+                              setYourRounds((rounds) =>
+                                produce(rounds, (newRounds) => {
+                                  newRounds[roundIndex].rating = Number(
+                                    e.target.id,
+                                  )
                                 }),
                               )
-                            }
+                            }}
+                            checked={brainIndex === 5 - rating}
+                            type="radio"
+                            id={5 - brainIndex + ''}
+                            className={`peer -ms-${size} size-${size} cursor-pointer appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
+                          />
+                          <label
+                            className={` text-gray-300 peer-checked:text-pink-400`}
                           >
-                            {/* -------------select options----------------- */}
-                            <option value={''}>Choose Combo</option>
-                            {lsCombos &&
-                              Object.entries(lsCombos).map(
-                                ([lsComboId, comboDetails], i) => {
-                                  if (
-                                    hideUsedCombos &&
-                                    comboId !== lsComboId &&
-                                    usedComboIds?.has(lsComboId as ComboId)
-                                  ) {
-                                    return null
-                                  } else {
-                                    return (
-                                      <option
-                                        className="dark:text-white"
-                                        value={lsComboId}
-                                        key={i}
-                                      >
-                                        {comboDetails.displayName}
-                                      </option>
-                                    )
-                                  }
-                                },
+                            <RenderBrainSvg
+                              className={`size-${size}`}
+                              fill="currentcolor"
+                            />
+                          </label>
+                        </>
+                      )
+                    })}
+                  </section>
+                  <label className="-mt-2 text-[9px]">Memorised</label>
+                </article>
+
+                {/* ===================COMBO LIST=========================== */}
+                <article className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+                  <h2>Combo List</h2>
+
+                  {comboList &&
+                    comboList.length > 0 &&
+                    comboList.map(
+                      ({ type, id: comboId, value }, comboIndex) => {
+                        return (
+                          // ----------------------SINGLE LIST-----------------------
+                          <section
+                            key={comboIndex}
+                            className="flex w-full items-center"
+                          >
+                            {/* ----------number-------- */}
+                            <section>
+                              <label>{comboIndex + 1}</label>
+                            </section>
+                            {/* -------COMBO SELECTION-------- */}
+                            <article className="w-2/5">
+                              {/* -----custom combo------- */}
+                              {type === 'customCombo' && (
+                                <section>
+                                  <input
+                                    className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none
+                                transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                                    type="text"
+                                    value={value}
+                                    placeholder="Super Combo 9000"
+                                    onChange={(e) =>
+                                      setYourRounds((prevRound) =>
+                                        produce(prevRound, (newRound) => {
+                                          const battleRound = newRound[
+                                            roundIndex
+                                          ]?.comboList?.[comboIndex] ?? {
+                                            type: 'customCombo',
+                                            value: '',
+                                          }
+                                          battleRound.value = e.target.value
+                                        }),
+                                      )
+                                    }
+                                  />
+                                </section>
                               )}
-                          </select>
-                          {/* ------Info------ */}
-                          <section className="w-1/6">
-                            {
-                              //don't display info if user hasn't chosen a combo yet
-                              comboId && (
-                                <RenderInfoSVG
-                                  onClick={(_) => {
-                                    setOpenInfo({ [comboId as ComboId]: true })
-                                  }}
-                                  className="size-4 text-gray-600"
-                                />
-                              )
-                            }
-                            {
-                              //user wants to view info
-                              openInfo?.[comboId as ComboId] && (
-                                <button onClick={() => setOpenInfo({})}>
-                                  {/* -----translucent help window---- */}
-                                  <section className="absolute left-0 top-0 h-full w-full content-center bg-gray-100 bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-90">
+                              {/* ----------normal combo----------- */}
+                              {type === 'combo' && (
+                                <section>
+                                  {/* ------select-------- */}
+                                  <select
+                                    className="ml-1 w-full rounded-md border dark:border-indigo-500 dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
+                                    value={comboId}
+                                    onChange={(e) =>
+                                      setYourRounds((prevRounds) =>
+                                        produce(prevRounds, (newRounds) => {
+                                          if (!lsCombos) return
+                                          const optionVal = e.target.value as
+                                            | ComboId
+                                            | ''
+
+                                          const battleRound =
+                                            newRounds[roundIndex]
+                                          battleRound.comboList =
+                                            battleRound.comboList ?? []
+
+                                          if (optionVal === '') {
+                                            battleRound.comboList[comboIndex] =
+                                              {
+                                                type: 'combo',
+                                              }
+                                          } else {
+                                            battleRound.comboList[comboIndex] =
+                                              {
+                                                type: 'combo',
+                                                id: optionVal,
+                                              }
+                                          }
+                                        }),
+                                      )
+                                    }
+                                  >
+                                    {/* -------------select options----------------- */}
+                                    <option value={''}>Choose Combo</option>
                                     {lsCombos &&
-                                      (() => {
-                                        const { displayName, sequence } =
-                                          lsCombos[comboId as ComboId] || {}
-                                        return (
-                                          //------title-----
-                                          <section>
-                                            <h3 className="text-xs">{`Combo Name: ${displayName}`}</h3>
-                                            {sequence &&
-                                              sequence.map(
-                                                ({ moves, type }, i) => {
-                                                  //-------type--------
-                                                  return (
-                                                    <section
-                                                      key={i}
-                                                      className="mt-1"
-                                                    >
-                                                      <label className="bold">{`Sequence Type: ${type}`}</label>
-                                                      {/* -------moves-------- */}
-                                                      <ol>
-                                                        {moves.map(
-                                                          (move, i) => (
-                                                            <li
-                                                              key={i}
-                                                            >{`${i + 1}. ${move}`}</li>
-                                                          ),
-                                                        )}
-                                                      </ol>
-                                                    </section>
-                                                  )
-                                                },
-                                              )}
-                                          </section>
-                                        )
-                                      })()}
-                                  </section>
-                                </button>
-                              )
-                            }
-                          </section>
-                          {/* --------end of info--------- */}
-                          <section>
-                            <RenderDeleteButtonSVG
-                              className="size-4 self-end fill-slate-500 text-slate-600"
-                              onClick={(_) =>
-                                setYourRounds((prevRounds) =>
-                                  produce(prevRounds, (newRounds) => {
-                                    newRounds[battleIndex].combos?.splice(
-                                      comboIndex,
-                                      1,
-                                    )
-                                  }),
+                                      Object.entries(lsCombos).map(
+                                        ([lsComboId, comboDetails], i) => {
+                                          if (
+                                            hideUsedCombos &&
+                                            comboId !== lsComboId &&
+                                            usedComboIds?.has(
+                                              lsComboId as ComboId,
+                                            )
+                                          ) {
+                                            return null
+                                          } else {
+                                            return (
+                                              <option
+                                                className="dark:text-white"
+                                                value={lsComboId}
+                                                key={i}
+                                              >
+                                                {comboDetails.displayName}
+                                              </option>
+                                            )
+                                          }
+                                        },
+                                      )}
+                                  </select>
+                                </section>
+                              )}
+                              {/* // -------END OF NORMAL COMBO------------ */}
+                            </article>
+                            {/* -------END OF COMBO SELECTION-------- */}
+
+                            {/* ------Info Button------ */}
+                            <section className="ml-1 size-3">
+                              {
+                                //don't display info if user hasn't chosen a combo yet
+                                comboId && (
+                                  <RenderInfoSVG
+                                    onClick={(_) => {
+                                      setOpenInfo({
+                                        [comboId as ComboId]: true,
+                                      })
+                                    }}
+                                    className="size-3 text-gray-600"
+                                  />
                                 )
                               }
-                            />
+                              {
+                                //user wants to view info
+                                openInfo?.[comboId as ComboId] && (
+                                  <button onClick={() => setOpenInfo({})}>
+                                    {/* -----translucent help window---- */}
+                                    <section className="absolute left-0 top-0 h-full w-full content-center bg-gray-100 bg-opacity-75 dark:bg-gray-800 dark:bg-opacity-90">
+                                      {lsCombos &&
+                                        (() => {
+                                          const { displayName, sequence } =
+                                            lsCombos[comboId as ComboId] || {}
+                                          return (
+                                            //------title-----
+                                            <section>
+                                              <h3 className="text-xs">{`Combo Name: ${displayName}`}</h3>
+                                              {sequence &&
+                                                sequence.map(
+                                                  ({ moves, type }, i) => {
+                                                    //-------type--------
+                                                    return (
+                                                      <section
+                                                        key={i}
+                                                        className="mt-1"
+                                                      >
+                                                        <label className="bold">{`Sequence Type: ${type}`}</label>
+                                                        {/* -------moves-------- */}
+                                                        <ol>
+                                                          {moves.map(
+                                                            (move, i) => (
+                                                              <li
+                                                                key={i}
+                                                              >{`${i + 1}. ${move}`}</li>
+                                                            ),
+                                                          )}
+                                                        </ol>
+                                                      </section>
+                                                    )
+                                                  },
+                                                )}
+                                            </section>
+                                          )
+                                        })()}
+                                    </section>
+                                  </button>
+                                )
+                              }
+                            </section>
+                            {/* --------end of info--------- */}
+                            {/* -------------DELETE------------ */}
+                            <section className="ml-1">
+                              <RenderDeleteButtonSVG
+                                className="size-4 self-end fill-slate-500 text-slate-600"
+                                onClick={(_) =>
+                                  setYourRounds((prevRounds) =>
+                                    produce(prevRounds, (newRounds) => {
+                                      newRounds[roundIndex].comboList?.splice(
+                                        comboIndex,
+                                        1,
+                                      )
+                                    }),
+                                  )
+                                }
+                              />
+                            </section>
                           </section>
-                        </section>
-                      </article>
-                    )
-                  })
-                ) : (
-                  <p>{`No combos in ${roundName}`}</p>
-                )}
-                {/* {-------------------add new combo ---------------- */}
-                <section className="mt-2 flex">
-                  <label>Add New Combo</label>
-                  <RenderAddButtonSVG
-                    className="ml-1 size-2 fill-slate-500"
-                    onClick={() =>
-                      setYourRounds((prevRounds) =>
-                        produce(prevRounds, (newRounds) => {
-                          if (!lsCombos) return
+                        )
+                      },
+                    )}
+                </article>
+                {/* -------------------END OF COMBO LIST------------------- */}
 
-                          const defaultComboId = Object.keys(
-                            lsCombos,
-                          )[0] as ComboId
-                          //if combos exist
-                          if (newRounds[battleIndex].combos) {
-                            newRounds[battleIndex].combos?.push('')
-                          } else {
-                            newRounds[battleIndex].combos = ['']
-                          }
-                        }),
-                      )
-                    }
-                  />
-                </section>
+                {/* --------------add new entry------------ */}
+                <article className="flex text-[9px]">
+                  {/* {-------------------add new combo ---------------- */}
+                  <section className=" flex items-center">
+                    <label>Add Combo</label>
+                    <RenderAddButtonSVG
+                      className="ml-1 size-2 fill-slate-500"
+                      onClick={() =>
+                        setYourRounds((prevRounds) =>
+                          produce(prevRounds, (newRounds) => {
+                            if (newRounds[roundIndex].comboList) {
+                              newRounds[roundIndex].comboList?.push({
+                                type: 'combo',
+                              })
+                            } else {
+                              newRounds[roundIndex].comboList = [
+                                { type: 'combo' },
+                              ]
+                            }
+                          }),
+                        )
+                      }
+                    />
+                  </section>
+                  {/* ------------------add custom-------------------- */}
+                  <section className="ml-3 flex items-center">
+                    <label>Add Custom</label>
+                    <RenderAddButtonSVG
+                      className="ml-1 size-2 fill-slate-500"
+                      onClick={() =>
+                        //add customCombo to rounds
+                        setYourRounds((prevRounds) =>
+                          produce(prevRounds, (newRounds) => {
+                            const comboListRef = newRounds[roundIndex]
+                            comboListRef.comboList =
+                              comboListRef.comboList ?? []
+                            comboListRef.comboList.push({
+                              type: 'customCombo',
+                              value: '',
+                            })
+                          }),
+                        )
+                      }
+                    />
+                  </section>
+                </article>
+                {/* ------------------NOTES---------------- */}
+                <article className="mt-1">
+                  <section className="flex flex-col">
+                    <label className="text-[9px]">Notes</label>
+                    <textarea
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-[8px] text-xs leading-snug text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+                      value={notes}
+                    />
+                  </section>
+                </article>
               </article>
-              {/* ------------------NOTES---------------- */}
-              <article>
-                <section className="flex flex-col">
-                  <label className="text-[9px]">Notes</label>
-                  <textarea
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full text-[8px] leading-relaxed"
-                  >
-                    {notes}
-                  </textarea>
-                </section>
-              </article>
-            </article>
-            // --------------END OF SINGLE BATTLE ROUND------------
-          )
-        })}
+              // --------------END OF SINGLE BATTLE ROUND------------
+            )
+          },
+        )}
       </article>
       {/* --------------------END OF ROUNDS------------------- */}
       <Notification
@@ -397,7 +485,7 @@ export default function RenderBattlePage() {
       />
       {/* ------------------BUTTONS--------------- */}
       <section className="flex justify-center">
-        {/* -----------new round------------- */}
+        {/* -----------ADD ROUND------------- */}
         <button
           className="flex h-fit items-center justify-center rounded border border-indigo-500
           px-3 py-2 text-center text-xs text-indigo-500"
@@ -407,7 +495,7 @@ export default function RenderBattlePage() {
                 newRounds.push({
                   displayName: roundName + ' ' + (prevRounds.length + 1),
                   rating: 1,
-                  combos: null,
+                  // combos: null,
                   id: makeRoundId(),
                 })
               }),
