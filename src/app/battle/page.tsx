@@ -37,6 +37,7 @@ export default function RenderBattlePage() {
   const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
   const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
   const [usedComboIds, setUsedComboIds] = useState<Set<ComboId>>()
+
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
@@ -46,7 +47,7 @@ export default function RenderBattlePage() {
     {
       displayName: roundName + ' 1',
       rating: 1,
-      combos: null,
+      // combos: null,
       id: makeRoundId(),
     },
   ])
@@ -56,19 +57,21 @@ export default function RenderBattlePage() {
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
 
   //-----------------------------hooks-------------------------------
-
   //Updates usedComboIds
-  useEffect(() => {
-    if (!hideUsedCombos) return
-    setUsedComboIds(
-      new Set<ComboId>(
-        yourRounds
-          .map((round) => round.combos)
-          .flat()
-          .filter((a) => a !== '' && a !== null) as ComboId[],
-      ),
-    )
-  }, [hideUsedCombos, yourRounds])
+  //   useEffect(() => {
+  //     if (!hideUsedCombos) return
+  //     setUsedComboIds(
+  //       new Set<ComboId>(
+  //         yourRounds
+  //           .map((round) => round.comboList)
+  //           .flat()
+  //           .filter((a) => {
+  //             return (a?.type === 'combo' && a !== '' && a !== null) as ComboId
+  //             return (a !== '' && a !== null) as ComboId[]
+  //           }
+  //           ),
+  //       )
+  // }, [hideUsedCombos, yourRounds])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
@@ -109,7 +112,7 @@ export default function RenderBattlePage() {
       {/* ---------render battle rounds ------------ */}
       <article className="flex flex-wrap pt-5">
         {yourRounds.map(
-          ({ id, displayName, combos, rating, customCombos }, battleIndex) => {
+          ({ id, displayName, rating, comboList }, roundIndex) => {
             return (
               // --------------single battle round------------
               <article
@@ -120,7 +123,7 @@ export default function RenderBattlePage() {
                   className="size-4 self-end"
                   onClick={(_) =>
                     setYourRounds((prevRounds) =>
-                      prevRounds.filter((_, i) => i !== battleIndex),
+                      prevRounds.filter((_, i) => i !== roundIndex),
                     )
                   }
                 />
@@ -128,14 +131,14 @@ export default function RenderBattlePage() {
                 <section className="flex items-center">
                   {
                     // display displayName by default
-                    openEdit?.[battleIndex] || (
+                    openEdit?.[roundIndex] || (
                       <>
                         <h2 className="bold text-xs dark:text-white">
                           {displayName}
                         </h2>
                         <RenderEditButton
                           onClick={() => {
-                            setOpenEdit({ [battleIndex]: true })
+                            setOpenEdit({ [roundIndex]: true })
                           }}
                           className="ml-1 size-2 fill-gray-600 dark:fill-gray-500"
                         />
@@ -144,13 +147,13 @@ export default function RenderBattlePage() {
                   }
                   {
                     // if editing displayName
-                    openEdit && openEdit[battleIndex] && (
+                    openEdit && openEdit[roundIndex] && (
                       <form
                         onSubmit={handleSubmit((data) => {
                           setOpenEdit({})
                           setYourRounds((prevRounds) =>
                             produce(prevRounds, (newRounds) => {
-                              newRounds[battleIndex].displayName = data.tempText
+                              newRounds[roundIndex].displayName = data.tempText
                             }),
                           )
                           reset()
@@ -184,7 +187,7 @@ export default function RenderBattlePage() {
                             onChange={(e) => {
                               setYourRounds((rounds) =>
                                 produce(rounds, (newRounds) => {
-                                  newRounds[battleIndex].rating = Number(
+                                  newRounds[roundIndex].rating = Number(
                                     e.target.id,
                                   )
                                 }),
@@ -210,96 +213,111 @@ export default function RenderBattlePage() {
                   <label className="-mt-2 text-[9px]">Memorised</label>
                 </article>
 
-                {/* -----------SHOW COMBOS------------ */}
+                {/* ===================COMBO LIST=========================== */}
                 <article className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
                   <h2>Combo List</h2>
 
-                  {/* ---------------TEMP: CUSTOM COMBO------------- */}
-                  <section>
-                    {customCombos &&
-                      customCombos.length > 0 &&
-                      customCombos.map((customCombo, customComboIndex) => {
+                  {comboList &&
+                    comboList.length > 0 &&
+                    comboList.map(
+                      ({ type, id: comboId, value }, comboIndex) => {
                         return (
-                          <article key={customComboIndex}>
-                            <input
-                              className=" w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 text-gray-700 outline-none
-                                transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
-                              type="text"
-                              value={customCombo}
-                              placeholder="Super Combo 9000"
-                              onChange={(e) =>
-                                setYourRounds((prevRound) =>
-                                  produce(prevRound, (newRound) => {
-                                    newRound[battleIndex].customCombos?.splice(
-                                      customComboIndex,
-                                      1,
-                                      e.target.value,
-                                    )
-                                  }),
-                                )
-                              }
-                            />
-                          </article>
-                        )
-                      })}
-                  </section>
-
-                  {/* ------------------TEMP: NORMAL COMBO------------- */}
-                  {combos && combos.length > 0 ? (
-                    combos.map((comboId, comboIndex) => {
-                      return (
-                        // ----------------combo line----------------
-                        <article key={comboIndex}>
-                          <section className="flex">
+                          // ----------------------SINGLE LIST-----------------------
+                          <section key={comboIndex} className="flex">
                             {/* ----------number-------- */}
-                            <label>{comboIndex + 1}</label>
-                            {/* ------select-------- */}
-                            <select
-                              className="ml-1 w-full rounded-md border dark:border-indigo-500 dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
-                              value={comboId}
-                              onChange={(e) =>
-                                setYourRounds((prevRounds) =>
-                                  produce(prevRounds, (newRounds) => {
-                                    if (!lsCombos) return
-                                    const optionVal = e.target.value as
-                                      | ComboId
-                                      | ''
+                            <section>
+                              <label>{comboIndex + 1}</label>
+                            </section>
 
-                                    const battleRound = newRounds[battleIndex]
-                                    battleRound.combos =
-                                      battleRound.combos ?? []
-                                    battleRound.combos[comboIndex] = optionVal
-                                  }),
-                                )
-                              }
-                            >
-                              {/* -------------select options----------------- */}
-                              <option value={''}>Choose Combo</option>
-                              {lsCombos &&
-                                Object.entries(lsCombos).map(
-                                  ([lsComboId, comboDetails], i) => {
-                                    if (
-                                      hideUsedCombos &&
-                                      comboId !== lsComboId &&
-                                      usedComboIds?.has(lsComboId as ComboId)
-                                    ) {
-                                      return null
-                                    } else {
-                                      return (
-                                        <option
-                                          className="dark:text-white"
-                                          value={lsComboId}
-                                          key={i}
-                                        >
-                                          {comboDetails.displayName}
-                                        </option>
-                                      )
-                                    }
-                                  },
-                                )}
-                            </select>
+                            {/* -----custom combo------- */}
+                            {type === 'customCombo' && (
+                              <article>
+                                <input
+                                  className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none
+                                transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                                  type="text"
+                                  value={value}
+                                  placeholder="Super Combo 9000"
+                                  onChange={(e) =>
+                                    setYourRounds((prevRound) =>
+                                      produce(prevRound, (newRound) => {
+                                        const battleRound = newRound[roundIndex]
+                                          ?.comboList?.[comboIndex] ?? {
+                                          type: 'customCombo',
+                                          value: '',
+                                        }
+                                        battleRound.value = e.target.value
+                                      }),
+                                    )
+                                  }
+                                />
+                              </article>
+                            )}
+                            {/* ----------normal combo----------- */}
+                            {type === 'combo' && (
+                              <article>
+                                {/* ------select-------- */}
+                                <select
+                                  className="ml-1 w-full rounded-md border dark:border-indigo-500 dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
+                                  value={comboId}
+                                  onChange={(e) =>
+                                    setYourRounds((prevRounds) =>
+                                      produce(prevRounds, (newRounds) => {
+                                        if (!lsCombos) return
+                                        const optionVal = e.target.value as
+                                          | ComboId
+                                          | ''
 
-                            {/* ------Info------ */}
+                                        const battleRound =
+                                          newRounds[roundIndex]
+                                        battleRound.comboList =
+                                          battleRound.comboList ?? []
+
+                                        if (optionVal === '') {
+                                          battleRound.comboList[comboIndex] = {
+                                            type: 'combo',
+                                          }
+                                        } else {
+                                          battleRound.comboList[comboIndex] = {
+                                            type: 'combo',
+                                            id: optionVal,
+                                          }
+                                        }
+                                      }),
+                                    )
+                                  }
+                                >
+                                  {/* -------------select options----------------- */}
+                                  <option value={''}>Choose Combo</option>
+                                  {lsCombos &&
+                                    Object.entries(lsCombos).map(
+                                      ([lsComboId, comboDetails], i) => {
+                                        if (
+                                          hideUsedCombos &&
+                                          comboId !== lsComboId &&
+                                          usedComboIds?.has(
+                                            lsComboId as ComboId,
+                                          )
+                                        ) {
+                                          return null
+                                        } else {
+                                          return (
+                                            <option
+                                              className="dark:text-white"
+                                              value={lsComboId}
+                                              key={i}
+                                            >
+                                              {comboDetails.displayName}
+                                            </option>
+                                          )
+                                        }
+                                      },
+                                    )}
+                                </select>
+                              </article>
+                            )}
+                            {/* // -----------END OF NORMAL COMBO------------ */}
+                            {/* ------Info Button------ */}
                             <section className="w-1/6">
                               {
                                 //don't display info if user hasn't chosen a combo yet
@@ -367,7 +385,7 @@ export default function RenderBattlePage() {
                                 onClick={(_) =>
                                   setYourRounds((prevRounds) =>
                                     produce(prevRounds, (newRounds) => {
-                                      newRounds[battleIndex].combos?.splice(
+                                      newRounds[roundIndex].comboList?.splice(
                                         comboIndex,
                                         1,
                                       )
@@ -377,14 +395,11 @@ export default function RenderBattlePage() {
                               />
                             </section>
                           </section>
-                        </article>
-                        //-------single line-------------
-                      )
-                    })
-                  ) : (
-                    <p>{`No combos in ${roundName}`}</p>
-                  )}
+                        )
+                      },
+                    )}
                 </article>
+                {/* -------------------END OF COMBO LIST------------------- */}
 
                 {/* --------------add new entry------------ */}
                 <article className="flex text-[9px]">
@@ -396,10 +411,14 @@ export default function RenderBattlePage() {
                       onClick={() =>
                         setYourRounds((prevRounds) =>
                           produce(prevRounds, (newRounds) => {
-                            if (newRounds[battleIndex].combos) {
-                              newRounds[battleIndex].combos?.push('')
+                            if (newRounds[roundIndex].comboList) {
+                              newRounds[roundIndex].comboList?.push({
+                                type: 'combo',
+                              })
                             } else {
-                              newRounds[battleIndex].combos = ['']
+                              newRounds[roundIndex].comboList = [
+                                { type: 'combo' },
+                              ]
                             }
                           }),
                         )
@@ -412,13 +431,16 @@ export default function RenderBattlePage() {
                     <RenderAddButtonSVG
                       className="ml-1 size-2 fill-slate-500"
                       onClick={() =>
+                        //add customCombo to rounds
                         setYourRounds((prevRounds) =>
                           produce(prevRounds, (newRounds) => {
-                            //battleRound is reference  newRounds. Changes to battleRound will affect newRounds.
-                            const battleRound = newRounds[battleIndex]
-                            battleRound.customCombos =
-                              newRounds[battleIndex].customCombos ?? []
-                            battleRound.customCombos.push('customCombo')
+                            const comboListRef = newRounds[roundIndex]
+                            comboListRef.comboList =
+                              comboListRef.comboList ?? []
+                            comboListRef.comboList.push({
+                              type: 'customCombo',
+                              value: '',
+                            })
                           }),
                         )
                       }
@@ -432,9 +454,8 @@ export default function RenderBattlePage() {
                     <textarea
                       onChange={(e) => setNotes(e.target.value)}
                       className="w-full text-[8px] leading-relaxed"
-                    >
-                      {notes}
-                    </textarea>
+                      value={notes}
+                    />
                   </section>
                 </article>
               </article>
@@ -460,7 +481,7 @@ export default function RenderBattlePage() {
                 newRounds.push({
                   displayName: roundName + ' ' + (prevRounds.length + 1),
                   rating: 1,
-                  combos: null,
+                  // combos: null,
                   id: makeRoundId(),
                 })
               }),

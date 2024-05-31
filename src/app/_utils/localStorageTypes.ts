@@ -152,12 +152,16 @@ export type ComboDictionary = {
   }
 }
 
+type ListOrder =
+  | { type: 'combo'; id?: ComboId; value?: never }
+  | { type: 'customCombo'; id?: never; value: string }
+
 export type Round = {
   displayName: string
   rating: number
-  combos: Array<ComboId | ''> | null
-  customCombos?: string[]
+  // combos?: Array<ComboId | ''> | null //depreciated
   id: RoundId
+  comboList?: ListOrder[]
 }
 
 export type GlobalStateProperties = {
