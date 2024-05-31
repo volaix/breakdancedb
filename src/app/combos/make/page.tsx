@@ -30,6 +30,7 @@ const idMap: Record<
 //-----------------local types-------------
 
 type SelectedComboNumber = boolean[]
+//TODO this is actually better as a map?
 type SelectedComboSeq = {
   [key: number]: {
     type: 'flow' | 'move' | 'custom'

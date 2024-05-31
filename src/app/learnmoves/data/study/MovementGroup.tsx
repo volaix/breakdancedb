@@ -39,6 +39,7 @@ export const useDataLearnStore = create<DataLearnState>()((set) => ({
 //-------------local types------------------
 //input types for react-hook-form
 type Inputs = {
+  //this wouldve been better as a map
   [key: `${number}`]: string //displayName
 }
 
