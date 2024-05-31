@@ -156,6 +156,7 @@ export type Round = {
   displayName: string
   rating: number
   combos: Array<ComboId | ''> | null
+  customCombos?: string[]
   id: RoundId
 }
 
