@@ -152,7 +152,7 @@ export type ComboDictionary = {
   }
 }
 
-type ListOrder =
+export type ListOrder =
   | { type: 'combo'; id?: ComboId; value?: never }
   | { type: 'customCombo'; id?: never; value: string }
 

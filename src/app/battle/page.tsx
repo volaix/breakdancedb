@@ -11,7 +11,12 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
+import {
+  ComboDictionary,
+  ComboId,
+  ListOrder,
+  Round,
+} from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -57,21 +62,19 @@ export default function RenderBattlePage() {
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
 
   //-----------------------------hooks-------------------------------
-  //Updates usedComboIds
-  //   useEffect(() => {
-  //     if (!hideUsedCombos) return
-  //     setUsedComboIds(
-  //       new Set<ComboId>(
-  //         yourRounds
-  //           .map((round) => round.comboList)
-  //           .flat()
-  //           .filter((a) => {
-  //             return (a?.type === 'combo' && a !== '' && a !== null) as ComboId
-  //             return (a !== '' && a !== null) as ComboId[]
-  //           }
-  //           ),
-  //       )
-  // }, [hideUsedCombos, yourRounds])
+  //Set usedComboIds
+  useEffect(() => {
+    if (!hideUsedCombos) return
+    const everyComboIdUsed: Set<ComboId> = new Set(
+      yourRounds.flatMap(
+        (round) =>
+          round.comboList
+            ?.filter((item) => item.type === 'combo' && item.id !== undefined)
+            .map((item) => item.id as ComboId) || [],
+      ),
+    )
+    setUsedComboIds(everyComboIdUsed)
+  }, [hideUsedCombos, yourRounds])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
