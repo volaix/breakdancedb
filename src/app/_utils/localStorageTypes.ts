@@ -147,7 +147,7 @@ export type ComboDictionary = {
   [key: ComboId]: {
     displayName: string
     notes: string
-    execution: number //how easy is it to do it
+    execution: number
     sequence: ComboMove[]
   }
 }

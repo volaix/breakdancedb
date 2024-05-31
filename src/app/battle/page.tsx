@@ -11,12 +11,7 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import {
-  ComboDictionary,
-  ComboId,
-  ListOrder,
-  Round,
-} from '../_utils/localStorageTypes'
+import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
@@ -236,7 +231,7 @@ export default function RenderBattlePage() {
                             </section>
                             {/* -------COMBO SELECTION-------- */}
                             <article className="w-2/5">
-                              {/* -----custom combo------- */}
+                              {/* -----CUSTOM COMBO INPUT------- */}
                               {type === 'customCombo' && (
                                 <section>
                                   <input
@@ -245,19 +240,15 @@ export default function RenderBattlePage() {
                                     type="text"
                                     value={value}
                                     placeholder="Super Combo 9000"
-                                    onChange={(e) =>
+                                    onChange={(e) => {
                                       setYourRounds((prevRound) =>
                                         produce(prevRound, (newRound) => {
-                                          const battleRound = newRound[
-                                            roundIndex
-                                          ]?.comboList?.[comboIndex] ?? {
-                                            type: 'customCombo',
-                                            value: '',
-                                          }
-                                          battleRound.value = e.target.value
+                                          newRound[roundIndex].comboList![
+                                            comboIndex
+                                          ].value = e.target.value
                                         }),
                                       )
-                                    }
+                                    }}
                                   />
                                 </section>
                               )}
@@ -276,22 +267,14 @@ export default function RenderBattlePage() {
                                             | ComboId
                                             | ''
 
-                                          const battleRound =
-                                            newRounds[roundIndex]
-                                          battleRound.comboList =
-                                            battleRound.comboList ?? []
-
                                           if (optionVal === '') {
-                                            battleRound.comboList[comboIndex] =
-                                              {
-                                                type: 'combo',
-                                              }
+                                            newRounds[roundIndex].comboList![
+                                              comboIndex
+                                            ] = { type: 'combo' }
                                           } else {
-                                            battleRound.comboList[comboIndex] =
-                                              {
-                                                type: 'combo',
-                                                id: optionVal,
-                                              }
+                                            newRounds[roundIndex].comboList![
+                                              comboIndex
+                                            ] = { type: 'combo', id: optionVal }
                                           }
                                         }),
                                       )
