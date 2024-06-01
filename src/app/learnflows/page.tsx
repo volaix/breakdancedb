@@ -176,6 +176,20 @@ export default function RenderFlows() {
                 Custom
               </button>
             </div>
+            {/* -----------------advanced options---------------- */}
+            <section className="mt-5">
+              <label>Show advanced options</label>
+              <section className="flex flex-col">
+                <label>
+                  Hide moves used in flows
+                  <input type="checkbox" />
+                </label>
+                <label>
+                  Hide moves used in Battle
+                  <input type="checkbox" />
+                </label>
+              </section>
+            </section>
           </div>
           {displayMoves || (
             <div className="flex flex-col text-center">
