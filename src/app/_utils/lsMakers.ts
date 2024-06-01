@@ -1,4 +1,4 @@
-import { v4 } from 'uuid'
+import { v4, validate } from 'uuid'
 
 import {
   ComboId,
@@ -14,28 +14,56 @@ import {
   Transitions,
 } from './localStorageTypes'
 
+// ------------------------validators-----------------------------
+
+const uuidPattern =
+  '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+//==================LEGACY IDS EXIST IN STATE==============
+// const isMoveId = (id: string): boolean => {
+//   return new RegExp(`^move-${uuidPattern}$`).test(id)
+// }
+// const isFlowId = (id: string): boolean => {
+//   return new RegExp(`^flow-${uuidPattern}$`).test(id)
+// }
+// const isPositionId = (id: string): boolean => {
+//   return new RegExp(`^position-${uuidPattern}$`).test(id)
+// }
+// const isComboId = (id: string): boolean => {
+//   return new RegExp(`^combo-${uuidPattern}$`).test(id)
+// }
+// const isRoundId = (id: string): boolean => {
+//   return new RegExp(`^round-${uuidPattern}$`).test(id)
+// }
+const isTransitionId = (id: string): boolean => {
+  return new RegExp(`^transition-${uuidPattern}$`).test(id)
+}
+// const isMovementId = (id: string): boolean => {
+//   return new RegExp(`^movement-${uuidPattern}$`).test(id)
+// }
+
 // ------------------------makers-----------------------------
 
 export const makeMoveId = (): MoveId => {
-  return v4() as MoveId
+  return `move-${v4()}` as MoveId
 }
 export const makeFlowId = (): FlowId => {
-  return v4() as FlowId
+  return `flow-${v4()}` as FlowId
 }
 export const makePositionId = (): PositionId => {
-  return v4() as PositionId
+  return `position-${v4()}` as PositionId
 }
 export const makeComboId = (): ComboId => {
-  return v4() as ComboId
+  return `combo-${v4()}` as ComboId
 }
 export const makeRoundId = (): RoundId => {
-  return v4() as RoundId
+  return `round-${v4()}` as RoundId
 }
 export const makeTransitionId = (): TransitionId => {
-  return v4() as TransitionId
+  return `transition-${v4()}` as TransitionId
 }
 export const makeMovementId = (): MovementId => {
-  return v4() as MovementId
+  return `movement-${v4()}` as MovementId
 }
 
 /**
