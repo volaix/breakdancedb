@@ -143,14 +143,14 @@ export type ComboMove = {
   type: 'move' | 'flow' | 'transition' | 'custom'
 }
 
-export type ComboDictionary = {
-  [key: ComboId]: {
-    displayName: string
-    notes: string
-    execution: number
-    sequence: ComboMove[]
-  }
+export type ComboVal = {
+  displayName: string
+  notes: string
+  execution: number
+  sequence: ComboMove[]
 }
+
+export type ComboDictionary = { [key: ComboId]: ComboVal }
 
 export type ListOrder =
   | { type: 'combo'; id?: ComboId; value?: never }
@@ -225,6 +225,8 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   getDanceList: () => string[]
 
   //============nested================
+  //-------ComboID Entry----------
+  getLsComboById: (id: ComboId) => ComboDictionary[keyof ComboDictionary] | null
   //-------User Move Keys --------
   setLsUserMovesByKey: (
     key: keyof GlobalStateProperties[typeof lsUserMoves],

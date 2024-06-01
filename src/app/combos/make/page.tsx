@@ -1,7 +1,7 @@
 'use client'
 //@format
 import { produce } from 'immer'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import LoadingFallback from '../../_components/LoadingFallback'
 import { Notification } from '../../_components/Notification'
@@ -13,10 +13,20 @@ import {
   FlowDictionary,
   FlowId,
   MoveCategories,
+  MoveId,
+  TransitionId,
   lsToprock,
 } from '../../_utils/localStorageTypes'
-import { makeComboId, makeFlowId, makeMoveId } from '../../_utils/lsMakers'
+import {
+  makeComboId,
+  makeFlowId,
+  makeMoveId,
+  makeTransitionId,
+} from '../../_utils/lsMakers'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
+import { comboIdKey } from '@/app/battle/page'
+import { shallow } from 'zustand/shallow'
+import { ComboVal } from '../../_utils/localStorageTypes'
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
@@ -25,6 +35,16 @@ const idMap: Record<
   flow: makeFlowId(), //only used as safety
   move: makeMoveId(),
   custom: 'custom',
+  transition: makeTransitionId(),
+}
+
+function convertComboMovesToSelectedComboSeq(
+  comboMoves: ComboMove[],
+): SelectedComboSeq {
+  return comboMoves.reduce((acc, { moves, type, id }, index) => {
+    acc[index] = { type, moves, id }
+    return acc
+  }, {} as SelectedComboSeq)
 }
 
 //-----------------local types-------------
@@ -33,11 +53,12 @@ type SelectedComboNumber = boolean[]
 //TODO this is actually better as a map?
 type SelectedComboSeq = {
   [key: number]: {
-    type: 'flow' | 'move' | 'custom'
+    id?: FlowId | MoveId | TransitionId | 'custom'
+    type: 'flow' | 'move' | 'custom' | 'transition'
     moves: string[]
-    id?: FlowId
   }
 }
+
 type Checked = {
   flows?: true
   useMoves?: true
@@ -64,16 +85,34 @@ const RenderMakeCombo = () => {
     useState<SelectedComboNumber>([true, false, false])
   const [selectedComboSeq, setSelectedComboSeq] =
     useState<SelectedComboSeq | null>(null)
+  const [existingComboId, setSelectedComboId] = useState<ComboId>()
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
+  const getLsComboById = useZustandStore((state) => state.getLsComboById)
 
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   //-----------------------------hooks-------------------------------
+  //Handle existing combo querystring
+  useEffect(() => {
+    const existingId = searchParams.get(comboIdKey) as ComboId
+    if (!existingId) return
+
+    const existingCombo = getLsComboById(existingId)
+    if (!existingCombo) return
+
+    setSelectedComboId(existingId)
+    const { displayName, notes, execution, sequence } = existingCombo
+    setTitle(displayName)
+    setNotes(notes)
+    setRating(execution)
+    setSelectedComboSeq(convertComboMovesToSelectedComboSeq(sequence))
+  }, [getLsComboById, searchParams])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
@@ -157,36 +196,32 @@ const RenderMakeCombo = () => {
     <main className="mt-20 flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
       <header>
         <h1 className="title-font mb-2 text-center text-3xl font-medium sm:text-4xl dark:text-white">
-          Make Combo
+          {existingComboId ? 'Edit Combo' : 'Make Combo'}
         </h1>
-        <p className="mx-2 text-center text-base leading-relaxed lg:w-2/3">
-          {`Make a combo for use in cyphers, battles, performances, or just for fun.`}
-        </p>
+        {!!existingComboId || (
+          <p className="mx-2 text-center text-base leading-relaxed lg:w-2/3">
+            {`Make a combo for use in cyphers, battles, performances, or just for fun.`}
+          </p>
+        )}
       </header>
       {/* ---------------------spacer------------------- */}
       <section className="mb-4 mt-2 flex w-10 justify-center">
         <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500" />
       </section>
+      {/* -----------------------combo name------------------ */}
       <article className="mt-5 w-full px-5">
         <h2 className="text-xs ">Combo Name:</h2>
         <input
-          className="
-             w-full
-             rounded
-                border
-            border-gray-300
-            bg-gray-100
-            bg-opacity-50
-            px-3 py-1 text-xs
-             leading-8 text-gray-700 outline-none
-            transition-colors duration-200 ease-in-out
-            focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
+          className=" w-full rounded border border-gray-300 bg-gray-100
+            bg-opacity-50 px-3 py-1 text-xs leading-8 text-gray-700 outline-none
+            transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
                 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
           type="text"
           value={title}
           placeholder="Super Combo 9000"
           onChange={(e) => setTitle(e.target.value)}
         />
+        <button>RNG Name</button>
       </article>
       {/* --------------------combo sequence------------------ */}
       <article className="w-full px-5">
@@ -549,7 +584,7 @@ const RenderMakeCombo = () => {
           </article>
           {/* ------------------how much do you like it?----------------- */}
           <article className="mt-10">
-            <label className="">How well can you execute this?</label>
+            <label className="">Confidence Ranking</label>
             <section className="mt-5 flex flex-row-reverse place-content-center">
               {Array.from(Array(5)).map((_, i) => {
                 return (
@@ -583,27 +618,41 @@ const RenderMakeCombo = () => {
           {/* -------------------save button----------------- */}
           <button
             onClick={(_) => {
-              const comboId = makeComboId()
-              if (selectedComboSeq) {
-                setLsCombos(
-                  {
-                    displayName: title,
-                    execution: rating,
-                    sequence: Object.keys(selectedComboSeq).map((key) => {
-                      const comboSeq = selectedComboSeq[Number(key)]
-                      return {
-                        type: comboSeq.type,
-                        id:
-                          (comboSeq.type === 'flow' && comboSeq.id) ||
-                          idMap[comboSeq.type] ||
-                          'custom',
-                        moves: comboSeq.moves,
-                      }
-                    }),
-                    notes: notes,
-                  },
-                  comboId,
-                )
+              //Update existing combo
+              if (existingComboId && selectedComboSeq) {
+                const comboFormat = {
+                  displayName: title,
+                  execution: rating,
+                  sequence: Object.keys(selectedComboSeq).map((key) => {
+                    const { type, moves, id } = selectedComboSeq[Number(key)]
+                    return { type, id: id || 'custom', moves }
+                  }),
+                  notes: notes,
+                }
+                setLsCombos(comboFormat, existingComboId)
+                setNotification({ visible: true, message: 'Combo Saved!' })
+                router.push('/battle')
+              }
+              //Save a new Combo
+              else if (selectedComboSeq) {
+                const comboFormat = {
+                  displayName: title,
+                  execution: rating,
+                  sequence: Object.keys(selectedComboSeq).map((key) => {
+                    const comboSeq = selectedComboSeq[Number(key)]
+                    return {
+                      type: comboSeq.type,
+                      id:
+                        (comboSeq.type === 'flow' && comboSeq.id) ||
+                        idMap[comboSeq.type] ||
+                        'custom',
+                      moves: comboSeq.moves,
+                    }
+                  }),
+                  notes: notes,
+                }
+
+                setLsCombos(comboFormat, makeComboId())
                 setNotification({ visible: true, message: 'Combo Saved!' })
                 router.push('/combos')
               } else {

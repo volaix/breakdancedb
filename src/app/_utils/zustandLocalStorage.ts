@@ -95,6 +95,9 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getDanceList: () => get()[lsDanceList],
 
         //============nested================
+        getLsComboById(id) {
+          return get()[lsCombos]?.[id] || null
+        },
         //-------User Move Keys --------
         setLsUserMovesByKey: (
           key: keyof GlobalStateProperties[typeof lsUserMoves],
