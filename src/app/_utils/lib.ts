@@ -43,7 +43,7 @@ export const useLocalStorage = (
 }
 
 //----------UTILITY---------
-export const comboIdsFromRounds = (rounds: Round[]): ComboId[] =>
+export const extractComboIds = (rounds: Round[]): ComboId[] =>
   rounds
     //gets [ ComboId[], ComboId[], ... ]
     .map(
