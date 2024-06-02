@@ -5,7 +5,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { RenderRedoIcon } from '../_components/Svgs'
 import {
   BasicFlow,
+  BasicMove,
+  ComboId,
+  ComboMove,
+  FlowId,
   GlobalStateProperties,
+  MoveCategories,
   lsBlowups,
   lsDrops,
   lsFloorwork,
@@ -21,6 +26,8 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { Notification } from '../_components/Notification'
 import Link from 'next/link'
+import { comboIdsFromRounds } from '../_utils/lib'
+import { produce } from 'immer'
 
 const categories: Category[] = [
   lsToprock,
@@ -62,9 +69,14 @@ export default function RenderFlows() {
       exitMove: lsToprock,
     })
   const [ratingVal, setRatingVal] = useState<number>(1)
+  const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
+  const [movesUsedInBattle, setMovesUsedInBattle] = useState<BasicMove[]>()
 
   const displayMoves = !!learning
   const setLsFlow = useZustandStore((state) => state.setLsFlow)
+  const getLsBattle = useZustandStore((state) => state.getLsBattle)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const getLsCombosById = useZustandStore((state) => state.getLsComboById)
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
@@ -100,6 +112,52 @@ export default function RenderFlows() {
   )
 
   //---------------------------hooks---------------------------------
+
+  //if HideMoves flag is on, set movesUsedInBattle
+  useEffect(() => {
+    if (!hideMovesIfBattle) return
+    const lsBattle = getLsBattle()
+    if (!lsBattle) return
+
+    const movesFromFlowIds: BasicMove[] = comboIdsFromRounds(lsBattle.rounds)
+      //FlowIds[] used in lsBattle
+      .map((comboId): FlowId[] | undefined => {
+        const comboVal = getLsCombosById(comboId)
+        if (!comboVal) return
+
+        const comboMoves: ComboMove[] = comboVal.sequence.filter(
+          (comboMove) => comboMove.type === 'flow' && comboMove.id,
+        )
+
+        return comboMoves.map((comboMove) => comboMove.id as FlowId)
+      })
+      .flat(1)
+      .filter((a): a is FlowId => a !== undefined)
+      //BasicMoves from FlowIds[]
+      .map((flowId) => {
+        const { entryMove, keyMove, exitMove } = getLsFlows()?.[flowId] || {}
+        return entryMove && keyMove && exitMove
+          ? [
+              {
+                category: entryMove.category as MoveCategories,
+                displayName: entryMove.displayName,
+              },
+              {
+                category: keyMove.category as MoveCategories,
+                displayName: keyMove.displayName,
+              },
+              {
+                category: exitMove.category as MoveCategories,
+                displayName: exitMove.displayName,
+              },
+            ]
+          : []
+      })
+      .flat(1)
+
+    setMovesUsedInBattle(movesFromFlowIds)
+  }, [getLsBattle, getLsCombosById, getLsFlows, hideMovesIfBattle])
+
   //on mount
   useEffect(() => {
     shuffleLearning()
@@ -178,18 +236,23 @@ export default function RenderFlows() {
             </div>
             {/* -----------------advanced options---------------- */}
             <section className="mt-5">
-              <label>Show advanced options</label>
-              <section className="flex flex-col">
-                <label>
-                  Hide moves used in flows
-                  <input type="checkbox" />
+              <details>
+                <summary className="text-xs">Advanced Options</summary>
+                <label className="mt-2">
+                  Hide moves already used in Battle
+                  <input
+                    className="ml-1"
+                    checked={hideMovesIfBattle}
+                    onChange={(e) => {
+                      setHideMovesIfBattle(e.target.checked)
+                    }}
+                    type="checkbox"
+                  />
                 </label>
-                <label>
-                  Hide moves used in Battle
-                  <input type="checkbox" />
-                </label>
-              </section>
+              </details>
+              <section className="flex flex-col"></section>
             </section>
+            {/* ------------------end of advanced options------------- */}
           </div>
           {displayMoves || (
             <div className="flex flex-col text-center">
@@ -278,30 +341,34 @@ export default function RenderFlows() {
                              py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                             value={learning[movePosition]}
                             onChange={(e) => {
-                              setLearning((prev) => {
-                                if (prev) {
-                                  return {
-                                    ...prev,
-                                    [movePosition]: e.target.value,
-                                  }
-                                } else {
-                                  return {
-                                    entryMove: '',
-                                    keyMove: '',
-                                    exitMove: '',
-                                    [movePosition]: e.target.value,
-                                  }
-                                }
-                              })
+                              setLearning((prev) => ({
+                                entryMove: prev?.entryMove || '',
+                                keyMove: prev?.keyMove || '',
+                                exitMove: prev?.exitMove || '',
+                                [movePosition]: e.target.value,
+                              }))
                             }}
                           >
                             {getLsUserMovesByKey(
                               selectedCategory[movePosition],
-                            ).map((moveStr) => (
-                              <option key={moveStr} value={moveStr}>
-                                {moveStr}
-                              </option>
-                            ))}
+                            ).map((moveStr) => {
+                              if (
+                                hideMovesIfBattle &&
+                                movesUsedInBattle?.some(
+                                  (a) =>
+                                    a.displayName === moveStr &&
+                                    a.category ===
+                                      selectedCategory[movePosition],
+                                )
+                              )
+                                return
+
+                              return (
+                                <option key={moveStr} value={moveStr}>
+                                  {moveStr}
+                                </option>
+                              )
+                            })}
                           </select>
                           <div className="mr-1 h-4 w-4">
                             <RenderRedoIcon

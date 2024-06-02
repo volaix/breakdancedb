@@ -77,7 +77,7 @@ export default function RenderHeader() {
                     <a href="/learnflows">💪 Do Flows 💪</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/combos">🤖 Combos 🤖</a>
+                    <a href="/combos">🤖 Sets/Combos 🤖</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/battle">🥊 Battle 🥊</a>

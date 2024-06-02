@@ -3,6 +3,12 @@ import { Brand } from './typehelpers'
 //----------------------------------------------
 //------------Local Storage Values ------------------
 
+export type BasicMove = {
+  category: keyof GlobalStateProperties[typeof lsUserMoves]
+  displayName: string
+  id?: never
+}
+
 export type BasicFlow = {
   entryMove: string
   keyMove: string
