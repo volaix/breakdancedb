@@ -16,7 +16,7 @@ import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
-import { comboIdsFromRounds } from '../_utils/lib'
+import { extractComboIds } from '../_utils/lib'
 
 type Inputs = {
   tempText: string //displayName
@@ -86,9 +86,7 @@ export default function RenderBattlePage() {
   //Set usedComboIds
   useEffect(() => {
     if (!hideUsedCombos) return
-    const everyComboIdUsed: Set<ComboId> = new Set(
-      comboIdsFromRounds(yourRounds),
-    )
+    const everyComboIdUsed: Set<ComboId> = new Set(extractComboIds(yourRounds))
     setUsedComboIds(everyComboIdUsed)
   }, [hideUsedCombos, yourRounds])
 
