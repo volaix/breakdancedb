@@ -16,6 +16,7 @@ import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
+import { comboIdsFromRounds } from '../_utils/lib'
 
 type Inputs = {
   tempText: string //displayName
@@ -23,6 +24,27 @@ type Inputs = {
 }
 
 export const comboIdKey = 'comboId'
+
+const Counter: React.FC = () => {
+  const [count, setCount] = useState(0)
+  return (
+    <section className="ml-1 flex items-center text-[9px]">
+      <button
+        className="flex h-fit items-center justify-center rounded border border-indigo-500
+          p-0.5 text-center  text-indigo-500"
+        onClick={() => setCount(count + 1)}
+      >
+        {count}
+      </button>
+      <button
+        // className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+        onClick={() => setCount(0)}
+      >
+        X
+      </button>
+    </section>
+  )
+}
 
 /**
  * Battle Page
@@ -65,12 +87,7 @@ export default function RenderBattlePage() {
   useEffect(() => {
     if (!hideUsedCombos) return
     const everyComboIdUsed: Set<ComboId> = new Set(
-      yourRounds.flatMap(
-        (round) =>
-          round.comboList
-            ?.filter((item) => item.type === 'combo' && item.id !== undefined)
-            .map((item) => item.id as ComboId) || [],
-      ),
+      comboIdsFromRounds(yourRounds),
     )
     setUsedComboIds(everyComboIdUsed)
   }, [hideUsedCombos, yourRounds])
@@ -442,6 +459,11 @@ export default function RenderBattlePage() {
                               )}
                             </section>
                             {/* --------------EDIT COMBO----------- */}
+                            {/* --------COUNTER------- */}
+                            <section>
+                              <Counter />
+                            </section>
+                            {/* --------END OF COUNTER------- */}
                           </section>
                         )
                       },
