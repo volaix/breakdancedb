@@ -1,5 +1,6 @@
 import rocks from '@/db/rocks.json'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { ComboId, Round } from './localStorageTypes'
 
 //---------------JS HELPERS-------------------
 /**
@@ -40,3 +41,20 @@ export const useLocalStorage = (
     setAccessToLocalStorage(typeof window !== 'undefined')
   }, [setAccessToLocalStorage])
 }
+
+//----------UTILITY---------
+export const extractComboIds = (rounds: Round[]): ComboId[] =>
+  rounds
+    //gets [ ComboId[], ComboId[], ... ]
+    .map(
+      (round) =>
+        round.comboList
+          ?.filter((item) => item.type === 'combo' && item.id !== undefined)
+          .map((item) => item.id as ComboId) || [],
+    )
+    //Flats to ComboId[]
+    .flat(1)
+
+//---------ROUTING----------
+
+export const comboIdKey = 'comboId'

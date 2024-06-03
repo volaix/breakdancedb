@@ -1,11 +1,20 @@
 'use client'
 // @format
 import { makeFlowId } from '@/app/_utils/lsMakers'
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import { Notification } from '../_components/Notification'
+import RenderThunder from '../_components/RenderChilli'
 import { RenderRedoIcon } from '../_components/Svgs'
+import { extractComboIds as extractComboIds } from '../_utils/lib'
 import {
   BasicFlow,
+  BasicMove,
+  ComboMove,
+  FlowDictionary,
+  FlowId,
   GlobalStateProperties,
+  MoveCategories,
   lsBlowups,
   lsDrops,
   lsFloorwork,
@@ -18,9 +27,6 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import RenderThunder from '../_components/RenderChilli'
-import { Notification } from '../_components/Notification'
-import Link from 'next/link'
 
 const categories: Category[] = [
   lsToprock,
@@ -37,6 +43,29 @@ const categories: Category[] = [
 //------------------------local utils------------------------------
 const pickRandomString = (items: string[]): string => {
   return items[Math.floor(Math.random() * items.length)]
+}
+
+const makeBasicMoves = (
+  flowId: FlowId,
+  lsFlows: FlowDictionary | null,
+): BasicMove[] => {
+  const { entryMove, keyMove, exitMove } = lsFlows?.[flowId] || {}
+  return entryMove && keyMove && exitMove
+    ? [
+        {
+          category: entryMove.category as MoveCategories,
+          displayName: entryMove.displayName,
+        },
+        {
+          category: keyMove.category as MoveCategories,
+          displayName: keyMove.displayName,
+        },
+        {
+          category: exitMove.category as MoveCategories,
+          displayName: exitMove.displayName,
+        },
+      ]
+    : []
 }
 
 //------------------------localtypes-------------------------------
@@ -62,37 +91,38 @@ export default function RenderFlows() {
       exitMove: lsToprock,
     })
   const [ratingVal, setRatingVal] = useState<number>(1)
+  const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
+  const [movesUsedInBattle, setMovesUsedInBattle] = useState<BasicMove[]>()
+  const [hideMovesIfFlow, setHideMovesIfFlow] = useState<boolean>(false)
+  const [movesUsedInFlow, setMovesUsedInFlow] = useState<BasicMove[]>()
 
   const displayMoves = !!learning
   const setLsFlow = useZustandStore((state) => state.setLsFlow)
+  const getLsBattle = useZustandStore((state) => state.getLsBattle)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const getLsCombosById = useZustandStore((state) => state.getLsComboById)
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
 
   //----------------functions----------------
+
   const shuffleLearning = useCallback(
     (single?: keyof BasicFlow) => {
+      const shuffleSingleKey = (key: keyof BasicFlow) =>
+        pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
+
       if (single) {
-        setLearning((prevLearning) => {
-          if (!prevLearning) return null
-          return {
-            ...prevLearning,
-            [single]: pickRandomString(
-              getLsUserMovesByKey(selectedCategory[single]),
-            ),
-          }
-        })
+        setLearning((prevLearning) =>
+          prevLearning
+            ? { ...prevLearning, [single]: shuffleSingleKey(single) }
+            : null,
+        )
       } else {
         setLearning({
-          entryMove: pickRandomString(
-            getLsUserMovesByKey(selectedCategory.entryMove),
-          ),
-          keyMove: pickRandomString(
-            getLsUserMovesByKey(selectedCategory.keyMove),
-          ),
-          exitMove: pickRandomString(
-            getLsUserMovesByKey(selectedCategory.exitMove),
-          ),
+          entryMove: shuffleSingleKey('entryMove'),
+          keyMove: shuffleSingleKey('keyMove'),
+          exitMove: shuffleSingleKey('exitMove'),
         })
       }
     },
@@ -100,6 +130,47 @@ export default function RenderFlows() {
   )
 
   //---------------------------hooks---------------------------------
+
+  //if hideMovesIfFlow flag, set movesUsedInFlow
+  useEffect(() => {
+    if (!hideMovesIfFlow) return
+    const lsFlows = getLsFlows()
+    if (!lsFlows) return
+    const flowIds: FlowId[] = Object.keys(lsFlows) as FlowId[]
+    const basicMoves: BasicMove[] = flowIds.flatMap((flowId) =>
+      makeBasicMoves(flowId, lsFlows),
+    )
+    setMovesUsedInFlow(basicMoves)
+  }, [getLsFlows, hideMovesIfFlow])
+
+  //if hideMovesIfBattle flag, set movesUsedInBattle
+  useEffect(() => {
+    if (!hideMovesIfBattle) return
+    const lsBattle = getLsBattle()
+    if (!lsBattle) return
+
+    const lsFlows = getLsFlows()
+    const movesFromFlowIds: BasicMove[] = extractComboIds(lsBattle.rounds)
+      //FlowId[] used in lsBattle
+      .map((comboId): FlowId[] | undefined => {
+        const comboVal = getLsCombosById(comboId)
+        if (!comboVal) return
+
+        const comboMoves: ComboMove[] = comboVal.sequence.filter(
+          (comboMove) => comboMove.type === 'flow' && comboMove.id,
+        )
+
+        return comboMoves.map((comboMove) => comboMove.id as FlowId)
+      })
+      .flat(1)
+      .filter((a): a is FlowId => a !== undefined)
+      //BasicMoves from FlowIds[]
+      .map((flowId) => makeBasicMoves(flowId, lsFlows))
+      .flat(1)
+
+    setMovesUsedInBattle(movesFromFlowIds)
+  }, [getLsBattle, getLsCombosById, getLsFlows, hideMovesIfBattle])
+
   //on mount
   useEffect(() => {
     shuffleLearning()
@@ -153,10 +224,10 @@ export default function RenderFlows() {
           <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
             {/* ---------------------------TITLE SUBTITLE------------------------ */}
             <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-              Hoard Flows
+              RNG Set
             </h1>
             <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-              {`Play around with these three moves. Dance through it. Do as many as you can. Try be you.`}
+              {`Learn every move into every other move. Do as many as you can. Try be you.`}
             </p>
             {/* ---------------------------BUTTON SWITCH------------------------ */}
             <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
@@ -176,6 +247,38 @@ export default function RenderFlows() {
                 Custom
               </button>
             </div>
+            {/* -----------------advanced options---------------- */}
+            <section className="mt-5">
+              <details className="flex flex-col leading-snug">
+                <summary className="text-xs">Advanced Options</summary>
+                <section className="mt-2">
+                  <article>
+                    <label> Hide moves already used in Battle </label>
+                    <input
+                      className="ml-1"
+                      checked={hideMovesIfBattle}
+                      onChange={(e) => {
+                        setHideMovesIfBattle(e.target.checked)
+                      }}
+                      type="checkbox"
+                    />
+                  </article>
+                  <article>
+                    <label> Hide moves already used in Flows </label>
+                    <input
+                      className="ml-1"
+                      checked={hideMovesIfFlow}
+                      onChange={(e) => {
+                        setHideMovesIfFlow(e.target.checked)
+                      }}
+                      type="checkbox"
+                    />
+                  </article>
+                </section>
+              </details>
+              <section className="flex flex-col"></section>
+            </section>
+            {/* ------------------end of advanced options------------- */}
           </div>
           {displayMoves || (
             <div className="flex flex-col text-center">
@@ -264,30 +367,55 @@ export default function RenderFlows() {
                              py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                             value={learning[movePosition]}
                             onChange={(e) => {
-                              setLearning((prev) => {
-                                if (prev) {
-                                  return {
-                                    ...prev,
-                                    [movePosition]: e.target.value,
-                                  }
-                                } else {
-                                  return {
-                                    entryMove: '',
-                                    keyMove: '',
-                                    exitMove: '',
-                                    [movePosition]: e.target.value,
-                                  }
-                                }
-                              })
+                              setLearning((prev) => ({
+                                entryMove: prev?.entryMove || '',
+                                keyMove: prev?.keyMove || '',
+                                exitMove: prev?.exitMove || '',
+                                [movePosition]: e.target.value,
+                              }))
                             }}
                           >
-                            {getLsUserMovesByKey(
-                              selectedCategory[movePosition],
-                            ).map((moveStr) => (
-                              <option key={moveStr} value={moveStr}>
-                                {moveStr}
-                              </option>
-                            ))}
+                            {getLsUserMovesByKey(selectedCategory[movePosition])
+                              .sort()
+                              .map((moveStr) => {
+                                //should hide based on advanced flags
+                                const shouldHideMove = (
+                                  hideCondition: boolean,
+                                  movesUsed:
+                                    | {
+                                        displayName: string
+                                        category: string
+                                      }[]
+                                    | undefined,
+                                ) =>
+                                  hideCondition &&
+                                  movesUsed?.some(
+                                    ({ displayName, category }) =>
+                                      displayName === moveStr &&
+                                      category ===
+                                        selectedCategory[movePosition],
+                                  )
+
+                                if (
+                                  shouldHideMove(
+                                    hideMovesIfBattle,
+                                    movesUsedInBattle,
+                                  ) ||
+                                  shouldHideMove(
+                                    hideMovesIfFlow,
+                                    movesUsedInFlow,
+                                  )
+                                ) {
+                                  return
+                                }
+                                console.log('moveStr: ', moveStr)
+
+                                return (
+                                  <option key={moveStr} value={moveStr}>
+                                    {moveStr}
+                                  </option>
+                                )
+                              })}
                           </select>
                           <div className="mr-1 h-4 w-4">
                             <RenderRedoIcon

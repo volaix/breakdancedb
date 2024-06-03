@@ -11,18 +11,37 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import {
-  ComboDictionary,
-  ComboId,
-  ListOrder,
-  Round,
-} from '../_utils/localStorageTypes'
+import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
 import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import RenderThunder from '../_components/RenderChilli'
+import { useRouter } from 'next/navigation'
+import { comboIdKey, extractComboIds } from '../_utils/lib'
 
 type Inputs = {
   tempText: string //displayName
   categoryName: string
+}
+
+const Counter: React.FC = () => {
+  const [count, setCount] = useState(0)
+  return (
+    <section className="ml-1 flex items-center text-[9px]">
+      <button
+        className="flex h-fit items-center justify-center rounded border border-indigo-500
+          p-0.5 text-center  text-indigo-500"
+        onClick={() => setCount(count + 1)}
+      >
+        {count}
+      </button>
+      <button
+        // className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+        onClick={() => setCount(0)}
+      >
+        X
+      </button>
+    </section>
+  )
 }
 
 /**
@@ -52,7 +71,6 @@ export default function RenderBattlePage() {
     {
       displayName: roundName + ' 1',
       rating: 1,
-      // combos: null,
       id: makeRoundId(),
     },
   ])
@@ -60,19 +78,13 @@ export default function RenderBattlePage() {
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const setLsBattle = useZustandStore((state) => state.setLsBattle)
+  const router = useRouter()
 
   //-----------------------------hooks-------------------------------
   //Set usedComboIds
   useEffect(() => {
     if (!hideUsedCombos) return
-    const everyComboIdUsed: Set<ComboId> = new Set(
-      yourRounds.flatMap(
-        (round) =>
-          round.comboList
-            ?.filter((item) => item.type === 'combo' && item.id !== undefined)
-            .map((item) => item.id as ComboId) || [],
-      ),
-    )
+    const everyComboIdUsed: Set<ComboId> = new Set(extractComboIds(yourRounds))
     setUsedComboIds(everyComboIdUsed)
   }, [hideUsedCombos, yourRounds])
 
@@ -104,18 +116,18 @@ export default function RenderBattlePage() {
   return (
     <main className="mt-20 w-full dark:bg-gray-900">
       {/* ------------title------------- */}
-      <article className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
+      <hgroup className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
         <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
           Battle
         </h1>
         <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
           {` Organise combos with categories. Whether that's round based, time based, or situation based.  `}
         </p>
-      </article>
+      </hgroup>
       {/* ---------render battle rounds ------------ */}
       <article className="flex flex-wrap pt-5">
         {yourRounds.map(
-          ({ id, displayName, rating, comboList }, roundIndex) => {
+          ({ id, displayName, rating: comboRating, comboList }, roundIndex) => {
             return (
               // --------------single battle round------------
               <article
@@ -196,7 +208,7 @@ export default function RenderBattlePage() {
                                 }),
                               )
                             }}
-                            checked={brainIndex === 5 - rating}
+                            checked={brainIndex === 5 - comboRating}
                             type="radio"
                             id={5 - brainIndex + ''}
                             className={`peer -ms-${size} size-${size} cursor-pointer appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
@@ -228,7 +240,7 @@ export default function RenderBattlePage() {
                           // ----------------------SINGLE LIST-----------------------
                           <section
                             key={comboIndex}
-                            className="flex w-full items-center"
+                            className="mt-2 flex w-full items-center"
                           >
                             {/* ----------number-------- */}
                             <section>
@@ -236,7 +248,7 @@ export default function RenderBattlePage() {
                             </section>
                             {/* -------COMBO SELECTION-------- */}
                             <article className="w-2/5">
-                              {/* -----custom combo------- */}
+                              {/* -----CUSTOM COMBO INPUT------- */}
                               {type === 'customCombo' && (
                                 <section>
                                   <input
@@ -245,19 +257,15 @@ export default function RenderBattlePage() {
                                     type="text"
                                     value={value}
                                     placeholder="Super Combo 9000"
-                                    onChange={(e) =>
+                                    onChange={(e) => {
                                       setYourRounds((prevRound) =>
                                         produce(prevRound, (newRound) => {
-                                          const battleRound = newRound[
-                                            roundIndex
-                                          ]?.comboList?.[comboIndex] ?? {
-                                            type: 'customCombo',
-                                            value: '',
-                                          }
-                                          battleRound.value = e.target.value
+                                          newRound[roundIndex].comboList![
+                                            comboIndex
+                                          ].value = e.target.value
                                         }),
                                       )
-                                    }
+                                    }}
                                   />
                                 </section>
                               )}
@@ -276,22 +284,14 @@ export default function RenderBattlePage() {
                                             | ComboId
                                             | ''
 
-                                          const battleRound =
-                                            newRounds[roundIndex]
-                                          battleRound.comboList =
-                                            battleRound.comboList ?? []
-
                                           if (optionVal === '') {
-                                            battleRound.comboList[comboIndex] =
-                                              {
-                                                type: 'combo',
-                                              }
+                                            newRounds[roundIndex].comboList![
+                                              comboIndex
+                                            ] = { type: 'combo' }
                                           } else {
-                                            battleRound.comboList[comboIndex] =
-                                              {
-                                                type: 'combo',
-                                                id: optionVal,
-                                              }
+                                            newRounds[roundIndex].comboList![
+                                              comboIndex
+                                            ] = { type: 'combo', id: optionVal }
                                           }
                                         }),
                                       )
@@ -408,6 +408,58 @@ export default function RenderBattlePage() {
                                 }
                               />
                             </section>
+                            {/* ---------EXECUTION------------ */}
+                            <section>
+                              {/* display the execution for each comboID */}
+                              {comboId &&
+                                lsCombos &&
+                                lsCombos[comboId as ComboId] && (
+                                  <article className="flex flex-row-reverse place-content-center pt-1">
+                                    {Array.from(Array(5)).map((_, i) => {
+                                      const { execution } =
+                                        lsCombos[comboId as ComboId]
+                                      return (
+                                        <RenderThunder
+                                          id={5 - i + ''}
+                                          checked={i === 5 - execution}
+                                          onChange={(e) => {
+                                            //onclick setLsCombos
+                                            // setRating(Number(e.target.id))
+                                          }}
+                                          color="peer-checked:text-indigo-500"
+                                          key={i}
+                                          size="size-3"
+                                        />
+                                      )
+                                    })}
+                                  </article>
+                                )}
+                            </section>
+                            {/* ---------END OF EXECUTION------------ */}
+                            {/* ---------EDIT COMBO------------ */}
+                            <section>
+                              {comboId && (
+                                <button
+                                  onClick={(_) => {
+                                    console.log('move user to edit combo page')
+                                    router.push(
+                                      `/combos/make?${comboIdKey}=${comboId}`,
+                                    )
+                                  }}
+                                  className="ml-1 inline-flex h-fit rounded border-0 
+                                bg-indigo-500 p-0.5 text-[7px] 
+                                text-white hover:bg-indigo-600 focus:outline-none"
+                                >
+                                  EDIT COMBO
+                                </button>
+                              )}
+                            </section>
+                            {/* --------------EDIT COMBO----------- */}
+                            {/* --------COUNTER------- */}
+                            <section>
+                              <Counter />
+                            </section>
+                            {/* --------END OF COUNTER------- */}
                           </section>
                         )
                       },
