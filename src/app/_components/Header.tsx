@@ -66,18 +66,10 @@ export default function RenderHeader() {
                     <a href="/yourmoves">📚 Your Moves 📚</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">🎷 Learn Moves 🎷</a>
-                  </li>
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/">Learn Transitions</a>
-                    </li>
-                  )}
-                  <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnflows">💪 Do Flows 💪</a>
+                    <a href="/learnflows">💪 RNG Set 💪</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/combos">🤖 Sets/Combos 🤖</a>
+                    <a href="/combos">🤖 Make Set 🤖</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/battle">🥊 Battle 🥊</a>
@@ -93,6 +85,14 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
                     <a href="/warmup">Warmup Protocol‍</a>
                   </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/learnmoves">🎷 Train Moves 🎷</a>
+                  </li>
+                  {inDevelopment || (
+                    <li className="my-2 border-b border-gray-400 uppercase">
+                      <a href="/">Learn Transitions</a>
+                    </li>
+                  )}
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
                       <a href="/nodes">Nodeview</a>
