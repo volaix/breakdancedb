@@ -54,3 +54,7 @@ export const extractComboIds = (rounds: Round[]): ComboId[] =>
     )
     //Flats to ComboId[]
     .flat(1)
+
+//---------ROUTING----------
+
+export const comboIdKey = 'comboId'

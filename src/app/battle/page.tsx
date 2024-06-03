@@ -16,14 +16,12 @@ import { makeRoundId } from '../_utils/lsMakers'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
-import { extractComboIds } from '../_utils/lib'
+import { comboIdKey, extractComboIds } from '../_utils/lib'
 
 type Inputs = {
   tempText: string //displayName
   categoryName: string
 }
-
-export const comboIdKey = 'comboId'
 
 const Counter: React.FC = () => {
   const [count, setCount] = useState(0)

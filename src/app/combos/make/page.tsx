@@ -24,9 +24,9 @@ import {
   makeTransitionId,
 } from '../../_utils/lsMakers'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
-import { comboIdKey } from '@/app/battle/page'
 import { shallow } from 'zustand/shallow'
 import { ComboVal } from '../../_utils/localStorageTypes'
+import { comboIdKey } from '@/app/_utils/lib'
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
