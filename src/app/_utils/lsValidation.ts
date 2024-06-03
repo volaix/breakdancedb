@@ -62,7 +62,9 @@ export const isFlow = (val: unknown): val is BasicFlow => {
 }
 
 /**
- * Checks if param is a key of [lsUserMoves]
+ *  Checks if param is a key of [lsUserMoves]
+ * @param key string
+ * @returns typeguard, key is key of [lsUserMoves]
  */
 export const isValidKey = (
   key: string,
