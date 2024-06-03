@@ -36,27 +36,20 @@ const RenderMoveBox = ({ move }: { move: Move }) => {
  */
 export default function RenderLearnMoves() {
   //---------------------state----------------
-  const [accessToLocalStorage, setAccessToLocalStorage] =
-    useState<boolean>(false)
   const [learning, setLearning] = useState<Move[]>([])
   const getLsUserLearning = useZustandStore((state) => state.getLsUserLearning)
 
   //-----------------------useeffect-----------------------------------
-  useEffect(() => {
-    setAccessToLocalStorage(typeof window !== 'undefined')
-  }, [])
 
   //get learning moves
   useEffect(() => {
-    if (accessToLocalStorage) {
-      setLearning(getLsUserLearning())
-    }
-  }, [accessToLocalStorage, getLsUserLearning])
+    setLearning(getLsUserLearning())
+  }, [getLsUserLearning])
 
   //---------------------render------------------------------------------------
 
   return (
-    <div className="mt-20 px-5" style={{ width: '375px' }}>
+    <main className="mt-20 px-5" style={{ width: '375px' }}>
       <>
         <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
           Moves Learning
@@ -89,6 +82,6 @@ export default function RenderLearnMoves() {
           </svg>
         </a>
       </div>
-    </div>
+    </main>
   )
 }
