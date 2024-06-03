@@ -224,10 +224,10 @@ export default function RenderFlows() {
           <div className="mb-10 flex w-full flex-col text-center dark:text-gray-400">
             {/* ---------------------------TITLE SUBTITLE------------------------ */}
             <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-              Hoard Flows
+              RNG Set
             </h1>
             <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-              {`Play around with these three moves. Dance through it. Do as many as you can. Try be you.`}
+              {`Learn every move into every other move. Do as many as you can. Try be you.`}
             </p>
             {/* ---------------------------BUTTON SWITCH------------------------ */}
             <div className="mx-auto mt-6 flex overflow-hidden rounded border-2 border-indigo-500">
