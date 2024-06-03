@@ -64,7 +64,7 @@ export const isFlow = (val: unknown): val is BasicFlow => {
 /**
  * Checks if param is a key of [lsUserMoves]
  */
-export const isValidUserMoveKey = (
+export const isValidKey = (
   key: string,
 ): key is keyof GlobalStateProperties[typeof lsUserMoves] => {
   if (
