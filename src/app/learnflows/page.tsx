@@ -376,12 +376,8 @@ export default function RenderFlows() {
                               }))
                             }}
                           >
-                            {[
-                              ...getLsUserMovesByKey(
-                                selectedCategory[movePosition],
-                              ),
-                            ]
-                              .sort()
+                            {getLsUserMovesByKey(selectedCategory[movePosition])
+                              .toSorted()
                               .map((moveStr) => {
                                 //should hide based on advanced flags
                                 const shouldHideMove = (
