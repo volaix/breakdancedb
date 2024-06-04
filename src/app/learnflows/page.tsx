@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
 import { RenderRedoIcon } from '../_components/Svgs'
-import { extractComboIds as extractComboIds } from '../_utils/lib'
+import { extractComboIds } from '../_utils/lib'
 import {
   BasicFlow,
   BasicMove,
@@ -27,7 +27,6 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { produce } from 'immer'
 
 const categories: Category[] = [
   lsToprock,

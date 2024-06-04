@@ -86,7 +86,10 @@ export default function RenderHeader() {
                     <a href="/warmup">Warmup Protocol‍</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">🎷 Train Moves 🎷</a>
+                    <a href="/learnmoves">🌱 Train Moves 🌱</a>
+                  </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/create">🎨 Create Move 🎨</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
