@@ -1,17 +1,48 @@
+//@format
+
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+
+type Inputs = {
+  concepts: string
+}
 
 export default function Concepts() {
+  // -------------state------------
   const [saveText, setSaveText] = useState('Save')
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<Inputs>()
+
+  //value of categoryMoves textarea
+  const unsavedConcepts = watch('concepts', '')
+  const sort = () => {
+    reset({ concepts: unsavedConcepts.split('\n').sort().join('\n') })
+  }
+
+  //-------------render-----------
   return (
     <section>
       <article>
         <h2 className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
           {`Concepts`}
         </h2>
-        <textarea
-          // {...register('categoryMoves')}
-          className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
-        />
+        {/* ---------------text area------------------------ */}
+        <section className="flex max-w-xs space-x-4 p-4">
+          {/* -----------------left textarea------------------- */}
+          <textarea
+            {...register('concepts')}
+            className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+          />
+          {/* --------------------right json view-------------------- */}
+          <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs">
+            {JSON.stringify(unsavedConcepts.split(/\r\n|\r|\n/), null, 1)}
+          </pre>
+        </section>
       </article>
       {/* -------------Buttons-------------- */}
       <section className="mt-5 flex w-full justify-center">
@@ -23,7 +54,7 @@ export default function Concepts() {
           onClick={(e) => {
             //prevents form submit
             e.preventDefault()
-            // sortMovesInTextArea()
+            sort()
           }}
         >
           <label className="text-lg leading-none">Sort</label>
