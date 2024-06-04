@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
 import { ComboDictionary, FlowDictionary } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { useRouter } from 'next/navigation'
+import { comboIdKey } from '../_utils/lib'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -16,6 +18,8 @@ export default function RenderViewCombos() {
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
+
+  const router = useRouter()
 
   //-----------------------------hooks-------------------------------
 
@@ -95,6 +99,24 @@ export default function RenderViewCombos() {
                         )
                       })}
                     </h1>
+                    {/* ------------edit----------- */}
+                    <section>
+                      {comboId && (
+                        <button
+                          onClick={(_) => {
+                            console.log('move user to edit combo page')
+                            router.push(`/combos/make?${comboIdKey}=${comboId}`)
+                          }}
+                          className="ml-1 inline-flex h-fit rounded border-0 
+                                bg-indigo-500 p-0.5 text-[7px] 
+                                text-white hover:bg-indigo-600 focus:outline-none"
+                        >
+                          EDIT COMBO
+                        </button>
+                      )}
+                    </section>
+
+                    {/* --------notes--------- */}
                     <label className="text-[9px]">Notes</label>
                     <p className="text-[6px]  leading-relaxed">{notes}</p>
                   </div>

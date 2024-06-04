@@ -454,7 +454,6 @@ export default function RenderBattlePage() {
                                 </button>
                               )}
                             </section>
-                            {/* --------------EDIT COMBO----------- */}
                             {/* --------COUNTER------- */}
                             <section>
                               <Counter />
