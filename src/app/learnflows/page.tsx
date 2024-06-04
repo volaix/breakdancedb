@@ -376,47 +376,50 @@ export default function RenderFlows() {
                               }))
                             }}
                           >
-                            {produce(
-                              getLsUserMovesByKey(
+                            {[
+                              ...getLsUserMovesByKey(
                                 selectedCategory[movePosition],
                               ),
-                              (draft) => {
-                                draft.sort()
-                              },
-                            ).map((moveStr) => {
-                              //should hide based on advanced flags
-                              const shouldHideMove = (
-                                hideCondition: boolean,
-                                movesUsed:
-                                  | {
-                                      displayName: string
-                                      category: string
-                                    }[]
-                                  | undefined,
-                              ) =>
-                                hideCondition &&
-                                movesUsed?.some(
-                                  ({ displayName, category }) =>
-                                    displayName === moveStr &&
-                                    category === selectedCategory[movePosition],
+                            ]
+                              .sort()
+                              .map((moveStr) => {
+                                //should hide based on advanced flags
+                                const shouldHideMove = (
+                                  hideCondition: boolean,
+                                  movesUsed:
+                                    | {
+                                        displayName: string
+                                        category: string
+                                      }[]
+                                    | undefined,
+                                ) =>
+                                  hideCondition &&
+                                  movesUsed?.some(
+                                    ({ displayName, category }) =>
+                                      displayName === moveStr &&
+                                      category ===
+                                        selectedCategory[movePosition],
+                                  )
+
+                                if (
+                                  shouldHideMove(
+                                    hideMovesIfBattle,
+                                    movesUsedInBattle,
+                                  ) ||
+                                  shouldHideMove(
+                                    hideMovesIfFlow,
+                                    movesUsedInFlow,
+                                  )
+                                ) {
+                                  return
+                                }
+
+                                return (
+                                  <option key={moveStr} value={moveStr}>
+                                    {moveStr}
+                                  </option>
                                 )
-
-                              if (
-                                shouldHideMove(
-                                  hideMovesIfBattle,
-                                  movesUsedInBattle,
-                                ) ||
-                                shouldHideMove(hideMovesIfFlow, movesUsedInFlow)
-                              ) {
-                                return
-                              }
-
-                              return (
-                                <option key={moveStr} value={moveStr}>
-                                  {moveStr}
-                                </option>
-                              )
-                            })}
+                              })}
                           </select>
                           <div className="mr-1 h-4 w-4">
                             <RenderRedoIcon
