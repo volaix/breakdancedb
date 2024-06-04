@@ -19,7 +19,7 @@ export default function RenderPageYourMoves() {
   //-------------------------render---------------------------------
   return (
     //--------------------------container--------------------------
-    <section className="body-font container relative mx-auto px-5 py-24 text-gray-600 dark:text-gray-600">
+    <main className="body-font container relative mx-auto px-5 py-24 text-gray-600 dark:text-gray-600">
       {/* -----------------header------------------- */}
       <hgroup className="mb-6 flex w-full flex-col text-center">
         <h1 className="title-font mb-4 text-2xl font-medium text-gray-900 sm:text-3xl dark:text-white">
@@ -54,7 +54,7 @@ export default function RenderPageYourMoves() {
       {movesOrConcepts && <Moves />}
       {/* ------------CONCEPTS----------- */}
       {!movesOrConcepts && <Concepts />}
-    </section>
+    </main>
   )
 }
 //----------------------------end of react component------------------------
