@@ -231,7 +231,9 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   getDanceList: () => string[]
 
   //============nested================
-  //-------ComboID Entry----------
+  //--------flows---------
+  deleteLsFlow: (key: FlowId) => void
+  //-------combos----------
   getLsComboById: (id: ComboId) => ComboDictionary[keyof ComboDictionary] | null
   //-------User Move Keys --------
   setLsUserMovesByKey: (
