@@ -10,7 +10,7 @@ import LoadingFallback from '@/app/_components/LoadingFallback'
 import {
   RenderEditButton,
   RenderAddButtonSVG,
-  RenderRedDeleteButton,
+  RenderRedHoldButton,
 } from '../../../_components/Svgs'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 
@@ -172,7 +172,7 @@ const RenderPositions = () => {
                               />
                               <RenderEditButton onClick={onClickEdit(index)} />
                               <div onClick={onClickDelete(index)}>
-                                <RenderRedDeleteButton />
+                                <RenderRedHoldButton />
                               </div>
                             </div>
                           )

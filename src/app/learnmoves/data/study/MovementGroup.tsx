@@ -20,7 +20,7 @@ import { create } from 'zustand'
 import {
   RenderAddButtonSVG,
   RenderEditButton,
-  RenderRedDeleteButton,
+  RenderRedHoldButton,
 } from '../../../_components/Svgs'
 import { RenderHearts } from './RenderHearts'
 import { MovementType } from './pagetypes'
@@ -333,7 +333,7 @@ export default function RenderMovementGroup({
                   //if there's more than one mvmt left, show delete button
                   localMovements.length > 1 && (
                     <div className="ml-2 w-2">
-                      <RenderRedDeleteButton
+                      <RenderRedHoldButton
                         id={movement.movementId}
                         onClick={onClickDeleteMovement}
                       />

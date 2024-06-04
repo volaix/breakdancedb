@@ -38,7 +38,7 @@ export const RenderThumbIcon = ({ ...props }: SVGProps<SVGSVGElement>) => {
 
 /**
  *
- * Render a delete button
+ * Render a info svg
  * @returns jsx
  */
 export const RenderInfoSVG = ({ ...props }: SVGProps<SVGSVGElement>) => {
@@ -61,15 +61,13 @@ export const RenderInfoSVG = ({ ...props }: SVGProps<SVGSVGElement>) => {
  * Render a delete button
  * @returns jsx
  */
-export const RenderRedDeleteButton = ({
-  ...props
-}: SVGProps<SVGSVGElement>) => {
+export const RenderRedHoldButton = ({ ...props }: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      {...props}
       className="dark:fill-gray-500"
       height="100%"
       width="100%"
+      {...props}
       viewBox="0 0 496.158 496.158"
     >
       <path

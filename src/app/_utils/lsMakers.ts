@@ -20,12 +20,15 @@ const uuidPattern =
   '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 
 //==================LEGACY IDS EXIST IN STATE==============
+export const isLegacyId = (id: string): boolean => {
+  return validate(id) === true
+}
 // const isMoveId = (id: string): boolean => {
 //   return new RegExp(`^move-${uuidPattern}$`).test(id)
 // }
-// const isFlowId = (id: string): boolean => {
-//   return new RegExp(`^flow-${uuidPattern}$`).test(id)
-// }
+export const isFlowId = (id: string): id is FlowId => {
+  return new RegExp(`^flow-${uuidPattern}$`).test(id)
+}
 // const isPositionId = (id: string): boolean => {
 //   return new RegExp(`^position-${uuidPattern}$`).test(id)
 // }

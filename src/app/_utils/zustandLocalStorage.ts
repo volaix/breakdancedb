@@ -95,6 +95,14 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getDanceList: () => get()[lsDanceList],
 
         //============nested================
+        //---------flows------
+        deleteLsFlow: (key) => {
+          return set((state) => {
+            if (state[lsFlows] === null) return
+            delete state[lsFlows][key]
+          })
+        },
+        //---------combos---------
         getLsComboById(id) {
           return get()[lsCombos]?.[id] || null
         },

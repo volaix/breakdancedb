@@ -1,10 +1,12 @@
 'use client'
 //@format
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import { FlowDictionary } from '../_utils/localStorageTypes'
+import { FlowDictionary, FlowId, PositionId } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { RenderDeleteButtonSVG, RenderRedHoldButton } from '../_components/Svgs'
+import { isFlowId, isLegacyId } from '../_utils/lsMakers'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -15,13 +17,19 @@ export default function RenderCompletedMoves() {
   //------------------------------state---------------------------------
   const [flows, setFlows] = useState<FlowDictionary | null>(null)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const deleteLsFlow = useZustandStore((state) => state.deleteLsFlow)
 
   //-----------------------------hooks-------------------------------
 
-  //updates flows using localstorage
-  useEffect(() => {
+  //updates flows
+  const updateFlows = useCallback(() => {
     setFlows(getLsFlows())
   }, [getLsFlows])
+
+  //sets flows on mount
+  useEffect(() => {
+    updateFlows()
+  }, [updateFlows])
 
   //-----------------------------render---------------------------------
 
@@ -38,26 +46,36 @@ export default function RenderCompletedMoves() {
             Review completed flows here.
           </p>
         </div>
+        <button className="ml-10 mt-10 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
+          <Link href="/learnflows">Add Flow</Link>
+        </button>
         <div className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
           {/* ---------render flow boxes ------------ */}
           {flows &&
             Object.entries(flows).map(
-              ([key, { entryMove, exitMove, keyMove, rating, notes }], i) => {
+              ([key, { entryMove, exitMove, keyMove, rating, notes }]) => {
                 return (
-                  <div className="break-inside-avoid-column" key={key}>
-                    <div
-                      className="relative flex h-full flex-col overflow-hidden rounded-lg 
-     bg-gray-100 bg-opacity-75 
-      px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40"
-                    >
-                      <label className="text-[8px]">Likeable</label>
-                      <div className="flex flex-row-reverse justify-center">
+                  <article className="break-inside-avoid-column" key={key}>
+                    <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                      <RenderDeleteButtonSVG
+                        onClick={() => {
+                          if (isFlowId(key) || isLegacyId(key)) {
+                            deleteLsFlow(key as FlowId)
+                            updateFlows()
+                          } else {
+                            console.log('not valid ID to delete')
+                          }
+                        }}
+                        className="absolute right-2 top-2 size-2"
+                      />
+                      <label className="text-[8px]">Likeability Rating</label>
+                      <section className="flex flex-row-reverse justify-center">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
                             <RenderThunder key={i} checked={i === 5 - rating} />
                           )
                         })}
-                      </div>
+                      </section>
 
                       <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
                         {[
@@ -93,15 +111,12 @@ export default function RenderCompletedMoves() {
                           <p className="text-[6px] leading-none">{notes}</p>
                         </section>
                       )}
-                    </div>
-                  </div>
+                    </section>
+                  </article>
                 )
               },
             )}
         </div>
-        <button className="ml-10 mt-10 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
-          <Link href="/learnflows">Add Flow</Link>
-        </button>
       </div>
     </div>
   )
