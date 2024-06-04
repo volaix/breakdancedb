@@ -27,6 +27,7 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { produce } from 'immer'
 
 const categories: Category[] = [
   lsToprock,
@@ -376,7 +377,7 @@ export default function RenderFlows() {
                             }}
                           >
                             {getLsUserMovesByKey(selectedCategory[movePosition])
-                              .sort()
+                              .toSorted()
                               .map((moveStr) => {
                                 //should hide based on advanced flags
                                 const shouldHideMove = (
@@ -408,7 +409,6 @@ export default function RenderFlows() {
                                 ) {
                                   return
                                 }
-                                console.log('moveStr: ', moveStr)
 
                                 return (
                                   <option key={moveStr} value={moveStr}>
@@ -434,22 +434,25 @@ export default function RenderFlows() {
           {/* //--------------------------END OF DROPDOWN ZONE------------------------------- */}
         </div>
         {/* //--------------------------I LIKE THIS METER------------------------------- */}
-        <h2 className="pb-2">I like this</h2>
-        <div className="flex flex-row-reverse pb-10">
-          {Array.from(Array(5)).map((a, i) => {
-            return (
-              <RenderThunder
-                id={5 - i + ''}
-                checked={i === 5 - ratingVal}
-                onChange={(e) => {
-                  setRatingVal(Number(e.target.id))
-                }}
-                key={i}
-                size="size-10"
-              />
-            )
-          })}
-        </div>
+        <section className="pb-10 text-center">
+          <h2 className="pb-2">I like this</h2>
+          <div className="flex flex-row-reverse">
+            {Array.from(Array(5)).map((a, i) => {
+              return (
+                <RenderThunder
+                  id={5 - i + ''}
+                  checked={i === 5 - ratingVal}
+                  onChange={(e) => {
+                    setRatingVal(Number(e.target.id))
+                  }}
+                  key={i}
+                  size="size-10"
+                />
+              )
+            })}
+          </div>
+          <p className="text-[7px]">4. this sucks</p>
+        </section>
         {/* ---------------------------------Notes----------------------------------- */}
         <h2>Notes</h2>
         <div className="w-full px-4">
