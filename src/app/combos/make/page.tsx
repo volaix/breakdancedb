@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from 'react'
 import LoadingFallback from '../../_components/LoadingFallback'
 import { Notification } from '../../_components/Notification'
 import RenderThunder from '../../_components/RenderChilli'
-import { RenderRedDeleteButton } from '../../_components/Svgs'
+import { RenderRedHoldButton } from '../../_components/Svgs'
 import {
   ComboId,
   ComboMove,
@@ -284,7 +284,7 @@ const RenderMakeCombo = () => {
                   //dont render first and last delete button
                   index !== 0 && selectedComboNumber.length > index + 1 && (
                     <button className="size-1">
-                      <RenderRedDeleteButton
+                      <RenderRedHoldButton
                         onClick={() => {
                           setSelectedComboSeq((prevState) =>
                             produce(prevState, (draft) => {
