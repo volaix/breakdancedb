@@ -124,6 +124,7 @@ export const lsUserMoves = 'userMoves'
 export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
 export const lsCombos = 'combos'
+export const lsConcepts = 'concepts'
 export const lsBattle = 'battle'
 
 export const lsToprock = 'toprock'
@@ -170,6 +171,7 @@ export type Round = {
 }
 
 export type GlobalStateProperties = {
+  [lsConcepts]?: string[]
   [lsCombos]?: ComboDictionary
   [lsBattle]?: {
     categoryName: string
@@ -199,12 +201,6 @@ type ZustandMiddlewareMutators = [
   ['zustand/persist', ZustandGlobalStore],
   ['zustand/immer', never],
 ]
-export type GlobalStatePropertiesV0 = {
-  [lsFlows]: BasicFlow[]
-  [lsUserMoves]: string[]
-  [lsUserLearning]: Move[]
-  [lsDanceList]: string[]
-}
 /**
  * Type that has all properties and methods of globalstate
  */
@@ -212,6 +208,7 @@ export type GlobalStatePropertiesV0 = {
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
+  setLsConcepts: (concepts: GlobalStateProperties[typeof lsConcepts]) => void
   setLsCombos: (
     combo: NonNullable<ComboDictionary[keyof ComboDictionary]>,
     comboId: ComboId,
@@ -223,6 +220,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   setDanceList: (list: string[]) => void
   setLsBattle: (battle: GlobalStateProperties[typeof lsBattle]) => void
   //-----Getters (Root level keys )------
+  getLsConcepts: () => GlobalStateProperties[typeof lsConcepts]
   getLsBattle: () => GlobalStateProperties[typeof lsBattle]
   getLsFlows: () => GlobalStateProperties[typeof lsFlows]
   getLsCombos: () => GlobalStateProperties[typeof lsCombos]

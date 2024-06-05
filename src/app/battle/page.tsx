@@ -18,6 +18,14 @@ import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 
+const battleRankings = new Map([
+  [1, 'I tried'],
+  [2, 'memorised sequence'],
+  [3, 'can do slow'],
+  [4, 'can do fast'],
+  [5, 'can dance while doing it'],
+])
+
 type Inputs = {
   tempText: string //displayName
   categoryName: string
@@ -35,7 +43,7 @@ const Counter: React.FC = () => {
         {count}
       </button>
       <button
-        // className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+        // className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-700"
         onClick={() => setCount(0)}
       >
         X
@@ -192,45 +200,46 @@ export default function RenderBattlePage() {
                   }
                 </section>
                 {/* -------------- 5 brains ------------------ */}
-                <article>
+                <article className="w-auto text-center">
                   <section className="mt-2 flex flex-row-reverse justify-end">
                     {Array.from(Array(5)).map((_, brainIndex) => {
-                      const size = '8'
                       return (
-                        <>
-                          <input
-                            onChange={(e) => {
-                              setYourRounds((rounds) =>
-                                produce(rounds, (newRounds) => {
-                                  newRounds[roundIndex].rating = Number(
-                                    e.target.id,
-                                  )
-                                }),
-                              )
-                            }}
-                            checked={brainIndex === 5 - comboRating}
-                            type="radio"
-                            id={5 - brainIndex + ''}
-                            className={`peer -ms-${size} size-${size} cursor-pointer appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
-                          />
-                          <label
-                            className={` text-gray-300 peer-checked:text-pink-400`}
-                          >
-                            <RenderBrainSvg
-                              className={`size-${size}`}
-                              fill="currentcolor"
+                        <article key={brainIndex}>
+                          <span className="relative inline-block">
+                            <input
+                              onChange={(e) => {
+                                setYourRounds((rounds) =>
+                                  produce(rounds, (newRounds) => {
+                                    newRounds[roundIndex].rating = Number(
+                                      e.target.id,
+                                    )
+                                  }),
+                                )
+                              }}
+                              checked={brainIndex === 5 - comboRating}
+                              type="radio"
+                              id={(5 - brainIndex).toString()}
+                              className={`peer absolute inset-0 h-full w-full cursor-pointer appearance-none border-0
+                bg-transparent text-transparent checked:bg-none focus:bg-none 
+                focus:ring-0 focus:ring-offset-0`}
                             />
-                          </label>
-                        </>
+                            <label className="text-gray-300 peer-checked:text-pink-400">
+                              <RenderBrainSvg
+                                className="size-8"
+                                fill="currentcolor"
+                              />
+                            </label>
+                          </span>
+                        </article>
                       )
                     })}
                   </section>
-                  <label className="-mt-2 text-[9px]">Memorised</label>
+                  <p className="text-4xs">{battleRankings.get(comboRating)}</p>
                 </article>
 
                 {/* ===================COMBO LIST=========================== */}
-                <article className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                  <h2>Combo List</h2>
+                <article className="title-font mb-1 mt-2 text-3xs font-medium text-black dark:text-white">
+                  <h2 className="text-xs">Combo List</h2>
 
                   {comboList &&
                     comboList.length > 0 &&
@@ -252,8 +261,7 @@ export default function RenderBattlePage() {
                               {type === 'customCombo' && (
                                 <section>
                                   <input
-                                    className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none
-                                transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                                    className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
                                     type="text"
                                     value={value}
                                     placeholder="Super Combo 9000"
@@ -469,7 +477,7 @@ export default function RenderBattlePage() {
                 {/* --------------add new entry------------ */}
                 <article className="flex text-[9px]">
                   {/* {-------------------add new combo ---------------- */}
-                  <section className=" flex items-center">
+                  <section className="flex items-center ">
                     <label>Add Combo</label>
                     <RenderAddButtonSVG
                       className="ml-1 size-2 fill-slate-500"
@@ -538,8 +546,8 @@ export default function RenderBattlePage() {
       <section className="flex justify-center">
         {/* -----------ADD ROUND------------- */}
         <button
-          className="flex h-fit items-center justify-center rounded border border-indigo-500
-          px-3 py-2 text-center text-xs text-indigo-500"
+          className="flex h-fit items-center justify-center rounded border border-indigo-500 px-3 py-2 text-center text-xs text-indigo-500
+ "
           onClick={() =>
             setYourRounds((prevRounds) =>
               produce(prevRounds, (newRounds) => {
@@ -568,9 +576,9 @@ export default function RenderBattlePage() {
               setNotification({ visible: true, message: 'Battle Saved' })
               console.log('saved')
             }}
-            className="inline-flex h-fit rounded border-0
-           bg-indigo-500 px-6 py-2 text-xs 
-           text-white hover:bg-indigo-600 focus:outline-none"
+            className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white
+  
+ hover:bg-indigo-600 focus:outline-none"
           >
             SAVE
           </button>

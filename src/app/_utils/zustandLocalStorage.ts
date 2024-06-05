@@ -6,6 +6,7 @@ import {
   lsBattle,
   lsBlowups,
   lsCombos,
+  lsConcepts,
   lsDanceList,
   lsDrops,
   lsFloorwork,
@@ -64,6 +65,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //============root level===============
         //-----Setters (Root Level Keys)-----
+        setLsConcepts: (concepts) => set({ [lsConcepts]: concepts }),
         setLsCombos: (combo, comboId) =>
           set((state) => {
             if (state[lsCombos]) {
@@ -87,6 +89,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         setLsBattle: (battle) => set({ [lsBattle]: battle }),
 
         //-----Getters (Root level keys )------
+        getLsConcepts: () => get()[lsConcepts],
         getLsFlows: () => get()[lsFlows],
         getLsBattle: () => get()[lsBattle],
         getLsCombos: () => get()[lsCombos],

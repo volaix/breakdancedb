@@ -17,10 +17,10 @@ export default function RenderHeader() {
   //-----------------render----------------------------------------
   return (
     <div
-      className="fixed left-0 top-0 z-10 flex w-full justify-center
-   border-b border-slate-300 bg-gradient-to-b
-   from-slate-200 pb-2 pt-4 backdrop-blur-2xl
-   dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
+      className="fixed left-0 top-0 z-10 flex w-full justify-center border-b border-slate-300 bg-gradient-to-b
+  from-slate-200 pb-2
+ pt-4 backdrop-blur-2xl
+ dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
     >
       <Link className="font-mono font-bold" href={{ pathname: '/' }}>
         breakdanceDB
@@ -86,7 +86,10 @@ export default function RenderHeader() {
                     <a href="/warmup">Warmup Protocol‍</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnmoves">🎷 Train Moves 🎷</a>
+                    <a href="/learnmoves">🌱 Train Moves 🌱</a>
+                  </li>
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/create">🎨 Create Move 🎨</a>
                   </li>
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">

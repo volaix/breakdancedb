@@ -56,7 +56,7 @@ export default function RenderLearnMoves() {
         </h1>
       </>
 
-      <div className="flex w-1/3 w-full flex-wrap">
+      <div className="flex w-full flex-wrap">
         {learning.length > 0 &&
           learning.map((move) => {
             return <RenderMoveBox key={move.moveId} move={move} />

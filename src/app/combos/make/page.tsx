@@ -1,5 +1,6 @@
 'use client'
 //@format
+import { comboIdKey } from '@/app/_utils/lib'
 import { produce } from 'immer'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
@@ -24,9 +25,14 @@ import {
   makeTransitionId,
 } from '../../_utils/lsMakers'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
-import { shallow } from 'zustand/shallow'
-import { ComboVal } from '../../_utils/localStorageTypes'
-import { comboIdKey } from '@/app/_utils/lib'
+
+const confidenceRanking = new Map<number, string>([
+  [1, 'I tried'],
+  [2, 'Feels like 1 move'],
+  [3, 'Super confident'],
+  [4, 'Has character'],
+  [5, 'Complete Freedom'],
+])
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
@@ -212,10 +218,10 @@ const RenderMakeCombo = () => {
       <article className="mt-5 w-full px-5">
         <h2 className="text-xs ">Combo Name:</h2>
         <input
-          className=" w-full rounded border border-gray-300 bg-gray-100
-            bg-opacity-50 px-3 py-1 text-xs leading-8 text-gray-700 outline-none
-            transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
-                dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs
+  leading-8 text-gray-700 outline-none
+ transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
+ dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
           type="text"
           value={title}
           placeholder="Super Combo 9000"
@@ -226,7 +232,7 @@ const RenderMakeCombo = () => {
       {/* --------------------combo sequence------------------ */}
       <article className="w-full px-5">
         <h2 className="mb-2 mt-5 w-full text-xs">Combo Sequence:</h2>
-        <ol className=" mr-5">
+        <ol className="mr-5 ">
           {selectedComboSeq &&
             Object.entries(selectedComboSeq).map(([key, value], index) => {
               return (
@@ -426,7 +432,7 @@ const RenderMakeCombo = () => {
                                     return (
                                       <section
                                         key={displayText}
-                                        className="flex	flex-col items-start overflow-hidden text-ellipsis	whitespace-nowrap leading-none"
+                                        className="flex flex-col items-start overflow-hidden	text-ellipsis whitespace-nowrap	leading-none"
                                       >
                                         <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
                                         <p>{displayText}</p>
@@ -537,7 +543,7 @@ const RenderMakeCombo = () => {
           </article>
           {/* ---------------------custom------------------ */}
           <article>
-            <label className="flex  rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
+            <label className="flex rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest  text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
               CUSTOM
               <input
                 className="ml-2"
@@ -574,7 +580,7 @@ const RenderMakeCombo = () => {
                     disabled={!checked.custom}
                     value={customInputVal}
                     onChange={(e) => setCustomInputVal(e.target.value || '')}
-                    className=" w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                    className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8  text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
                     type="text"
                     defaultValue={''}
                   />
@@ -601,6 +607,7 @@ const RenderMakeCombo = () => {
                 )
               })}
             </section>
+            <p className="text-4xs">{confidenceRanking.get(rating)}</p>
           </article>
           {/* --------------------notes----------------------- */}
           <section className="mt-5">

@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
 import { RenderRedoIcon } from '../_components/Svgs'
-import { extractComboIds as extractComboIds } from '../_utils/lib'
+import { extractComboIds } from '../_utils/lib'
 import {
   BasicFlow,
   BasicMove,
@@ -27,7 +27,6 @@ import {
   lsUserMoves,
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { produce } from 'immer'
 
 const categories: Category[] = [
   lsToprock,
@@ -40,6 +39,14 @@ const categories: Category[] = [
   lsBlowups,
   lsMisc,
 ]
+
+const likeRanking = new Map<number, string>([
+  [5, 'Super Cool!'],
+  [4, 'what i want to be'],
+  [3, 'ok but not for me'],
+  [2, 'this sucks'],
+  [1, 'I tried'],
+])
 
 //------------------------local utils------------------------------
 const pickRandomString = (items: string[]): string => {
@@ -236,7 +243,7 @@ export default function RenderFlows() {
                 disabled={singleCategory}
                 onClick={() => setSingleCategory(true)}
                 className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 
-                disabled:text-white dark:enabled:text-gray-300"
+  disabled:text-white dark:enabled:text-gray-300"
               >
                 Single
               </button>
@@ -287,7 +294,7 @@ export default function RenderFlows() {
               <Link href="/yourmoves">
                 <button
                   className="bg-indigo-500 px-4 py-1 text-white
-                 focus:outline-none dark:text-gray-300"
+  focus:outline-none dark:text-gray-300"
                 >
                   Add moves
                 </button>
@@ -311,12 +318,11 @@ export default function RenderFlows() {
                     <div className="relative">
                       <select
                         disabled={i !== 0 && singleCategory}
-                        className="focus:shadow-outline block w-full appearance-none
-                      rounded-lg border border-gray-300 bg-white px-4
-                      py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 
-                       dark:border-indigo-500 dark:bg-transparent dark:bg-none
-                      dark:text-white dark:disabled:opacity-10 
-                       "
+                        className="focus:shadow-outline block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10
+  leading-tight
+ focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 
+ dark:border-indigo-500 dark:bg-transparent dark:bg-none
+ dark:text-white dark:disabled:opacity-10"
                         value={
                           singleCategory
                             ? selectedCategory['entryMove']
@@ -362,10 +368,10 @@ export default function RenderFlows() {
                     {displayMoves && (
                       <section className="h-full w-full dark:bg-gray-900 dark:text-white">
                         <label>{`${selectedCategory[movePosition]} move`}</label>
-                        <div className=" relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300 dark:border-indigo-500">
+                        <div className="relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300  dark:border-indigo-500">
                           <select
-                            className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent 
-                             py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                            className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent py-2 pl-2 leading-tight 
+  focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                             value={learning[movePosition]}
                             onChange={(e) => {
                               setLearning((prev) => ({
@@ -451,7 +457,7 @@ export default function RenderFlows() {
               )
             })}
           </div>
-          <p className="text-[7px]">4. this sucks</p>
+          <p className="text-4xs">{likeRanking.get(ratingVal)}</p>
         </section>
         {/* ---------------------------------Notes----------------------------------- */}
         <h2>Notes</h2>

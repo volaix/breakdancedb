@@ -8,6 +8,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        //xs is 12px
+        '2xs': '.625rem', // 10px
+        '3xs': '.5rem', //8px
+        '4xs': '.375rem', //6px
+      },
       maxWidth: {
         se: '375px',
       },

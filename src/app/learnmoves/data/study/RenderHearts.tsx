@@ -250,15 +250,15 @@ export const RenderHearts = ({
                   }}
                   checked={i === 10 - rating}
                   type="radio"
-                  className="peer -ms-5 size-5 cursor-pointer
-              appearance-none border-0 bg-transparent
-              text-transparent
-              checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
+                  className="peer -ms-5 size-5 cursor-pointer appearance-none border-0
+  bg-transparent
+ text-transparent
+ checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
                   id={'' + (10 - i)}
                 />
                 <label
                   className="pointer-events-none text-gray-300 
-            peer-checked:text-red-500"
+  peer-checked:text-red-500"
                 >
                   <svg
                     className="size-5 flex-shrink-0"
