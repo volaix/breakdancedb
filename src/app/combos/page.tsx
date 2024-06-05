@@ -1,18 +1,13 @@
 'use client'
 //@format
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import {
-  ComboDictionary,
-  ComboId,
-  FlowDictionary,
-} from '../_utils/localStorageTypes'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { useRouter } from 'next/navigation'
-import { comboIdKey } from '../_utils/lib'
 import { RenderDeleteButtonSVG } from '../_components/Svgs'
-import { isFlowId, isLegacyId } from '../_utils/lsMakers'
+import { comboIdKey, extractComboIds } from '../_utils/lib'
+import { ComboDictionary, ComboId } from '../_utils/localStorageTypes'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -22,13 +17,23 @@ import { isFlowId, isLegacyId } from '../_utils/lsMakers'
 export default function RenderViewCombos() {
   //------------------------------state---------------------------------
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
-  const [isChecked, setIsChecked] = useState<boolean>(false)
+  const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
+  const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
+  const getLsBattle = useZustandStore((state) => state.getLsBattle)
 
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
+  //Advanced Option: Set Combos used in Battle
+  useEffect(() => {
+    if (!hideMovesIfBattle) return
+    const lsBattle = getLsBattle()
+    if (!lsBattle) return
+    setCombosInBattle(extractComboIds(lsBattle.rounds))
+  }, [getLsBattle, hideMovesIfBattle])
+
   //updates combos
   const updateCombos = useCallback(() => {
     setCombos(getLsCombos() || null)
@@ -58,25 +63,42 @@ export default function RenderViewCombos() {
           <Link href="/combos/make">Add Combo</Link>
         </button>
       </section>
-      {
-        //in development
-        false && (
-          <section>
-            <label>view used</label>
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => setIsChecked(!isChecked)}
-              className="form-checkbox"
-            />
+      {/* -----------------advanced options---------------- */}
+      <section className="mt-5 text-center">
+        <details className="flex flex-col leading-snug">
+          <summary className="text-xs">Advanced Options</summary>
+          <section className="mt-2">
+            <article>
+              <label className="text-xs">
+                Hide combos already used in Battle
+              </label>
+              <input
+                className="ml-1"
+                checked={hideMovesIfBattle}
+                onChange={(e) => {
+                  setHideMovesIfBattle(e.target.checked)
+                }}
+                type="checkbox"
+              />
+            </article>
           </section>
-        )
-      }
+        </details>
+        <section className="flex flex-col"></section>
+      </section>
+      {/* ------------------end of advanced options------------- */}
       {/* ---------render combo boxes ------------ */}
       <section className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
         {combos &&
           Object.entries(combos).map(
             ([comboId, { displayName, notes, execution, sequence }], i) => {
+              //Advanced Option
+              if (
+                hideMovesIfBattle &&
+                combosInBattle?.includes(comboId as ComboId)
+              ) {
+                return
+              }
+
               return (
                 <article className="break-inside-avoid-column" key={comboId}>
                   <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
