@@ -1,7 +1,9 @@
 //@format
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Notification } from '../_components/Notification'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 type Inputs = {
   concepts: string
@@ -10,6 +12,11 @@ type Inputs = {
 export default function Concepts() {
   // -------------state------------
   const [saveText, setSaveText] = useState('Save')
+  const [notification, setNotification] = useState<null | {
+    visible?: boolean
+    message?: string
+    timeShown?: number
+  }>(null)
   const {
     register,
     handleSubmit,
@@ -17,6 +24,26 @@ export default function Concepts() {
     reset,
     formState: { errors },
   } = useForm<Inputs>()
+  const getLsConcepts = useZustandStore((state) => state.getLsConcepts)
+  const setLsConcepts = useZustandStore((state) => state.setLsConcepts)
+
+  // --------hooks-----------------
+  //onload getsLsConcepts
+  useEffect(() => {
+    const lsConcepts = getLsConcepts()
+    if (lsConcepts) {
+      reset({ concepts: lsConcepts.join('\n') })
+    }
+  }, [getLsConcepts, reset])
+
+  //Show Notifcation for 2 seconds
+  useEffect(() => {
+    const fadeOutTimer = setTimeout(
+      () => setNotification({ visible: false }),
+      notification?.timeShown || 2000,
+    )
+    return () => clearTimeout(fadeOutTimer)
+  }, [notification?.timeShown, notification?.visible])
 
   //value of categoryMoves textarea
   const unsavedConcepts = watch('concepts', '')
@@ -26,7 +53,13 @@ export default function Concepts() {
 
   //-------------render-----------
   return (
-    <section>
+    <form
+      onSubmit={handleSubmit((data) => {
+        setLsConcepts(data.concepts.split(/\r\n|\r|\n/))
+        setNotification({ message: 'Saved', visible: true })
+        setSaveText('Saved!')
+      })}
+    >
       <article>
         <h2 className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
           {`Concepts`}
@@ -44,6 +77,10 @@ export default function Concepts() {
           </pre>
         </section>
       </article>
+      <Notification
+        visible={!!notification?.visible}
+        message={notification?.message || ''}
+      />
       {/* -------------Buttons-------------- */}
       <section className="mt-5 flex w-full justify-center">
         {/* ----------sort button------- */}
@@ -63,9 +100,7 @@ export default function Concepts() {
         <button
           // disabled={!saveButtonActive}
           type="submit"
-          className="flex rounded border-0 bg-indigo-500 
-              px-8 py-2 text-lg text-white hover:bg-indigo-600 
-              focus:outline-none disabled:opacity-50"
+          className="flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none disabled:opacity-50"
         >
           {saveText}
         </button>
@@ -74,6 +109,6 @@ export default function Concepts() {
         sort button cannot be undone. Sorts current moves in alphabetical order
       </p>
       {/* ---------end of buttons--------- */}
-    </section>
+    </form>
   )
 }

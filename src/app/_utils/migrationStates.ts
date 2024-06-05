@@ -1,5 +1,5 @@
+import { BasicFlow } from './localStorageTypes'
 import {
-  GlobalStatePropertiesV0,
   lsFlows,
   FlowDictionary,
   lsUserMoves,
@@ -16,6 +16,7 @@ import {
   Move,
   lsDanceList,
 } from './localStorageTypes'
+import { GlobalStatePropertiesV0 } from './migrationStates'
 
 //==============MIGRATION STATES==================
 /**
@@ -64,4 +65,10 @@ export const isGlobalStateV2 = (
   if (version === 2) {
     return true
   } else return false
+}
+export type GlobalStatePropertiesV0 = {
+  [lsFlows]: BasicFlow[]
+  [lsUserMoves]: string[]
+  [lsUserLearning]: Move[]
+  [lsDanceList]: string[]
 }
