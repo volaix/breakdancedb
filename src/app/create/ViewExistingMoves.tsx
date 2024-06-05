@@ -21,6 +21,7 @@ import {
 } from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
+//TODO: This should be derived from state
 const categories: Category[] = [
   lsToprock,
   lsFootwork,
@@ -158,11 +159,11 @@ export default function ExistingMoves() {
                     {/* //--------------------------INDIVIDUAL MOVE------------------------- */}
                     <article className="w-1/2">
                       {displayMoves && (
-                        <section className="h-full w-full dark:bg-gray-900 dark:text-white">
+                        <section className="h-full w-full ">
                           <label>{`${selectedCategory[movePosition]} move`}</label>
                           <div className="relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300  dark:border-indigo-500">
                             <select
-                              className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent py-2 pl-2 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                              className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent py-2 pl-2 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:text-white"
                               value={learning[movePosition]}
                               onChange={(e) => {
                                 setLearning(() => ({
