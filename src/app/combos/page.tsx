@@ -1,12 +1,18 @@
 'use client'
 //@format
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import { ComboDictionary, FlowDictionary } from '../_utils/localStorageTypes'
+import {
+  ComboDictionary,
+  ComboId,
+  FlowDictionary,
+} from '../_utils/localStorageTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { useRouter } from 'next/navigation'
 import { comboIdKey } from '../_utils/lib'
+import { RenderDeleteButtonSVG } from '../_components/Svgs'
+import { isFlowId, isLegacyId } from '../_utils/lsMakers'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -18,10 +24,15 @@ export default function RenderViewCombos() {
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
+  const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
 
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
+  //updates combos
+  const updateCombos = useCallback(() => {
+    setCombos(getLsCombos() || null)
+  }, [getLsCombos])
 
   //updates flows using localstorage
   useEffect(() => {
@@ -68,7 +79,14 @@ export default function RenderViewCombos() {
             ([comboId, { displayName, notes, execution, sequence }], i) => {
               return (
                 <article className="break-inside-avoid-column" key={comboId}>
-                  <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                  <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                    <RenderDeleteButtonSVG
+                      onClick={() => {
+                        deleteLsCombo(comboId as ComboId)
+                        updateCombos()
+                      }}
+                      className="absolute right-2 top-2 size-2"
+                    />
                     <h2 className="bold text-xs dark:text-white">
                       {displayName}
                     </h2>
@@ -119,7 +137,7 @@ export default function RenderViewCombos() {
                     {/* --------notes--------- */}
                     <label className="text-[9px]">Notes</label>
                     <p className="text-[6px]  leading-relaxed">{notes}</p>
-                  </div>
+                  </section>
                 </article>
               )
             },

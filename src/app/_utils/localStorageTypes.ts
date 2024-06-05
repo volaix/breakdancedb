@@ -232,6 +232,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   //--------flows---------
   deleteLsFlow: (key: FlowId) => void
   //-------combos----------
+  deleteLsCombo: (key: ComboId) => void
   getLsComboById: (id: ComboId) => ComboDictionary[keyof ComboDictionary] | null
   //-------User Move Keys --------
   setLsUserMovesByKey: (
