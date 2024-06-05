@@ -57,7 +57,7 @@ export default function RenderFlows() {
       </article>
       {/* ---------------END OF MODIFIER------------ */}
       {/* //--------------------------I LIKE THIS METER------------------------------- */}
-      <section className="pb-10 text-center">
+      <section className="p-5 text-center">
         <h2 className="pb-2">Cool ranking</h2>
         <div className="flex flex-row-reverse">
           {Array.from(Array(5)).map((a, i) => {
