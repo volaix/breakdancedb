@@ -42,7 +42,7 @@ export default function Selection({ modifier }: { modifier?: true }) {
         </section>
         {/* ---------move options------------- */}
         {moveOrConcept === 'move' && (
-          <section className="flex justify-around text-xs">
+          <section className="mt-1 flex justify-around text-xs">
             <label>
               Existing Move
               <input

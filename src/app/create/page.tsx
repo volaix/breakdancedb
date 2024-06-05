@@ -4,9 +4,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
-import ExistingMoves from './ViewExistingMoves'
 import Selection from './Selection'
+
+const coolRanking = new Map<number, string>([
+  [1, 'not cool at all'],
+  [2, 'not cool'],
+  [3, 'cool'],
+  [4, 'very cool'],
+  [5, 'excitedly cool'],
+])
 
 //----------------------------mainrender--------------------------
 /*
@@ -74,7 +80,7 @@ export default function RenderFlows() {
             )
           })}
         </div>
-        <p className="text-[7px]">not cool at all</p>
+        <p className="text-4xs">{coolRanking.get(ratingVal)}</p>
       </section>
       {/* ---------------------------------Notes----------------------------------- */}
       <h2>Notes</h2>
