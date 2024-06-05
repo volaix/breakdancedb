@@ -16,7 +16,7 @@ export default function RenderHeader() {
 
   //-----------------render----------------------------------------
   return (
-    <div
+    <header
       className="fixed left-0 top-0 z-10 flex w-full justify-center border-b border-slate-300 bg-gradient-to-b
   from-slate-200 pb-2
  pt-4 backdrop-blur-2xl
@@ -26,12 +26,12 @@ export default function RenderHeader() {
         breakdanceDB
       </Link>
 
-      <div className="fixed left-2 top-3">
+      <nav className="fixed left-2 top-3">
         {/* TODO when is selected then left-0 top-0 */}
         <div className="fixed flex w-4/5 max-w-xs items-center justify-between">
           <nav>
             <section className="flex">
-              <div
+              <article
                 className="space-y-2"
                 onClick={() => setIsNavOpen((prev) => !prev)}
               >
@@ -40,10 +40,10 @@ export default function RenderHeader() {
                   <span className="h-0.5 w-5 rounded-full bg-slate-400 transition group-hover:scale-x-0" />
                   <span className="h-0.5 w-5 rounded-full bg-slate-400 group-hover:-translate-y-2.5 group-hover:-rotate-45" />
                 </div>
-              </div>
+              </article>
 
               {/* //TODO convert to tailwind classes */}
-              <div className={isNavOpen ? 'showMenuNav' : 'hideMenuNav'}>
+              <nav className={isNavOpen ? 'showMenuNav' : 'hideMenuNav'}>
                 <div
                   className="absolute right-0 top-0 px-8 py-8"
                   onClick={() => setIsNavOpen(false)}
@@ -102,7 +102,7 @@ export default function RenderHeader() {
                     </li>
                   )}
                 </ul>
-              </div>
+              </nav>
             </section>
           </nav>
           <style>{`
@@ -125,7 +125,7 @@ export default function RenderHeader() {
       }
     `}</style>
         </div>
-      </div>
+      </nav>
       <div className="fixed right-2 top-3">
         <Image
           className="h-5 w-5 rounded-full"
@@ -135,6 +135,6 @@ export default function RenderHeader() {
           alt="Rounded avatar"
         />
       </div>
-    </div>
+    </header>
   )
 }
