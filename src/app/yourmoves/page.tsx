@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import Concepts from './Concepts'
 import Moves from './Moves'
