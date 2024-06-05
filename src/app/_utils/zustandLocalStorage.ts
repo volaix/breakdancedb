@@ -106,6 +106,12 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           })
         },
         //---------combos---------
+        deleteLsCombo: (id) => {
+          return set((state) => {
+            if (!state[lsCombos]) return
+            delete state[lsCombos][id]
+          })
+        },
         getLsComboById(id) {
           return get()[lsCombos]?.[id] || null
         },
