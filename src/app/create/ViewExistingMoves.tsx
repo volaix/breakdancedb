@@ -35,7 +35,7 @@ const categories: Category[] = [
 
 //------------------------localtypes-------------------------------
 type Category = keyof GlobalStateProperties[typeof lsUserMoves]
-type SelectedCategoryState = Record<keyof BasicFlow, Category>
+type SelectedCategory = Record<'selectedCategory', Category>
 
 //------------------------local utils------------------------------
 const pickRandomString = (items: string[]): string => {
@@ -67,44 +67,26 @@ const makeBasicMoves = (
 
 export default function ExistingMoves() {
   // -------------state---------
-  const [learning, setLearning] = useState<BasicFlow | null>(null)
-  const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
-  const [movesUsedInBattle, setMovesUsedInBattle] = useState<BasicMove[]>()
-  const [hideMovesIfFlow, setHideMovesIfFlow] = useState<boolean>(false)
-  const [movesUsedInFlow, setMovesUsedInFlow] = useState<BasicMove[]>()
+  const [learning, setLearning] = useState<{ selectedCategory: string } | null>(
+    null,
+  )
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
   const displayMoves = !!learning
-  const [selectedCategory, setSelectedCategory] =
-    useState<SelectedCategoryState>({
-      entryMove: lsToprock,
-      keyMove: lsToprock,
-      exitMove: lsToprock,
-    })
+  const [selectedCategory, setSelectedCategory] = useState<SelectedCategory>({
+    selectedCategory: lsToprock,
+  })
   //----------------functions----------------
 
-  const shuffleLearning = useCallback(
-    (single?: keyof BasicFlow) => {
-      const shuffleSingleKey = (key: keyof BasicFlow) =>
-        pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
+  const shuffleLearning = useCallback(() => {
+    const shuffleSingleKey = (key: 'selectedCategory') =>
+      pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
 
-      if (single) {
-        setLearning((prevLearning) =>
-          prevLearning
-            ? { ...prevLearning, [single]: shuffleSingleKey(single) }
-            : null,
-        )
-      } else {
-        setLearning({
-          entryMove: shuffleSingleKey('entryMove'),
-          keyMove: shuffleSingleKey('keyMove'),
-          exitMove: shuffleSingleKey('exitMove'),
-        })
-      }
-    },
-    [getLsUserMovesByKey, selectedCategory],
-  )
+    setLearning({
+      selectedCategory: shuffleSingleKey('selectedCategory'),
+    })
+  }, [getLsUserMovesByKey, selectedCategory])
 
   //---------------------------hooks---------------------------------
   //on mount
@@ -123,10 +105,7 @@ export default function ExistingMoves() {
             <div className="flex flex-col text-center">
               No moves to display.
               <Link href="/yourmoves">
-                <button
-                  className="bg-indigo-500 px-4 py-1 text-white
-                 focus:outline-none dark:text-gray-300"
-                >
+                <button className="bg-indigo-500 px-4 py-1 text-white focus:outline-none dark:text-gray-300">
                   Add moves
                 </button>
               </Link>
@@ -134,8 +113,8 @@ export default function ExistingMoves() {
           )}
           {/* ----------------dropdowns----------- */}
           {displayMoves && (
-            <div className="mb-5 flex w-full flex-col gap-4 p-4 pt-0 text-xs">
-              {(['entryMove'] as Array<keyof SelectedCategoryState>).map(
+            <div className="flex w-full flex-col gap-4 text-xs">
+              {(['selectedCategory'] as Array<keyof SelectedCategory>).map(
                 (movePosition, i) => (
                   <div key={i} className="relative flex">
                     {/* //-------------------------DROPDOWN------------------------- */}
@@ -145,12 +124,7 @@ export default function ExistingMoves() {
                       {/* select */}
                       <div className="relative">
                         <select
-                          className="focus:shadow-outline block w-full appearance-none
-                      rounded-lg border border-gray-300 bg-white px-4
-                      py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 
-                       dark:border-indigo-500 dark:bg-transparent dark:bg-none
-                      dark:text-white dark:disabled:opacity-10 
-                       "
+                          className="focus:shadow-outline block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10 "
                           value={selectedCategory[movePosition]}
                           onChange={(e) =>
                             setSelectedCategory({
@@ -186,16 +160,12 @@ export default function ExistingMoves() {
                       {displayMoves && (
                         <section className="h-full w-full dark:bg-gray-900 dark:text-white">
                           <label>{`${selectedCategory[movePosition]} move`}</label>
-                          <div className=" relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300 dark:border-indigo-500">
+                          <div className="relative flex w-full appearance-none items-center justify-between overflow-hidden rounded-lg border border-gray-300  dark:border-indigo-500">
                             <select
-                              className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent 
-                             py-2 pl-2  leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
+                              className="focus:shadow-outline block w-full appearance-none rounded-lg border border-none border-gray-300 bg-transparent py-2 pl-2 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35"
                               value={learning[movePosition]}
                               onChange={(e) => {
-                                setLearning((prev) => ({
-                                  entryMove: prev?.entryMove || '',
-                                  keyMove: prev?.keyMove || '',
-                                  exitMove: prev?.exitMove || '',
+                                setLearning(() => ({
                                   [movePosition]: e.target.value,
                                 }))
                               }}
@@ -223,19 +193,6 @@ export default function ExistingMoves() {
                                           selectedCategory[movePosition],
                                     )
 
-                                  if (
-                                    shouldHideMove(
-                                      hideMovesIfBattle,
-                                      movesUsedInBattle,
-                                    ) ||
-                                    shouldHideMove(
-                                      hideMovesIfFlow,
-                                      movesUsedInFlow,
-                                    )
-                                  ) {
-                                    return
-                                  }
-
                                   return (
                                     <option key={moveStr} value={moveStr}>
                                       {moveStr}
@@ -246,7 +203,7 @@ export default function ExistingMoves() {
                             <div className="mr-1 h-4 w-4">
                               <RenderRedoIcon
                                 className="fill-black dark:fill-indigo-500"
-                                onClick={() => shuffleLearning(movePosition)}
+                                onClick={() => shuffleLearning()}
                               />
                             </div>
                           </div>

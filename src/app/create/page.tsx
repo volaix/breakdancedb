@@ -6,6 +6,7 @@ import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import ExistingMoves from './ViewExistingMoves'
+import Selection from './Selection'
 
 //----------------------------mainrender--------------------------
 /*
@@ -18,14 +19,6 @@ export default function RenderFlows() {
   const [notificationMessage, setNotificationMessage] = useState<string>('')
   const [textAreaValue, setTextAreaValue] = useState<string>('')
   const [ratingVal, setRatingVal] = useState<number>(1)
-
-  const [selectedModifierType, setSelectedModifierType] = useState<
-    'existingMove' | 'learningMove' | 'custom'
-  >('existingMove')
-  const [selectedBaseType, setSelectedBaseType] = useState<
-    'existingMove' | 'learningMove' | 'custom'
-  >('existingMove')
-  const [moveOrConcept, setMoveOrConcept] = useState<'move' | 'concept'>('move')
 
   // --------------hooks--------
   //Show Notifcation for 2 seconds
@@ -52,138 +45,15 @@ export default function RenderFlows() {
       </section>
       {/* ----------END OF TITLE SECTION------------- */}
       {/* //----------------------BASE MOVE----------------------- */}
-      <article className="w-full rounded-lg bg-slate-100">
-        <h2 className="text-lg"> BASE MOVE</h2>
-        {/* ----------basetype radios----------- */}
-        <section className="flex justify-around text-xs">
-          <label>
-            Existing Move
-            <input
-              type="radio"
-              checked={selectedBaseType === 'existingMove'}
-              name="baseType"
-              value="existingMove"
-              onChange={(e) =>
-                setSelectedBaseType(e.target.value as 'existingMove')
-              }
-            />
-          </label>
-          <label>
-            Learning Move
-            <input
-              type="radio"
-              checked={selectedBaseType === 'learningMove'}
-              name="baseType"
-              value="learningMove"
-              onChange={(e) =>
-                setSelectedBaseType(e.target.value as 'learningMove')
-              }
-            />
-          </label>
-          <label>
-            Custom
-            <input
-              type="radio"
-              name="baseType"
-              value="custom"
-              onChange={(e) => setSelectedBaseType(e.target.value as 'custom')}
-              checked={selectedBaseType === 'custom'}
-            />
-          </label>
-        </section>
-        {/* ------------base move selector----------- */}
-        <section className="mt-5">
-          {selectedBaseType === 'existingMove' && <ExistingMoves />}
-          {/* -----------------learning moves-------------- */}
-          {selectedBaseType === 'learningMove' && (
-            <article>
-              <div>all of the learning moves here</div>
-            </article>
-          )}
-          {/* ----------------custom--------------- */}
-          {selectedBaseType === 'custom' && (
-            <article>
-              <div>input</div>
-            </article>
-          )}
-        </section>
+      <article className="w-full rounded-lg bg-slate-100 p-2 pb-10">
+        <h2 className="text-lg">BASE MOVE</h2>
+        <Selection />
       </article>
       {/* //--------------------------END OF BASE MOVE------------------------------- */}
       {/* -------------------MODIFIER---------------- */}
-      <article className="mt-5 w-full rounded-lg bg-slate-100">
+      <article className="mt-5 w-full rounded-lg bg-slate-100 p-2 pb-10">
         <h2 className="text-lg">MODIFIER</h2>
-        {/* --------radios---------- */}
-        <section>
-          {/* -------move or concept radio-------- */}
-          <section>
-            <label>
-              Use Move
-              <input
-                type="radio"
-                checked={moveOrConcept === 'move'}
-                name="moveOrConcept"
-                value="move"
-                onChange={(e) => setMoveOrConcept(e.target.value as 'move')}
-              />
-            </label>
-            <label>
-              Use Concept
-              <input
-                type="radio"
-                checked={moveOrConcept === 'concept'}
-                name="moveOrConcept"
-                value="concept"
-                onChange={(e) => setMoveOrConcept(e.target.value as 'concept')}
-              />
-            </label>
-          </section>
-          {/* ---------move options------------- */}
-          {moveOrConcept === 'move' && (
-            <section className="flex justify-around text-xs">
-              <label>
-                Existing Move
-                <input
-                  type="radio"
-                  checked={selectedModifierType === 'existingMove'}
-                  name="modifierType"
-                  value="existingMove"
-                  onChange={(e) =>
-                    setSelectedModifierType(e.target.value as 'existingMove')
-                  }
-                />
-              </label>
-              <label>
-                Learning Move
-                <input
-                  type="radio"
-                  checked={selectedModifierType === 'learningMove'}
-                  name="modifierType"
-                  value="learningMove"
-                  onChange={(e) =>
-                    setSelectedModifierType(e.target.value as 'learningMove')
-                  }
-                />
-              </label>
-              <label>
-                Custom
-                <input
-                  type="radio"
-                  name="modifierType"
-                  value="custom"
-                  onChange={(e) =>
-                    setSelectedModifierType(e.target.value as 'custom')
-                  }
-                  checked={selectedModifierType === 'custom'}
-                />
-              </label>
-            </section>
-          )}
-        </section>
-        {/* ----------move display-------- */}
-        <section>
-          {moveOrConcept === 'move' &&
-            selectedModifierType === 'existingMove' && <ExistingMoves />}
-        </section>
+        <Selection modifier />
       </article>
       {/* ---------------END OF MODIFIER------------ */}
       {/* //--------------------------I LIKE THIS METER------------------------------- */}

@@ -1,5 +1,6 @@
 'use client'
 //@format
+import { comboIdKey } from '@/app/_utils/lib'
 import { produce } from 'immer'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
@@ -24,9 +25,6 @@ import {
   makeTransitionId,
 } from '../../_utils/lsMakers'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
-import { shallow } from 'zustand/shallow'
-import { ComboVal } from '../../_utils/localStorageTypes'
-import { comboIdKey } from '@/app/_utils/lib'
 
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
@@ -212,7 +210,7 @@ const RenderMakeCombo = () => {
       <article className="mt-5 w-full px-5">
         <h2 className="text-xs ">Combo Name:</h2>
         <input
-          className=" w-full rounded border border-gray-300 bg-gray-100
+          className="w-full rounded border border-gray-300 bg-gray-100
             bg-opacity-50 px-3 py-1 text-xs leading-8 text-gray-700 outline-none
             transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
                 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
