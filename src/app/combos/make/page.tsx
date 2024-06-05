@@ -26,6 +26,14 @@ import {
 } from '../../_utils/lsMakers'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
 
+const confidenceRanking = new Map<number, string>([
+  [1, 'I tried'],
+  [2, 'Feels like 1 move'],
+  [3, 'Super confident'],
+  [4, 'Has character'],
+  [5, 'Complete Freedom'],
+])
+
 const idMap: Record<
   SelectedComboSeq[keyof SelectedComboSeq]['type'],
   ComboMove['id']
@@ -599,6 +607,7 @@ const RenderMakeCombo = () => {
                 )
               })}
             </section>
+            <p className="text-4xs">{confidenceRanking.get(rating)}</p>
           </article>
           {/* --------------------notes----------------------- */}
           <section className="mt-5">

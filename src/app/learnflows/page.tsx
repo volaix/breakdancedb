@@ -40,6 +40,14 @@ const categories: Category[] = [
   lsMisc,
 ]
 
+const likeRanking = new Map<number, string>([
+  [5, 'Super Cool!'],
+  [4, 'what i want to be'],
+  [3, 'ok but not for me'],
+  [2, 'this sucks'],
+  [1, 'I tried'],
+])
+
 //------------------------local utils------------------------------
 const pickRandomString = (items: string[]): string => {
   return items[Math.floor(Math.random() * items.length)]
@@ -450,7 +458,7 @@ export default function RenderFlows() {
               )
             })}
           </div>
-          <p className="text-[7px]">4. this sucks</p>
+          <p className="text-4xs">{likeRanking.get(ratingVal)}</p>
         </section>
         {/* ---------------------------------Notes----------------------------------- */}
         <h2>Notes</h2>

@@ -18,6 +18,14 @@ import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 
+const battleRankings = new Map([
+  [1, 'I tried'],
+  [2, 'memorised sequence'],
+  [3, 'can do slow'],
+  [4, 'can do fast'],
+  [5, 'can dance while doing it'],
+])
+
 type Inputs = {
   tempText: string //displayName
   categoryName: string
@@ -192,45 +200,46 @@ export default function RenderBattlePage() {
                   }
                 </section>
                 {/* -------------- 5 brains ------------------ */}
-                <article>
+                <article className="w-auto text-center">
                   <section className="mt-2 flex flex-row-reverse justify-end">
                     {Array.from(Array(5)).map((_, brainIndex) => {
-                      const size = '8'
                       return (
-                        <>
-                          <input
-                            onChange={(e) => {
-                              setYourRounds((rounds) =>
-                                produce(rounds, (newRounds) => {
-                                  newRounds[roundIndex].rating = Number(
-                                    e.target.id,
-                                  )
-                                }),
-                              )
-                            }}
-                            checked={brainIndex === 5 - comboRating}
-                            type="radio"
-                            id={5 - brainIndex + ''}
-                            className={`peer -ms-${size} size-${size} cursor-pointer appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
-                          />
-                          <label
-                            className={` text-gray-300 peer-checked:text-pink-400`}
-                          >
-                            <RenderBrainSvg
-                              className={`size-${size}`}
-                              fill="currentcolor"
+                        <article key={brainIndex}>
+                          <span className="relative inline-block">
+                            <input
+                              onChange={(e) => {
+                                setYourRounds((rounds) =>
+                                  produce(rounds, (newRounds) => {
+                                    newRounds[roundIndex].rating = Number(
+                                      e.target.id,
+                                    )
+                                  }),
+                                )
+                              }}
+                              checked={brainIndex === 5 - comboRating}
+                              type="radio"
+                              id={(5 - brainIndex).toString()}
+                              className={`peer absolute inset-0 h-full w-full cursor-pointer appearance-none border-0
+                bg-transparent text-transparent checked:bg-none focus:bg-none 
+                focus:ring-0 focus:ring-offset-0`}
                             />
-                          </label>
-                        </>
+                            <label className="text-gray-300 peer-checked:text-pink-400">
+                              <RenderBrainSvg
+                                className="size-8"
+                                fill="currentcolor"
+                              />
+                            </label>
+                          </span>
+                        </article>
                       )
                     })}
                   </section>
-                  <label className="-mt-2 text-[9px]">Memorised</label>
+                  <p className="text-4xs">{battleRankings.get(comboRating)}</p>
                 </article>
 
                 {/* ===================COMBO LIST=========================== */}
-                <article className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                  <h2>Combo List</h2>
+                <article className="title-font mb-1 mt-2 text-3xs font-medium text-black dark:text-white">
+                  <h2 className="text-xs">Combo List</h2>
 
                   {comboList &&
                     comboList.length > 0 &&
