@@ -23,9 +23,8 @@ export default function RenderHero() {
             </Link>
             <Link href={{ pathname: '/learnflows' }}>
               <button
-                className="ml-4 inline-flex 
-              rounded border-0 bg-gray-100 
-              px-6 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:outline-none"
+                className="ml-4 inline-flex rounded border-0 bg-gray-100 px-6 py-2 text-xs text-gray-700 
+  hover:bg-gray-200 focus:outline-none"
               >
                 RNG Flows
               </button>

@@ -43,7 +43,7 @@ const Counter: React.FC = () => {
         {count}
       </button>
       <button
-        // className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+        // className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-700"
         onClick={() => setCount(0)}
       >
         X
@@ -261,8 +261,7 @@ export default function RenderBattlePage() {
                               {type === 'customCombo' && (
                                 <section>
                                   <input
-                                    className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none
-                                transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                                    className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
                                     type="text"
                                     value={value}
                                     placeholder="Super Combo 9000"
@@ -478,7 +477,7 @@ export default function RenderBattlePage() {
                 {/* --------------add new entry------------ */}
                 <article className="flex text-[9px]">
                   {/* {-------------------add new combo ---------------- */}
-                  <section className=" flex items-center">
+                  <section className="flex items-center ">
                     <label>Add Combo</label>
                     <RenderAddButtonSVG
                       className="ml-1 size-2 fill-slate-500"
@@ -547,8 +546,8 @@ export default function RenderBattlePage() {
       <section className="flex justify-center">
         {/* -----------ADD ROUND------------- */}
         <button
-          className="flex h-fit items-center justify-center rounded border border-indigo-500
-          px-3 py-2 text-center text-xs text-indigo-500"
+          className="flex h-fit items-center justify-center rounded border border-indigo-500 px-3 py-2 text-center text-xs text-indigo-500
+ "
           onClick={() =>
             setYourRounds((prevRounds) =>
               produce(prevRounds, (newRounds) => {
@@ -577,9 +576,9 @@ export default function RenderBattlePage() {
               setNotification({ visible: true, message: 'Battle Saved' })
               console.log('saved')
             }}
-            className="inline-flex h-fit rounded border-0
-           bg-indigo-500 px-6 py-2 text-xs 
-           text-white hover:bg-indigo-600 focus:outline-none"
+            className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white
+  
+ hover:bg-indigo-600 focus:outline-none"
           >
             SAVE
           </button>

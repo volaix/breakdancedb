@@ -61,8 +61,8 @@ export default function RenderPageWarmup() {
           </div>
           <div className="my-5">
             <h5
-              className=" text-left
-            font-bold text-black dark:text-white"
+              className="text-left font-bold  text-black
+ dark:text-white"
             >
               5min: load slowly the activity
             </h5>
@@ -83,14 +83,14 @@ export default function RenderPageWarmup() {
         <div className="flex max-w-xs space-x-4 p-4">
           <textarea
             className="w-1/2 rounded-lg border border-gray-300 p-4
-    shadow-sm focus:border-transparent focus:outline-none
-    focus:ring-2 focus:ring-blue-400"
+  shadow-sm focus:border-transparent focus:outline-none
+ focus:ring-2 focus:ring-blue-400"
             rows={10}
             cols={30}
             onChange={handleChange}
             defaultValue={list.join('\n')}
           ></textarea>
-          <pre className="w-1/2	 overflow-hidden rounded-lg bg-gray-100 p-4">
+          <pre className="w-1/2 overflow-hidden rounded-lg bg-gray-100 p-4	">
             {JSON.stringify(list, null, 2)}
           </pre>
         </div>

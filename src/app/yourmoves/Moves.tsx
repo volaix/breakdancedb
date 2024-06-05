@@ -225,9 +225,8 @@ export default function Moves() {
         <section className="mt-5 flex w-full justify-center">
           {/* ----------sort button------- */}
           <button
-            className="flex items-center justify-center rounded border 
-              border-indigo-500 px-8 py-2 text-center  
-              text-indigo-500"
+            className="flex items-center justify-center rounded border border-indigo-500 px-8 py-2 text-center text-indigo-500 
+ "
             onClick={(e) => {
               //prevents form submit
               e.preventDefault()
@@ -240,9 +239,8 @@ export default function Moves() {
           <button
             disabled={!saveButtonActive}
             type="submit"
-            className="flex rounded border-0 bg-indigo-500 
-              px-8 py-2 text-lg text-white hover:bg-indigo-600 
-              focus:outline-none disabled:opacity-50"
+            className="flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white 
+  hover:bg-indigo-600 focus:outline-none disabled:opacity-50"
           >
             {saveText}
           </button>

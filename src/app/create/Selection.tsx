@@ -97,7 +97,7 @@ export default function Selection({ modifier }: { modifier?: true }) {
           <section>
             <select
               className="w-full rounded-md border border-gray-300 p-1 outline-indigo-500 focus:border-indigo-500 dark:border-indigo-500 
-            dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
+  dark:bg-transparent dark:placeholder-gray-400 dark:placeholder-opacity-50"
             >
               <option value={''}>Choose Concept</option>
               {lsConceptsArr.map((concept) => (
@@ -113,8 +113,7 @@ export default function Selection({ modifier }: { modifier?: true }) {
           <div className="w-full">
             <textarea
               className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out 
-                focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
-                dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+  focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
               rows={3}
               cols={30}
             />

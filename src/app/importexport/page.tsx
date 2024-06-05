@@ -120,7 +120,7 @@ export default function RenderImportExport() {
         </div>
         <div className="text-base text-black dark:text-white">Export</div>
         <button
-          className=" m-2 w-2/3 rounded border-0 bg-indigo-500 px-6 py-2 text-center text-white hover:bg-indigo-600 focus:outline-none"
+          className="m-2 w-2/3 rounded border-0 bg-indigo-500 px-6 py-2 text-center text-white  hover:bg-indigo-600 focus:outline-none"
           onClick={handleDownload}
         >
           Export localStorage
@@ -130,7 +130,7 @@ export default function RenderImportExport() {
           <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
         </div>
         <button
-          className=" m-2 w-2/3 rounded border-0 bg-red-500 px-6 py-2 text-center text-white focus:outline-none"
+          className="m-2 w-2/3 rounded border-0 bg-red-500 px-6 py-2 text-center text-white  focus:outline-none"
           onClick={handleClear}
         >
           Clear localStorage
