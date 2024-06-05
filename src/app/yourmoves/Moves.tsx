@@ -1,4 +1,3 @@
-import RenderHeader from '@/app/_components/Header'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Notification } from '../_components/Notification'

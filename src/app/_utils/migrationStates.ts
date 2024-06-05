@@ -16,7 +16,6 @@ import {
   Move,
   lsDanceList,
 } from './localStorageTypes'
-import { GlobalStatePropertiesV0 } from './migrationStates'
 
 //==============MIGRATION STATES==================
 /**
@@ -66,7 +65,8 @@ export const isGlobalStateV2 = (
     return true
   } else return false
 }
-export type GlobalStatePropertiesV0 = {
+
+type GlobalStatePropertiesV0 = {
   [lsFlows]: BasicFlow[]
   [lsUserMoves]: string[]
   [lsUserLearning]: Move[]

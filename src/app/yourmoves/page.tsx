@@ -1,8 +1,6 @@
-'use client'
-
 import { useState } from 'react'
-import Moves from './moves'
 import Concepts from './Concepts'
+import Moves from './Moves'
 
 //@format
 
