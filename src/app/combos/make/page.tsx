@@ -76,7 +76,11 @@ const RenderMakeCombo = () => {
   //------------------------------state---------------------------------
   const [rating, setRating] = useState<number>(1)
   const [hideUsedFlows, setHideUsedFlows] = useState<boolean>(true)
-  const [isSingle, setIsSingle] = useState<boolean>(true)
+  const [subCategoryRadio, setSubCategoryRadio] = useState<{
+    single?: true
+    custom?: true
+    anySingle?: true
+  }>({ single: true })
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
   const [notification, setNotification] = useState<null | {
@@ -124,24 +128,44 @@ const RenderMakeCombo = () => {
     setMoveCategories(getLsUserMoveCategories())
 
     //Sets the filters for flow
-    if (isSingle) {
+    if (subCategoryRadio.anySingle) {
       //get all single flows
-      const singleFlows = Object.entries(lsFlows)
-        .filter(([_, flowVal]) => {
-          if (!flowVal) return false
-          const { entryMove, exitMove, keyMove } = flowVal
-          return (
-            category === entryMove.category &&
-            entryMove.category === keyMove.category &&
-            keyMove.category === exitMove.category
-          )
-        })
-        .map(([flowId]) => flowId as FlowId)
-      setFilterFlowIds(singleFlows)
-    } else if (!isSingle) {
-      //do mixed flows only depending on XYZ
+      setFilterFlowIds(
+        Object.entries(lsFlows)
+          .filter(([_, flowVal]) => {
+            if (!flowVal) return false
+            const { entryMove, exitMove, keyMove } = flowVal
+            return (
+              entryMove.category === keyMove.category &&
+              keyMove.category === exitMove.category
+            )
+          })
+          .map(([flowId]) => flowId as FlowId),
+      )
+    } else if (subCategoryRadio.single) {
+      setFilterFlowIds(
+        Object.entries(lsFlows)
+          .filter(([_, flowVal]) => {
+            if (!flowVal) return false
+            const { entryMove, exitMove, keyMove } = flowVal
+            return (
+              category === entryMove.category &&
+              entryMove.category === keyMove.category &&
+              keyMove.category === exitMove.category
+            )
+          })
+          .map(([flowId]) => flowId as FlowId),
+      )
+    } else if (subCategoryRadio.custom) {
+      console.log('wip')
     }
-  }, [category, categorySearch, getLsFlows, getLsUserMoveCategories, isSingle])
+  }, [
+    category,
+    categorySearch,
+    getLsFlows,
+    getLsUserMoveCategories,
+    subCategoryRadio,
+  ])
 
   //Handle existing combo querystring
   useEffect(() => {
@@ -408,38 +432,56 @@ const RenderMakeCombo = () => {
                             className="ml-1"
                             type="radio"
                             name="singleOrMulti"
-                            checked={isSingle}
-                            onChange={() => setIsSingle((prev) => !prev)}
+                            checked={subCategoryRadio.single}
+                            onChange={() =>
+                              setSubCategoryRadio({ single: true })
+                            }
                           />
                         </label>
-                        <label className=" ml-2">
+                        {/* <label className=" ml-2">
                           Custom
                           <input
                             type="radio"
                             name="singleOrMulti"
                             className="ml-1"
-                            checked={!isSingle}
-                            onChange={() => setIsSingle((prev) => !prev)}
+                            checked={subCategoryRadio.custom}
+                            onChange={() =>
+                              setSubCategoryRadio({ custom: true })
+                            }
+                          />
+                        </label> */}
+                        <label className=" ml-2">
+                          Any Singular Category
+                          <input
+                            type="radio"
+                            name="singleOrMulti"
+                            className="ml-1"
+                            checked={subCategoryRadio.anySingle}
+                            onChange={() =>
+                              setSubCategoryRadio({ anySingle: true })
+                            }
                           />
                         </label>
                       </section>
-                      <select
-                        className="focus:shadow-outline mt-1 block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
-                        value={category}
-                        onChange={(e) => {
-                          setCategory(e.target.value as KeyOfMoves)
-                        }}
-                      >
-                        <option value="">Select a category</option>
-                        {moveCategories &&
-                          moveCategories.map((category) => {
-                            return (
-                              <option key={category} value={category}>
-                                {category}
-                              </option>
-                            )
-                          })}
-                      </select>
+                      {subCategoryRadio.single && (
+                        <select
+                          className="focus:shadow-outline mt-1 block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
+                          value={category}
+                          onChange={(e) => {
+                            setCategory(e.target.value as KeyOfMoves)
+                          }}
+                        >
+                          <option value="">Select a category</option>
+                          {moveCategories &&
+                            moveCategories.map((category) => {
+                              return (
+                                <option key={category} value={category}>
+                                  {category}
+                                </option>
+                              )
+                            })}
+                        </select>
+                      )}
                     </article>
                   )}
                 </article>
