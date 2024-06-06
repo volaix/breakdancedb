@@ -13,17 +13,18 @@ import {
   ComboMove,
   FlowDictionary,
   FlowId,
+  KeyOfMoves,
   MoveCategories,
   MoveId,
   TransitionId,
   lsToprock,
-} from '../../_utils/localStorageTypes'
+} from '../../_utils/lsTypes'
 import {
   makeComboId,
   makeFlowId,
   makeMoveId,
   makeTransitionId,
-} from '../../_utils/lsMakers'
+} from '../../_utils/lsGenerators'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
 
 const confidenceRanking = new Map<number, string>([
@@ -56,7 +57,7 @@ function convertComboMovesToSelectedComboSeq(
 //-----------------local types-------------
 
 type SelectedComboNumber = boolean[]
-//TODO this is actually better as a map?
+
 type SelectedComboSeq = {
   [key: number]: {
     id?: FlowId | MoveId | TransitionId | 'custom'
@@ -75,13 +76,18 @@ const RenderMakeCombo = () => {
   //------------------------------state---------------------------------
   const [rating, setRating] = useState<number>(1)
   const [hideUsedFlows, setHideUsedFlows] = useState<boolean>(true)
+  const [subCategoryRadio, setSubCategoryRadio] = useState<{
+    single?: true
+    custom?: true
+    anySingle?: true
+  }>({ single: true })
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
-  const [flows, setFlows] = useState<FlowDictionary | null>(null)
+  const [displayFlows, setDisplayFlows] = useState<FlowDictionary | null>(null)
   const [selectedMoveKey, setSelectedMoveKey] =
     useState<MoveCategories>(lsToprock)
   const [customInputVal, setCustomInputVal] = useState<string>('')
@@ -92,18 +98,75 @@ const RenderMakeCombo = () => {
   const [selectedComboSeq, setSelectedComboSeq] =
     useState<SelectedComboSeq | null>(null)
   const [existingComboId, setSelectedComboId] = useState<ComboId>()
+  const [categorySearch, setCategorySearch] = useState<boolean>(false)
+
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsComboById = useZustandStore((state) => state.getLsComboById)
+  const getLsUserMoveCategories = useZustandStore(
+    (state) => state.getLsUserMoveCategories,
+  )
 
+  const [moveCategories, setMoveCategories] = useState<KeyOfMoves[]>()
+  const [category, setCategory] = useState<KeyOfMoves>()
+  const [filterFlowIds, setFilterFlowIds] = useState<FlowId[]>()
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
   const router = useRouter()
   const searchParams = useSearchParams()
 
   //-----------------------------hooks-------------------------------
+  //ADV. OPT. Category Search
+  useEffect(() => {
+    if (!categorySearch) return
+    const lsFlows = getLsFlows()
+    if (!lsFlows) return
+
+    //Sets info for the category dropdown
+    setMoveCategories(getLsUserMoveCategories())
+
+    //Sets the filters for flow
+    if (subCategoryRadio.anySingle) {
+      //get all single flows
+      setFilterFlowIds(
+        Object.entries(lsFlows)
+          .filter(([_, flowVal]) => {
+            if (!flowVal) return false
+            const { entryMove, exitMove, keyMove } = flowVal
+            return (
+              entryMove.category === keyMove.category &&
+              keyMove.category === exitMove.category
+            )
+          })
+          .map(([flowId]) => flowId as FlowId),
+      )
+    } else if (subCategoryRadio.single) {
+      setFilterFlowIds(
+        Object.entries(lsFlows)
+          .filter(([_, flowVal]) => {
+            if (!flowVal) return false
+            const { entryMove, exitMove, keyMove } = flowVal
+            return (
+              category === entryMove.category &&
+              entryMove.category === keyMove.category &&
+              keyMove.category === exitMove.category
+            )
+          })
+          .map(([flowId]) => flowId as FlowId),
+      )
+    } else if (subCategoryRadio.custom) {
+      console.log('wip')
+    }
+  }, [
+    category,
+    categorySearch,
+    getLsFlows,
+    getLsUserMoveCategories,
+    subCategoryRadio,
+  ])
+
   //Handle existing combo querystring
   useEffect(() => {
     const existingId = searchParams.get(comboIdKey) as ComboId
@@ -194,13 +257,13 @@ const RenderMakeCombo = () => {
 
   //gets flows on mount
   useEffect(() => {
-    setFlows(getLsFlows())
+    setDisplayFlows(getLsFlows())
   }, [getLsFlows])
 
   //-----------------------------render---------------------------------
   return (
     <main className="mt-20 flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
-      <header>
+      <hgroup>
         <h1 className="title-font mb-2 text-center text-3xl font-medium sm:text-4xl dark:text-white">
           {existingComboId ? 'Edit Combo' : 'Make Combo'}
         </h1>
@@ -209,7 +272,7 @@ const RenderMakeCombo = () => {
             {`Make a combo for use in cyphers, battles, performances, or just for fun.`}
           </p>
         )}
-      </header>
+      </hgroup>
       {/* ---------------------spacer------------------- */}
       <section className="mb-4 mt-2 flex w-10 justify-center">
         <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500" />
@@ -218,16 +281,12 @@ const RenderMakeCombo = () => {
       <article className="mt-5 w-full px-5">
         <h2 className="text-xs ">Combo Name:</h2>
         <input
-          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs
-  leading-8 text-gray-700 outline-none
- transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
- dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
           type="text"
           value={title}
           placeholder="Super Combo 9000"
           onChange={(e) => setTitle(e.target.value)}
         />
-        <button>RNG Name</button>
       </article>
       {/* --------------------combo sequence------------------ */}
       <article className="w-full px-5">
@@ -336,118 +395,210 @@ const RenderMakeCombo = () => {
                 type="radio"
               />
             </label>
+            {/* -----------------advanced options---------------- */}
+            <section className="mt-5 text-center">
+              <details className="flex flex-col text-center leading-snug">
+                <summary className="text-xs">Advanced Options</summary>
+                <section className="mt-2">
+                  <section className="ml-2 mt-1 ">
+                    <label className="text-xs">Hide Used</label>
+                    <input
+                      className="ml-2"
+                      checked={hideUsedFlows}
+                      onClick={() => setHideUsedFlows((prev) => !prev)}
+                      type="checkbox"
+                    />
+                  </section>
+                </section>
+
+                <article>
+                  <section>
+                    <label className="text-xs">
+                      Category Search
+                      <input
+                        className="ml-2"
+                        checked={categorySearch}
+                        onClick={() => setCategorySearch((prev) => !prev)}
+                        type="checkbox"
+                      />
+                    </label>
+                  </section>
+                  {categorySearch && (
+                    <article>
+                      <section className="mt-1 text-2xs">
+                        <label className="">
+                          Single
+                          <input
+                            className="ml-1"
+                            type="radio"
+                            name="singleOrMulti"
+                            checked={subCategoryRadio.single}
+                            onChange={() =>
+                              setSubCategoryRadio({ single: true })
+                            }
+                          />
+                        </label>
+                        {/* <label className=" ml-2">
+                          Custom
+                          <input
+                            type="radio"
+                            name="singleOrMulti"
+                            className="ml-1"
+                            checked={subCategoryRadio.custom}
+                            onChange={() =>
+                              setSubCategoryRadio({ custom: true })
+                            }
+                          />
+                        </label> */}
+                        <label className=" ml-2">
+                          Any Singular Category
+                          <input
+                            type="radio"
+                            name="singleOrMulti"
+                            className="ml-1"
+                            checked={subCategoryRadio.anySingle}
+                            onChange={() =>
+                              setSubCategoryRadio({ anySingle: true })
+                            }
+                          />
+                        </label>
+                      </section>
+                      {subCategoryRadio.single && (
+                        <select
+                          className="focus:shadow-outline mt-1 block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
+                          value={category}
+                          onChange={(e) => {
+                            setCategory(e.target.value as KeyOfMoves)
+                          }}
+                        >
+                          <option value="">Select a category</option>
+                          {moveCategories &&
+                            moveCategories.map((category) => {
+                              return (
+                                <option key={category} value={category}>
+                                  {category}
+                                </option>
+                              )
+                            })}
+                        </select>
+                      )}
+                    </article>
+                  )}
+                </article>
+              </details>
+              <section className="flex flex-col"></section>
+            </section>
+            {/* ------------------end of advanced options------------- */}
             {checked.flows && (
               <section className="flex flex-col ">
-                <section className="ml-2 mt-1 flex">
-                  <label className="text-xs">Hide Used</label>
-                  <input
-                    className="ml-2"
-                    checked={hideUsedFlows}
-                    onClick={() => setHideUsedFlows(!hideUsedFlows)}
-                    type="checkbox"
-                  />
-                </section>
                 <section className="mt-2 flex overflow-x-scroll">
-                  {flows &&
-                    Object.entries(flows)
-                      .sort(([_, a], [__, b]) => b.rating - a.rating)
-                      .map(
-                        (
-                          [
-                            flowId,
-                            { entryMove, exitMove, keyMove, rating, notes },
-                          ],
-                          _,
-                        ) => {
-                          const combos = getLsCombos()
+                  {displayFlows &&
+                    Object.entries(displayFlows)
+                      .sort(([_, a], [__, b]) => {
+                        if (!b || !a) return 0
+                        return b.rating - a.rating
+                      })
+                      .map(([flowId, flowVal], _) => {
+                        if (!flowVal) return
+                        const { entryMove, exitMove, keyMove, rating, notes } =
+                          flowVal
+                        const combos = getLsCombos()
 
-                          //checks if flowId exists in one of the combos
-                          const flowIsUsed = Object.values(combos || {}).some(
-                            (a) => a.sequence.some((b) => b.id === flowId),
-                          )
+                        //checks if flowId exists in one of the combos
+                        const flowIsUsed = Object.values(combos || {}).some(
+                          (a) => a && a.sequence.some((b) => b.id === flowId),
+                        )
 
-                          //hide used flows if checkbox ticked
-                          if (flowIsUsed && hideUsedFlows) return
+                        //ADV OPT: Category Search.
+                        if (
+                          categorySearch &&
+                          filterFlowIds &&
+                          !filterFlowIds.some((a) => a === flowId)
+                        ) {
+                          return
+                        }
 
-                          const indexOfCurCombo =
-                            selectedComboNumber.indexOf(true)
-                          const isSelected =
-                            selectedComboSeq?.[indexOfCurCombo]?.type ===
-                              'flow' &&
-                            selectedComboSeq[indexOfCurCombo].moves.join('') ===
-                              [
-                                entryMove.displayName,
-                                keyMove.displayName,
-                                exitMove.displayName,
-                              ].join('')
+                        //ADV OPT: Hide used flows.
+                        if (flowIsUsed && hideUsedFlows) return
 
-                          return (
-                            <button
-                              className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
-                              key={flowId}
-                              onClick={() =>
-                                setSelectedComboSeq((prevState) => {
-                                  return {
-                                    ...prevState,
-                                    [indexOfCurCombo]: {
-                                      type: 'flow',
-                                      id: flowId as FlowId,
-                                      moves: [
-                                        entryMove.displayName,
-                                        keyMove.displayName,
-                                        exitMove.displayName,
-                                      ],
-                                    },
-                                  }
-                                })
-                              }
-                            >
-                              <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-3 text-center dark:bg-gray-800 dark:bg-opacity-40">
-                                <section className="flex flex-row-reverse">
-                                  {Array.from(Array(5)).map((_, i) => {
-                                    return (
-                                      <RenderThunder
-                                        key={i}
-                                        checked={i === 5 - rating}
-                                      />
-                                    )
-                                  })}
-                                </section>
+                        const indexOfCurCombo =
+                          selectedComboNumber.indexOf(true)
+                        const isSelected =
+                          selectedComboSeq?.[indexOfCurCombo]?.type ===
+                            'flow' &&
+                          selectedComboSeq[indexOfCurCombo].moves.join('') ===
+                            [
+                              entryMove.displayName,
+                              keyMove.displayName,
+                              exitMove.displayName,
+                            ].join('')
 
-                                <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                                  {[
-                                    {
-                                      category: entryMove.category,
-                                      displayText: entryMove.displayName,
-                                    },
-                                    {
-                                      category: keyMove.category,
-                                      displayText: keyMove.displayName,
-                                    },
-                                    {
-                                      category: exitMove.category,
-                                      displayText: exitMove.displayName,
-                                    },
-                                  ].map(({ category, displayText }) => {
-                                    return (
-                                      <section
-                                        key={displayText}
-                                        className="flex flex-col items-start overflow-hidden	text-ellipsis whitespace-nowrap	leading-none"
-                                      >
-                                        <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
-                                        <p>{displayText}</p>
-                                      </section>
-                                    )
-                                  })}
-                                </section>
-                                <p className="text-[6px]  leading-relaxed">
-                                  {notes}
-                                </p>
-                              </div>
-                            </button>
-                          )
-                        },
-                      )}
+                        return (
+                          <button
+                            className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
+                            key={flowId}
+                            onClick={() =>
+                              setSelectedComboSeq((prevState) => {
+                                return {
+                                  ...prevState,
+                                  [indexOfCurCombo]: {
+                                    type: 'flow',
+                                    id: flowId as FlowId,
+                                    moves: [
+                                      entryMove.displayName,
+                                      keyMove.displayName,
+                                      exitMove.displayName,
+                                    ],
+                                  },
+                                }
+                              })
+                            }
+                          >
+                            <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-3 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                              <section className="flex flex-row-reverse">
+                                {Array.from(Array(5)).map((_, i) => {
+                                  return (
+                                    <RenderThunder
+                                      key={i}
+                                      checked={i === 5 - rating}
+                                    />
+                                  )
+                                })}
+                              </section>
+
+                              <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+                                {[
+                                  {
+                                    category: entryMove.category,
+                                    displayText: entryMove.displayName,
+                                  },
+                                  {
+                                    category: keyMove.category,
+                                    displayText: keyMove.displayName,
+                                  },
+                                  {
+                                    category: exitMove.category,
+                                    displayText: exitMove.displayName,
+                                  },
+                                ].map(({ category, displayText }) => {
+                                  return (
+                                    <section
+                                      key={displayText}
+                                      className="flex flex-col items-start overflow-hidden text-ellipsis whitespace-nowrap leading-none"
+                                    >
+                                      <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
+                                      <p>{displayText}</p>
+                                    </section>
+                                  )
+                                })}
+                              </section>
+                              <p className="text-[6px]  leading-relaxed">
+                                {notes}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
                 </section>
               </section>
             )}
@@ -543,7 +694,7 @@ const RenderMakeCombo = () => {
           </article>
           {/* ---------------------custom------------------ */}
           <article>
-            <label className="flex rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest  text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
+            <label className="flex rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
               CUSTOM
               <input
                 className="ml-2"
@@ -580,7 +731,7 @@ const RenderMakeCombo = () => {
                     disabled={!checked.custom}
                     value={customInputVal}
                     onChange={(e) => setCustomInputVal(e.target.value || '')}
-                    className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8  text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                    className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
                     type="text"
                     defaultValue={''}
                   />

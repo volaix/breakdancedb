@@ -20,8 +20,8 @@ import {
   lsUserLearning,
   lsUserMoves,
   ZustandGlobalStore,
-} from './localStorageTypes'
-import { isGlobalStateV0, isGlobalStateV2 } from './migrationStates'
+} from './lsTypes'
+import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 
 const currentVersion: number = 3
 
@@ -121,6 +121,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           values: string[],
         ) => {
           return set((state) => {
+            if (!state[lsUserMoves]) return
             state[lsUserMoves][key] = [...values]
           })
         },
@@ -128,6 +129,9 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           key: keyof GlobalStateProperties[typeof lsUserMoves],
         ) => {
           return get()[lsUserMoves][key]
+        },
+        getLsUserMoveCategories: () => {
+          return Object.keys(get()[lsUserMoves])
         },
 
         //=================================
@@ -166,7 +170,8 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           }
           //if there's existing footwork, reuse it
           if (persistedState[lsUserMoves].length > 0) {
-            base[lsUserMoves][lsFootwork] = persistedState[lsUserMoves]
+            ;(base[lsUserMoves] as any)[lsFootwork] =
+              persistedState[lsUserMoves]
           }
           return base
         }

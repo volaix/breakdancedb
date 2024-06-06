@@ -1,17 +1,12 @@
 import { useLocalStorage } from '@/app/_utils/lib'
-import {
-  Move,
-  MovementGroup,
-  Position,
-  Transition,
-} from '@/app/_utils/localStorageTypes'
+import { Move, MovementGroup, Position, Transition } from '@/app/_utils/lsTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,
   makeMovementId,
   makePositionId,
   makeTransitionId,
-} from '@/app/_utils/lsMakers'
+} from '@/app/_utils/lsGenerators'
 import { Dispatch, MouseEventHandler, SetStateAction, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 

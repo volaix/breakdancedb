@@ -1,12 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
-import { makeMoveId } from '@/app/_utils/lsMakers'
-import { Move } from '@/app/_utils/localStorageTypes'
+import { makeMoveId } from '@/app/_utils/lsGenerators'
+import { Move } from '@/app/_utils/lsTypes'
 import { useMoveStore } from './store'
-import { makeTransitions } from '@/app/_utils/lsMakers'
-import { makePositions } from '@/app/_utils/lsMakers'
-import { makeDefaultTransitionNames } from '@/app/_utils/lsMakers'
+import { makeTransitions } from '@/app/_utils/lsGenerators'
+import { makePositions } from '@/app/_utils/lsGenerators'
+import { makeDefaultTransitionNames } from '@/app/_utils/lsGenerators'
 import rocks from '@/db/rocks.json'
 import { useRouter } from 'next/navigation'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
@@ -36,7 +36,7 @@ const RenderPosition = ({ position }: { position: number }) => {
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
           name="name"
-          className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:text-gray-500 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+          className="w-full resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-6 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40  dark:text-gray-500 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
         />
       </div>
     </div>

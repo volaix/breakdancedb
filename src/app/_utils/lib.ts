@@ -1,6 +1,6 @@
 import rocks from '@/db/rocks.json'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { ComboId, Round } from './localStorageTypes'
+import { ComboId, Round } from './lsTypes'
 
 //---------------JS HELPERS-------------------
 /**

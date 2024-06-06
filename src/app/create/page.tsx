@@ -51,13 +51,13 @@ export default function RenderFlows() {
       </section>
       {/* ----------END OF TITLE SECTION------------- */}
       {/* //----------------------BASE MOVE----------------------- */}
-      <article className="w-full rounded-lg bg-slate-100 p-2 pb-10">
+      <article className="w-full rounded-lg bg-slate-100 p-2 pb-10 dark:bg-gray-800 dark:bg-opacity-40">
         <h2 className="text-lg">BASE MOVE</h2>
         <Selection />
       </article>
       {/* //--------------------------END OF BASE MOVE------------------------------- */}
       {/* -------------------MODIFIER---------------- */}
-      <article className="mt-5 w-full rounded-lg bg-slate-100 p-2 pb-10">
+      <article className="mt-5 w-full rounded-lg bg-slate-100 p-2 pb-10 dark:bg-gray-800 dark:bg-opacity-40">
         <h2 className="text-lg">MODIFIER</h2>
         <Selection modifier />
       </article>

@@ -4,13 +4,13 @@ import {
   MovementGroup,
   PositionId,
   TransitionId,
-} from '@/app/_utils/localStorageTypes'
+} from '@/app/_utils/lsTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,
   makePositionId,
   makeTransitionId,
-} from '@/app/_utils/lsMakers'
+} from '@/app/_utils/lsGenerators'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 import { produce } from 'immer'
 import { Dispatch, SetStateAction, useState } from 'react'

@@ -1,6 +1,6 @@
 'use client'
 // @format
-import { makeFlowId } from '@/app/_utils/lsMakers'
+import { makeFlowId } from '@/app/_utils/lsGenerators'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
@@ -25,7 +25,7 @@ import {
   lsSuicides,
   lsToprock,
   lsUserMoves,
-} from '../_utils/localStorageTypes'
+} from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 const categories: Category[] = [
@@ -42,7 +42,7 @@ const categories: Category[] = [
 
 const likeRanking = new Map<number, string>([
   [5, 'Super Cool!'],
-  [4, 'what i want to be'],
+  [4, 'ok ill use it'],
   [3, 'ok but not for me'],
   [2, 'this sucks'],
   [1, 'I tried'],
@@ -388,12 +388,7 @@ export default function RenderFlows() {
                                 //should hide based on advanced flags
                                 const shouldHideMove = (
                                   hideCondition: boolean,
-                                  movesUsed:
-                                    | {
-                                        displayName: string
-                                        category: string
-                                      }[]
-                                    | undefined,
+                                  movesUsed?: BasicMove[],
                                 ) =>
                                   hideCondition &&
                                   movesUsed?.some(

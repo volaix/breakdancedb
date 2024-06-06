@@ -11,8 +11,8 @@ import {
   RenderEditButton,
   RenderInfoSVG,
 } from '../_components/Svgs'
-import { ComboDictionary, ComboId, Round } from '../_utils/localStorageTypes'
-import { makeRoundId } from '../_utils/lsMakers'
+import { ComboDictionary, ComboId, Round } from '../_utils/lsTypes'
+import { makeRoundId } from '../_utils/lsGenerators'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
@@ -325,7 +325,7 @@ export default function RenderBattlePage() {
                                                 value={lsComboId}
                                                 key={i}
                                               >
-                                                {comboDetails.displayName}
+                                                {comboDetails?.displayName}
                                               </option>
                                             )
                                           }
@@ -424,8 +424,9 @@ export default function RenderBattlePage() {
                                 lsCombos[comboId as ComboId] && (
                                   <article className="flex flex-row-reverse place-content-center pt-1">
                                     {Array.from(Array(5)).map((_, i) => {
-                                      const { execution } =
-                                        lsCombos[comboId as ComboId]
+                                      const combo = lsCombos[comboId as ComboId]
+                                      if (!combo) return null
+                                      const { execution } = combo
                                       return (
                                         <RenderThunder
                                           id={5 - i + ''}

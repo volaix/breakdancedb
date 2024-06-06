@@ -13,7 +13,7 @@ import {
   lsSuicides,
   lsToprock,
   lsUserMoves,
-} from '../_utils/localStorageTypes'
+} from '../_utils/lsTypes'
 import { isValidKey } from '../_utils/lsValidation'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
