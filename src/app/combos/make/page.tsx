@@ -13,6 +13,7 @@ import {
   ComboMove,
   FlowDictionary,
   FlowId,
+  KeyOfMoves,
   MoveCategories,
   MoveId,
   TransitionId,
@@ -23,7 +24,7 @@ import {
   makeFlowId,
   makeMoveId,
   makeTransitionId,
-} from '../../_utils/lsMakers'
+} from '../../_utils/lsGenerators'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
 
 const confidenceRanking = new Map<number, string>([
@@ -56,7 +57,7 @@ function convertComboMovesToSelectedComboSeq(
 //-----------------local types-------------
 
 type SelectedComboNumber = boolean[]
-//TODO this is actually better as a map?
+
 type SelectedComboSeq = {
   [key: number]: {
     id?: FlowId | MoveId | TransitionId | 'custom'
@@ -92,18 +93,32 @@ const RenderMakeCombo = () => {
   const [selectedComboSeq, setSelectedComboSeq] =
     useState<SelectedComboSeq | null>(null)
   const [existingComboId, setSelectedComboId] = useState<ComboId>()
+  const [categorySearch, setCategorySearch] = useState<boolean>(false)
+
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsComboById = useZustandStore((state) => state.getLsComboById)
+  const getLsUserMoveCategories = useZustandStore(
+    (state) => state.getLsUserMoveCategories,
+  )
 
+  const [moveCategories, setMoveCategories] = useState<KeyOfMoves[]>()
+  const [category, setCategory] = useState<KeyOfMoves>()
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
   const router = useRouter()
   const searchParams = useSearchParams()
 
   //-----------------------------hooks-------------------------------
+  //ADV. OPT.
+  useEffect(() => {
+    if (categorySearch) {
+      setMoveCategories(getLsUserMoveCategories())
+    }
+  }, [categorySearch, getLsUserMoveCategories])
+
   //Handle existing combo querystring
   useEffect(() => {
     const existingId = searchParams.get(comboIdKey) as ComboId
@@ -218,10 +233,7 @@ const RenderMakeCombo = () => {
       <article className="mt-5 w-full px-5">
         <h2 className="text-xs ">Combo Name:</h2>
         <input
-          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs
-  leading-8 text-gray-700 outline-none
- transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 
- dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+          className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
           type="text"
           value={title}
           placeholder="Super Combo 9000"
@@ -336,17 +348,72 @@ const RenderMakeCombo = () => {
                 type="radio"
               />
             </label>
+            {/* -----------------advanced options---------------- */}
+            <section className="mt-5 text-center">
+              <details className="flex flex-col leading-snug">
+                <summary className="text-xs">Advanced Options</summary>
+                <section className="mt-2">
+                  <section className="ml-2 mt-1 flex">
+                    <label className="text-xs">Hide Used</label>
+                    <input
+                      className="ml-2"
+                      checked={hideUsedFlows}
+                      onClick={() => setHideUsedFlows((prev) => !prev)}
+                      type="checkbox"
+                    />
+                  </section>
+                </section>
+
+                <article>
+                  <section>
+                    <label className="text-xs">
+                      Category Search
+                      <input
+                        className="ml-2"
+                        checked={categorySearch}
+                        onClick={() => setCategorySearch((prev) => !prev)}
+                        type="checkbox"
+                      />
+                    </label>
+                  </section>
+                  {categorySearch && (
+                    <article>
+                      <section>
+                        <label className="text-xs">
+                          single
+                          <input type="radio" name="singleOrMulti" />
+                        </label>
+                        <label className="text-xs">
+                          custom
+                          <input type="radio" name="singleOrMulti" />
+                        </label>
+                      </section>
+                      <select
+                        className="focus:shadow-outline block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
+                        value={category}
+                        onChange={(e) => {
+                          setCategory(e.target.value as KeyOfMoves)
+                        }}
+                      >
+                        <option value="">Select a category</option>
+                        {moveCategories &&
+                          moveCategories.map((category) => {
+                            return (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            )
+                          })}
+                      </select>
+                    </article>
+                  )}
+                </article>
+              </details>
+              <section className="flex flex-col"></section>
+            </section>
+            {/* ------------------end of advanced options------------- */}
             {checked.flows && (
               <section className="flex flex-col ">
-                <section className="ml-2 mt-1 flex">
-                  <label className="text-xs">Hide Used</label>
-                  <input
-                    className="ml-2"
-                    checked={hideUsedFlows}
-                    onClick={() => setHideUsedFlows(!hideUsedFlows)}
-                    type="checkbox"
-                  />
-                </section>
                 <section className="mt-2 flex overflow-x-scroll">
                   {flows &&
                     Object.entries(flows)
@@ -432,7 +499,7 @@ const RenderMakeCombo = () => {
                                     return (
                                       <section
                                         key={displayText}
-                                        className="flex flex-col items-start overflow-hidden	text-ellipsis whitespace-nowrap	leading-none"
+                                        className="flex flex-col items-start overflow-hidden text-ellipsis whitespace-nowrap leading-none"
                                       >
                                         <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
                                         <p>{displayText}</p>
@@ -543,7 +610,7 @@ const RenderMakeCombo = () => {
           </article>
           {/* ---------------------custom------------------ */}
           <article>
-            <label className="flex rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest  text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
+            <label className="flex rounded bg-indigo-50 px-2 py-1 text-xs font-medium tracking-widest text-indigo-500 dark:bg-gray-800 dark:text-gray-400">
               CUSTOM
               <input
                 className="ml-2"
@@ -580,7 +647,7 @@ const RenderMakeCombo = () => {
                     disabled={!checked.custom}
                     value={customInputVal}
                     onChange={(e) => setCustomInputVal(e.target.value || '')}
-                    className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8  text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                    className="w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-base leading-8 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
                     type="text"
                     defaultValue={''}
                   />
