@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
 import { RenderDeleteButtonSVG } from '../_components/Svgs'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
-import { ComboDictionary, ComboId } from '../_utils/localStorageTypes'
+import { ComboDictionary, ComboId } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
@@ -89,81 +89,78 @@ export default function RenderViewCombos() {
       {/* ---------render combo boxes ------------ */}
       <section className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
         {combos &&
-          Object.entries(combos).map(
-            ([comboId, { displayName, notes, execution, sequence }], i) => {
-              //Advanced Option
-              if (
-                hideMovesIfBattle &&
-                combosInBattle?.includes(comboId as ComboId)
-              ) {
-                return
-              }
+          Object.entries(combos).map(([comboId, comboVal], i) => {
+            if (!comboVal) return
+            const { displayName, notes, execution, sequence } = comboVal
+            //Advanced Option
+            if (
+              hideMovesIfBattle &&
+              combosInBattle?.includes(comboId as ComboId)
+            ) {
+              return
+            }
 
-              return (
-                <article className="break-inside-avoid-column" key={comboId}>
-                  <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
-                    <RenderDeleteButtonSVG
-                      onClick={() => {
-                        deleteLsCombo(comboId as ComboId)
-                        updateCombos()
-                      }}
-                      className="absolute right-2 top-2 size-2"
-                    />
-                    <h2 className="bold text-xs dark:text-white">
-                      {displayName}
-                    </h2>
-                    <div className="mt-2 flex flex-row-reverse justify-center">
-                      {Array.from(Array(5)).map((_, i) => {
-                        return (
-                          <RenderThunder
-                            key={i}
-                            checked={i === 5 - execution}
-                          />
-                        )
-                      })}
-                    </div>
-                    <label className="text-[9px]">Execution</label>
+            return (
+              <article className="break-inside-avoid-column" key={comboId}>
+                <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                  <RenderDeleteButtonSVG
+                    onClick={() => {
+                      deleteLsCombo(comboId as ComboId)
+                      updateCombos()
+                    }}
+                    className="absolute right-2 top-2 size-2"
+                  />
+                  <h2 className="bold text-xs dark:text-white">
+                    {displayName}
+                  </h2>
+                  <div className="mt-2 flex flex-row-reverse justify-center">
+                    {Array.from(Array(5)).map((_, i) => {
+                      return (
+                        <RenderThunder key={i} checked={i === 5 - execution} />
+                      )
+                    })}
+                  </div>
+                  <label className="text-[9px]">Execution</label>
 
-                    <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                      {sequence.map(({ moves }, index) => {
-                        return (
-                          <div
-                            key={moves.toString()}
-                            className="flex flex-col items-start text-ellipsis"
-                          >
-                            <div className="text-[6px] text-gray-400 dark:text-gray-500">
-                              {index + 1}
-                            </div>
-                            <div>{moves.join(' -> ')}</div>
+                  <h1 className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+                    {sequence.map(({ moves }, index) => {
+                      return (
+                        <div
+                          key={moves.toString()}
+                          className="flex flex-col items-start text-ellipsis"
+                        >
+                          <div className="text-[6px] text-gray-400 dark:text-gray-500">
+                            {index + 1}
                           </div>
-                        )
-                      })}
-                    </h1>
-                    {/* ------------edit----------- */}
-                    <section>
-                      {comboId && (
-                        <button
-                          onClick={(_) => {
-                            console.log('move user to edit combo page')
-                            router.push(`/combos/make?${comboIdKey}=${comboId}`)
-                          }}
-                          className="ml-1 inline-flex h-fit rounded border-0 
+                          <div>{moves.join(' -> ')}</div>
+                        </div>
+                      )
+                    })}
+                  </h1>
+                  {/* ------------edit----------- */}
+                  <section>
+                    {comboId && (
+                      <button
+                        onClick={(_) => {
+                          console.log('move user to edit combo page')
+                          router.push(`/combos/make?${comboIdKey}=${comboId}`)
+                        }}
+                        className="ml-1 inline-flex h-fit rounded border-0 
                                 bg-indigo-500 p-0.5 text-[7px] 
                                 text-white hover:bg-indigo-600 focus:outline-none"
-                        >
-                          EDIT COMBO
-                        </button>
-                      )}
-                    </section>
-
-                    {/* --------notes--------- */}
-                    <label className="text-[9px]">Notes</label>
-                    <p className="text-[6px]  leading-relaxed">{notes}</p>
+                      >
+                        EDIT COMBO
+                      </button>
+                    )}
                   </section>
-                </article>
-              )
-            },
-          )}
+
+                  {/* --------notes--------- */}
+                  <label className="text-[9px]">Notes</label>
+                  <p className="text-[6px]  leading-relaxed">{notes}</p>
+                </section>
+              </article>
+            )
+          })}
       </section>
       {/* -------------------end of combos--------------------- */}
     </main>

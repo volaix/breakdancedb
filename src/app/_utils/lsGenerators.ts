@@ -1,4 +1,12 @@
 import { v4, validate } from 'uuid'
+import {
+  COMBO_PREFIX,
+  FLOW_PREFIX,
+  MOVEMENT_PREFIX,
+  POSITION_PREFIX,
+  ROUND_PREFIX,
+  TRANSITION_PREFIX,
+} from './lsSchemas'
 
 import {
   ComboId,
@@ -12,7 +20,8 @@ import {
   Transition,
   TransitionId,
   Transitions,
-} from './localStorageTypes'
+} from './lsTypes'
+import { MOVE_PREFIX } from './lsSchemas'
 
 // ------------------------validators-----------------------------
 
@@ -45,28 +54,34 @@ const isTransitionId = (id: string): boolean => {
 //   return new RegExp(`^movement-${uuidPattern}$`).test(id)
 // }
 
-// ------------------------makers-----------------------------
+// ------------------------ID GENERATORS-----------------------------
 
 export const makeMoveId = (): MoveId => {
-  return `move-${v4()}` as MoveId
+  return `${MOVE_PREFIX}${v4()}` as MoveId
 }
+
 export const makeFlowId = (): FlowId => {
-  return `flow-${v4()}` as FlowId
+  return `${FLOW_PREFIX}${v4()}` as FlowId
 }
+
 export const makePositionId = (): PositionId => {
-  return `position-${v4()}` as PositionId
+  return `${POSITION_PREFIX}${v4()}` as PositionId
 }
+
 export const makeComboId = (): ComboId => {
-  return `combo-${v4()}` as ComboId
+  return `${COMBO_PREFIX}${v4()}` as ComboId
 }
+
 export const makeRoundId = (): RoundId => {
-  return `round-${v4()}` as RoundId
+  return `${ROUND_PREFIX}${v4()}` as RoundId
 }
+
 export const makeTransitionId = (): TransitionId => {
-  return `transition-${v4()}` as TransitionId
+  return `${TRANSITION_PREFIX}${v4()}` as TransitionId
 }
+
 export const makeMovementId = (): MovementId => {
-  return `movement-${v4()}` as MovementId
+  return `${MOVEMENT_PREFIX}${v4()}` as MovementId
 }
 
 /**

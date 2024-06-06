@@ -1,6 +1,6 @@
 'use client'
 // @format
-import { makeFlowId } from '@/app/_utils/lsMakers'
+import { makeFlowId } from '@/app/_utils/lsGenerators'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
@@ -25,7 +25,7 @@ import {
   lsSuicides,
   lsToprock,
   lsUserMoves,
-} from '../_utils/localStorageTypes'
+} from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 const categories: Category[] = [

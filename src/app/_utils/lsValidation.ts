@@ -1,8 +1,8 @@
-import { LocalStorageValues, lsUserMoves } from './localStorageTypes'
+import { LocalStorageValues, lsUserMoves } from './lsTypes'
 import { validate } from 'uuid'
-import { BasicFlow, MoveId, Move } from './localStorageTypes'
+import { BasicFlow, MoveId, Move } from './lsTypes'
 import { initialState } from './zustandLocalStorage'
-import { GlobalStateProperties } from './localStorageTypes'
+import { GlobalStateProperties } from './lsTypes'
 
 /**
  * Checks if the passed value is a typeof moveid

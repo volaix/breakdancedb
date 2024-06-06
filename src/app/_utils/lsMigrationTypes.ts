@@ -1,4 +1,4 @@
-import { BasicFlow } from './localStorageTypes'
+import { BasicFlow } from './lsTypes'
 import {
   lsFlows,
   FlowDictionary,
@@ -15,7 +15,7 @@ import {
   lsUserLearning,
   Move,
   lsDanceList,
-} from './localStorageTypes'
+} from './lsTypes'
 
 //==============MIGRATION STATES==================
 /**

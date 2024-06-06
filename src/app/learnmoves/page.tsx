@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Move } from '../_utils/localStorageTypes'
+import { Move } from '../_utils/lsTypes'
 import Link from 'next/link'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 

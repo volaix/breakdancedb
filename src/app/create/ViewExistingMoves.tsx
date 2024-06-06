@@ -18,7 +18,7 @@ import {
   lsSuicides,
   lsToprock,
   lsUserMoves,
-} from '../_utils/localStorageTypes'
+} from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //TODO: This should be derived from state

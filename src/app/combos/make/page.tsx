@@ -18,7 +18,7 @@ import {
   MoveId,
   TransitionId,
   lsToprock,
-} from '../../_utils/localStorageTypes'
+} from '../../_utils/lsTypes'
 import {
   makeComboId,
   makeFlowId,
@@ -417,104 +417,102 @@ const RenderMakeCombo = () => {
                 <section className="mt-2 flex overflow-x-scroll">
                   {flows &&
                     Object.entries(flows)
-                      .sort(([_, a], [__, b]) => b.rating - a.rating)
-                      .map(
-                        (
-                          [
-                            flowId,
-                            { entryMove, exitMove, keyMove, rating, notes },
-                          ],
-                          _,
-                        ) => {
-                          const combos = getLsCombos()
+                      .sort(([_, a], [__, b]) => {
+                        if (!b || !a) return 0
+                        return b.rating - a.rating
+                      })
+                      .map(([flowId, flowVal], _) => {
+                        if (!flowVal) return
+                        const { entryMove, exitMove, keyMove, rating, notes } =
+                          flowVal
+                        const combos = getLsCombos()
 
-                          //checks if flowId exists in one of the combos
-                          const flowIsUsed = Object.values(combos || {}).some(
-                            (a) => a.sequence.some((b) => b.id === flowId),
-                          )
+                        //checks if flowId exists in one of the combos
+                        const flowIsUsed = Object.values(combos || {}).some(
+                          (a) => a && a.sequence.some((b) => b.id === flowId),
+                        )
 
-                          //hide used flows if checkbox ticked
-                          if (flowIsUsed && hideUsedFlows) return
+                        //hide used flows if checkbox ticked
+                        if (flowIsUsed && hideUsedFlows) return
 
-                          const indexOfCurCombo =
-                            selectedComboNumber.indexOf(true)
-                          const isSelected =
-                            selectedComboSeq?.[indexOfCurCombo]?.type ===
-                              'flow' &&
-                            selectedComboSeq[indexOfCurCombo].moves.join('') ===
-                              [
-                                entryMove.displayName,
-                                keyMove.displayName,
-                                exitMove.displayName,
-                              ].join('')
+                        const indexOfCurCombo =
+                          selectedComboNumber.indexOf(true)
+                        const isSelected =
+                          selectedComboSeq?.[indexOfCurCombo]?.type ===
+                            'flow' &&
+                          selectedComboSeq[indexOfCurCombo].moves.join('') ===
+                            [
+                              entryMove.displayName,
+                              keyMove.displayName,
+                              exitMove.displayName,
+                            ].join('')
 
-                          return (
-                            <button
-                              className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
-                              key={flowId}
-                              onClick={() =>
-                                setSelectedComboSeq((prevState) => {
-                                  return {
-                                    ...prevState,
-                                    [indexOfCurCombo]: {
-                                      type: 'flow',
-                                      id: flowId as FlowId,
-                                      moves: [
-                                        entryMove.displayName,
-                                        keyMove.displayName,
-                                        exitMove.displayName,
-                                      ],
-                                    },
-                                  }
-                                })
-                              }
-                            >
-                              <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-3 text-center dark:bg-gray-800 dark:bg-opacity-40">
-                                <section className="flex flex-row-reverse">
-                                  {Array.from(Array(5)).map((_, i) => {
-                                    return (
-                                      <RenderThunder
-                                        key={i}
-                                        checked={i === 5 - rating}
-                                      />
-                                    )
-                                  })}
-                                </section>
+                        return (
+                          <button
+                            className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
+                            key={flowId}
+                            onClick={() =>
+                              setSelectedComboSeq((prevState) => {
+                                return {
+                                  ...prevState,
+                                  [indexOfCurCombo]: {
+                                    type: 'flow',
+                                    id: flowId as FlowId,
+                                    moves: [
+                                      entryMove.displayName,
+                                      keyMove.displayName,
+                                      exitMove.displayName,
+                                    ],
+                                  },
+                                }
+                              })
+                            }
+                          >
+                            <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-3 text-center dark:bg-gray-800 dark:bg-opacity-40">
+                              <section className="flex flex-row-reverse">
+                                {Array.from(Array(5)).map((_, i) => {
+                                  return (
+                                    <RenderThunder
+                                      key={i}
+                                      checked={i === 5 - rating}
+                                    />
+                                  )
+                                })}
+                              </section>
 
-                                <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
-                                  {[
-                                    {
-                                      category: entryMove.category,
-                                      displayText: entryMove.displayName,
-                                    },
-                                    {
-                                      category: keyMove.category,
-                                      displayText: keyMove.displayName,
-                                    },
-                                    {
-                                      category: exitMove.category,
-                                      displayText: exitMove.displayName,
-                                    },
-                                  ].map(({ category, displayText }) => {
-                                    return (
-                                      <section
-                                        key={displayText}
-                                        className="flex flex-col items-start overflow-hidden text-ellipsis whitespace-nowrap leading-none"
-                                      >
-                                        <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
-                                        <p>{displayText}</p>
-                                      </section>
-                                    )
-                                  })}
-                                </section>
-                                <p className="text-[6px]  leading-relaxed">
-                                  {notes}
-                                </p>
-                              </div>
-                            </button>
-                          )
-                        },
-                      )}
+                              <section className="title-font mb-1 text-[9px] font-medium text-black dark:text-white">
+                                {[
+                                  {
+                                    category: entryMove.category,
+                                    displayText: entryMove.displayName,
+                                  },
+                                  {
+                                    category: keyMove.category,
+                                    displayText: keyMove.displayName,
+                                  },
+                                  {
+                                    category: exitMove.category,
+                                    displayText: exitMove.displayName,
+                                  },
+                                ].map(({ category, displayText }) => {
+                                  return (
+                                    <section
+                                      key={displayText}
+                                      className="flex flex-col items-start overflow-hidden text-ellipsis whitespace-nowrap leading-none"
+                                    >
+                                      <h3 className="text-[6px] text-gray-400 dark:text-gray-500">{`${category}: `}</h3>
+                                      <p>{displayText}</p>
+                                    </section>
+                                  )
+                                })}
+                              </section>
+                              <p className="text-[6px]  leading-relaxed">
+                                {notes}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
                 </section>
               </section>
             )}
