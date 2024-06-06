@@ -42,7 +42,7 @@ const categories: Category[] = [
 
 const likeRanking = new Map<number, string>([
   [5, 'Super Cool!'],
-  [4, 'what i want to be'],
+  [4, 'ok ill use it'],
   [3, 'ok but not for me'],
   [2, 'this sucks'],
   [1, 'I tried'],
@@ -388,12 +388,7 @@ export default function RenderFlows() {
                                 //should hide based on advanced flags
                                 const shouldHideMove = (
                                   hideCondition: boolean,
-                                  movesUsed:
-                                    | {
-                                        displayName: string
-                                        category: string
-                                      }[]
-                                    | undefined,
+                                  movesUsed?: BasicMove[],
                                 ) =>
                                   hideCondition &&
                                   movesUsed?.some(
