@@ -76,13 +76,14 @@ const RenderMakeCombo = () => {
   //------------------------------state---------------------------------
   const [rating, setRating] = useState<number>(1)
   const [hideUsedFlows, setHideUsedFlows] = useState<boolean>(true)
+  const [isSingle, setIsSingle] = useState<boolean>(true)
   const [notes, setNotes] = useState<string>('')
   const [title, setTitle] = useState<string>('')
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
-  const [flows, setFlows] = useState<FlowDictionary | null>(null)
+  const [displayFlows, setDisplayFlows] = useState<FlowDictionary | null>(null)
   const [selectedMoveKey, setSelectedMoveKey] =
     useState<MoveCategories>(lsToprock)
   const [customInputVal, setCustomInputVal] = useState<string>('')
@@ -106,18 +107,41 @@ const RenderMakeCombo = () => {
 
   const [moveCategories, setMoveCategories] = useState<KeyOfMoves[]>()
   const [category, setCategory] = useState<KeyOfMoves>()
+  const [filterFlowIds, setFilterFlowIds] = useState<FlowId[]>()
   const userMoves = getLsUserMoves()
   const currentIndex = selectedComboNumber.indexOf(true)
   const router = useRouter()
   const searchParams = useSearchParams()
 
   //-----------------------------hooks-------------------------------
-  //ADV. OPT.
+  //ADV. OPT. Category Search
   useEffect(() => {
-    if (categorySearch) {
-      setMoveCategories(getLsUserMoveCategories())
+    if (!categorySearch) return
+    const lsFlows = getLsFlows()
+    if (!lsFlows) return
+
+    //Sets info for the category dropdown
+    setMoveCategories(getLsUserMoveCategories())
+
+    //Sets the filters for flow
+    if (isSingle) {
+      //get all single flows
+      const singleFlows = Object.entries(lsFlows)
+        .filter(([_, flowVal]) => {
+          if (!flowVal) return false
+          const { entryMove, exitMove, keyMove } = flowVal
+          return (
+            category === entryMove.category &&
+            entryMove.category === keyMove.category &&
+            keyMove.category === exitMove.category
+          )
+        })
+        .map(([flowId]) => flowId as FlowId)
+      setFilterFlowIds(singleFlows)
+    } else if (!isSingle) {
+      //do mixed flows only depending on XYZ
     }
-  }, [categorySearch, getLsUserMoveCategories])
+  }, [category, categorySearch, getLsFlows, getLsUserMoveCategories, isSingle])
 
   //Handle existing combo querystring
   useEffect(() => {
@@ -209,13 +233,13 @@ const RenderMakeCombo = () => {
 
   //gets flows on mount
   useEffect(() => {
-    setFlows(getLsFlows())
+    setDisplayFlows(getLsFlows())
   }, [getLsFlows])
 
   //-----------------------------render---------------------------------
   return (
     <main className="mt-20 flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
-      <header>
+      <hgroup>
         <h1 className="title-font mb-2 text-center text-3xl font-medium sm:text-4xl dark:text-white">
           {existingComboId ? 'Edit Combo' : 'Make Combo'}
         </h1>
@@ -224,7 +248,7 @@ const RenderMakeCombo = () => {
             {`Make a combo for use in cyphers, battles, performances, or just for fun.`}
           </p>
         )}
-      </header>
+      </hgroup>
       {/* ---------------------spacer------------------- */}
       <section className="mb-4 mt-2 flex w-10 justify-center">
         <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500" />
@@ -239,7 +263,6 @@ const RenderMakeCombo = () => {
           placeholder="Super Combo 9000"
           onChange={(e) => setTitle(e.target.value)}
         />
-        <button>RNG Name</button>
       </article>
       {/* --------------------combo sequence------------------ */}
       <article className="w-full px-5">
@@ -350,10 +373,10 @@ const RenderMakeCombo = () => {
             </label>
             {/* -----------------advanced options---------------- */}
             <section className="mt-5 text-center">
-              <details className="flex flex-col leading-snug">
+              <details className="flex flex-col text-center leading-snug">
                 <summary className="text-xs">Advanced Options</summary>
                 <section className="mt-2">
-                  <section className="ml-2 mt-1 flex">
+                  <section className="ml-2 mt-1 ">
                     <label className="text-xs">Hide Used</label>
                     <input
                       className="ml-2"
@@ -378,18 +401,30 @@ const RenderMakeCombo = () => {
                   </section>
                   {categorySearch && (
                     <article>
-                      <section>
-                        <label className="text-xs">
-                          single
-                          <input type="radio" name="singleOrMulti" />
+                      <section className="mt-1 text-2xs">
+                        <label className="">
+                          Single
+                          <input
+                            className="ml-1"
+                            type="radio"
+                            name="singleOrMulti"
+                            checked={isSingle}
+                            onChange={() => setIsSingle((prev) => !prev)}
+                          />
                         </label>
-                        <label className="text-xs">
-                          custom
-                          <input type="radio" name="singleOrMulti" />
+                        <label className=" ml-2">
+                          Custom
+                          <input
+                            type="radio"
+                            name="singleOrMulti"
+                            className="ml-1"
+                            checked={!isSingle}
+                            onChange={() => setIsSingle((prev) => !prev)}
+                          />
                         </label>
                       </section>
                       <select
-                        className="focus:shadow-outline block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
+                        className="focus:shadow-outline mt-1 block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 leading-tight focus:outline-none enabled:hover:border-gray-500 disabled:opacity-35 dark:border-indigo-500 dark:bg-transparent dark:bg-none dark:text-white dark:disabled:opacity-10"
                         value={category}
                         onChange={(e) => {
                           setCategory(e.target.value as KeyOfMoves)
@@ -415,8 +450,8 @@ const RenderMakeCombo = () => {
             {checked.flows && (
               <section className="flex flex-col ">
                 <section className="mt-2 flex overflow-x-scroll">
-                  {flows &&
-                    Object.entries(flows)
+                  {displayFlows &&
+                    Object.entries(displayFlows)
                       .sort(([_, a], [__, b]) => {
                         if (!b || !a) return 0
                         return b.rating - a.rating
@@ -432,7 +467,16 @@ const RenderMakeCombo = () => {
                           (a) => a && a.sequence.some((b) => b.id === flowId),
                         )
 
-                        //hide used flows if checkbox ticked
+                        //ADV OPT: Category Search.
+                        if (
+                          categorySearch &&
+                          filterFlowIds &&
+                          !filterFlowIds.some((a) => a === flowId)
+                        ) {
+                          return
+                        }
+
+                        //ADV OPT: Hide used flows.
                         if (flowIsUsed && hideUsedFlows) return
 
                         const indexOfCurCombo =
