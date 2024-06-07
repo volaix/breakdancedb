@@ -27,6 +27,8 @@ import {
   lsUserMoves,
 } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { extractMoveTransitions } from '../_utils/lib'
+import { MoveTransition } from '../_utils/lib'
 
 const categories: Category[] = [
   lsToprock,
@@ -52,7 +54,6 @@ const likeRanking = new Map<number, string>([
 const pickRandomString = (items: string[]): string => {
   return items[Math.floor(Math.random() * items.length)]
 }
-
 const makeBasicMoves = (
   flowId: FlowId,
   lsFlows: FlowDictionary | null,
@@ -142,45 +143,17 @@ export default function RenderFlows() {
   )
 
   //---------------------------hooks---------------------------------
-  type MoveTransition = {
-    moveFrom: BasicMove
-    moveTo: BasicMove
-  }
-
   /**
  * For ADV. OPT. Hide Uniques
   Set move transitions
  */
   useEffect(() => {
     if (!hideUnique) return
-    const lsFlows = getLsFlows()
-    if (!lsFlows) return
-    const moveTransitions: MoveTransition[] = Object.values(lsFlows).flatMap(
-      (flowVal): MoveTransition[] => {
-        if (!flowVal) return []
-        const { entryMove, keyMove, exitMove } = flowVal
-        const midMove: BasicMove = {
-          category: keyMove.category,
-          displayName: keyMove.displayName,
-        }
-        return [
-          {
-            moveFrom: {
-              category: entryMove.category,
-              displayName: entryMove.displayName,
-            },
-            moveTo: midMove,
-          },
-          {
-            moveFrom: midMove,
-            moveTo: {
-              category: exitMove.category,
-              displayName: exitMove.displayName,
-            },
-          },
-        ]
-      },
-    )
+    const lsFlowsLocal = getLsFlows()
+    if (!lsFlowsLocal) return
+
+    const moveTransitions: MoveTransition[] =
+      extractMoveTransitions(lsFlowsLocal)
 
     setMoveTransitions(moveTransitions)
 

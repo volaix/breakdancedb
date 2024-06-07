@@ -26,6 +26,7 @@ import {
   makeTransitionId,
 } from '../../_utils/lsGenerators'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
+import { BRAND } from 'zod'
 
 const confidenceRanking = new Map<number, string>([
   [1, 'I tried'],
@@ -88,8 +89,9 @@ const RenderMakeCombo = () => {
     message?: string
   }>(null)
   const [displayFlows, setDisplayFlows] = useState<FlowDictionary | null>(null)
-  const [selectedMoveKey, setSelectedMoveKey] =
-    useState<MoveCategories>(lsToprock)
+  const [selectedMoveKey, setSelectedMoveKey] = useState<MoveCategories>(
+    lsToprock as string & BRAND<'category'>,
+  )
   const [customInputVal, setCustomInputVal] = useState<string>('')
   const [checked, setChecked] = useState<Checked>({ flows: true })
   const [singleMove, setSingleMove] = useState<string>('')
