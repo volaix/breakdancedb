@@ -16,19 +16,15 @@ export default function RenderHeader() {
 
   //-----------------render----------------------------------------
   return (
-    <header
-      className="fixed left-0 top-0 z-10 flex w-full justify-center border-b border-slate-300 bg-gradient-to-b
-  from-slate-200 pb-2
- pt-4 backdrop-blur-2xl
- dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30"
-    >
+    <header className="fixed left-0 top-0 z-10 flex w-full justify-center border-b border-slate-300 bg-gradient-to-b from-slate-200 pb-2 pt-4 backdrop-blur-2xl dark:border-neutral-800 dark:bg-slate-800/30 dark:from-inherit lg:dark:bg-slate-800/30">
       <Link className="font-mono font-bold" href={{ pathname: '/' }}>
         breakdanceDB
       </Link>
 
-      <nav className="fixed left-2 top-3">
-        {/* TODO when is selected then left-0 top-0 */}
-        <div className="fixed flex w-4/5 max-w-xs items-center justify-between">
+      <nav className={`fixed left-2 top-3 `}>
+        <div
+          className={`fixed flex w-4/5 max-w-xs items-center justify-between`}
+        >
           <nav>
             <section className="flex">
               <article
@@ -42,9 +38,11 @@ export default function RenderHeader() {
                 </div>
               </article>
 
-              {/* //TODO convert to tailwind classes */}
-              <nav className={isNavOpen ? 'showMenuNav' : 'hideMenuNav'}>
-                <div
+              <nav
+                className={`${isNavOpen && 'absolute left-0 top-0 z-10 flex h-screen w-full flex-col items-center justify-evenly bg-white'} ${!isNavOpen && 'hidden'} `}
+              >
+                {/* ------delete button------- */}
+                <article
                   className="absolute right-0 top-0 px-8 py-8"
                   onClick={() => setIsNavOpen(false)}
                 >
@@ -60,7 +58,8 @@ export default function RenderHeader() {
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                   </svg>
-                </div>
+                </article>
+                {/* ----------navigation------------ */}
                 <ul className="flex	min-h-[250px] flex-col items-center justify-between text-black">
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/yourmoves">📚 Your Moves 📚</a>
@@ -74,11 +73,9 @@ export default function RenderHeader() {
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/battle">🥊 Battle 🥊</a>
                   </li>
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
-                      <a href="/dblist">View DB</a>
-                    </li>
-                  )}
+                  <li className="my-2 border-b border-gray-400 text-xs uppercase">
+                    <a href="/dblist">View Stats</a>
+                  </li>
                   <li className="my-2 border-b border-gray-400 text-xs uppercase">
                     <a href="/importexport"> Import / Export </a>
                   </li>
@@ -105,25 +102,6 @@ export default function RenderHeader() {
               </nav>
             </section>
           </nav>
-          <style>{`
-      .hideMenuNav {
-        display: none;
-      }
-      .showMenuNav {
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 100vh;
-        top: 0;
-        left: 0;
-        background: white;
-        z-index: 10;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        align-items: center;
-      }
-    `}</style>
         </div>
       </nav>
       <div className="fixed right-2 top-3">

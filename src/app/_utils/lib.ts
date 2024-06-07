@@ -1,6 +1,12 @@
 import rocks from '@/db/rocks.json'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { ComboId, Round } from './lsTypes'
+import {
+  BasicMove,
+  ComboId,
+  GlobalStateProperties,
+  Round,
+  lsFlows,
+} from './lsTypes'
 
 //---------------JS HELPERS-------------------
 /**
@@ -55,6 +61,40 @@ export const extractComboIds = (rounds: Round[]): ComboId[] =>
     //Flats to ComboId[]
     .flat(1)
 
+export type MoveTransition = {
+  moveFrom: BasicMove
+  moveTo: BasicMove
+}
+
+export const extractMoveTransitions = (
+  flows: GlobalStateProperties[typeof lsFlows],
+): MoveTransition[] => {
+  if (flows === null) return []
+  return Object.values(flows).flatMap((flowVal): MoveTransition[] => {
+    if (!flowVal) return []
+    const { entryMove, keyMove, exitMove } = flowVal
+    const midMove: BasicMove = {
+      category: keyMove.category,
+      displayName: keyMove.displayName,
+    }
+    return [
+      {
+        moveFrom: {
+          category: entryMove.category,
+          displayName: entryMove.displayName,
+        },
+        moveTo: midMove,
+      },
+      {
+        moveFrom: midMove,
+        moveTo: {
+          category: exitMove.category,
+          displayName: exitMove.displayName,
+        },
+      },
+    ]
+  })
+}
 //---------ROUTING----------
 
 export const comboIdKey = 'comboId'
