@@ -43,6 +43,9 @@ export default function RenderFlows() {
   const [flowTransitions, setTransitions] = useState<MoveTransition[]>([])
   const [moves, setMoves] = useState<Array<[string, string[]]>>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [overrideTransitions, setOverrideTransitions] = useState<
+    MoveTransition[]
+  >([])
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
 
@@ -223,7 +226,21 @@ export default function RenderFlows() {
                                   checked={checkedFromFlow}
                                   type="checkbox"
                                   onClick={() => {
-                                    console.log('clicked')
+                                    setOverrideTransitions((prev) => {
+                                      const newTrans = {
+                                        // transitionId:
+                                        isImpossible: false,
+                                        moveFrom: {
+                                          category: selectedCategory,
+                                          displayName: selectedMove,
+                                        },
+                                        moveTo: {
+                                          category,
+                                          displayName: move,
+                                        },
+                                      }
+                                      return [...prev]
+                                    })
                                   }}
                                 />
                               )}
@@ -234,13 +251,15 @@ export default function RenderFlows() {
                               </span>
                             </label>
                             <section className="flex">
-                              <button
-                                onClick={() => setIsOpen(true)}
-                                className={`mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${!isImpossible ? 'opacity-100' : 'opacity-20'}`}
-                                type="button"
-                              >
-                                Attempt
-                              </button>
+                              {false && (
+                                <button
+                                  onClick={() => setIsOpen(true)}
+                                  className={`mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${!isImpossible ? 'opacity-100' : 'opacity-20'}`}
+                                  type="button"
+                                >
+                                  Attempt
+                                </button>
+                              )}
                               <button
                                 onClick={() =>
                                   console.log('mark as impossible')
