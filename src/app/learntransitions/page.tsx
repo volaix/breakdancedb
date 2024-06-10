@@ -35,15 +35,15 @@ function getRandomMove(arr: Array<[string, string[]]>): SelectedMove {
 /*
  * Renders 3 moves with 3 buttons at the bottom.
  */
-export default function RenderFlows() {
+export default function RenderTransitions() {
   //-----------------------------state-----------------------------
   //learning refers to "what will be displayed" and is RNG set
+  const [{ notificationVisible, message }, setNotification] = useState<{
+    notificationVisible: boolean
+    message: string
+  }>({ notificationVisible: false, message: '' })
   const [{ selectedMove, selectedCategory }, setSelectedMove] =
     useState<SelectedMove>({})
-  const [visible, setVisible] = useState(false)
-  const [notificationMessage, setNotificationMessage] = useState<string>('')
-  const [textAreaValue, setTextAreaValue] = useState<string>('')
-  const [ratingVal, setRatingVal] = useState<number>(1)
   const [flowTransitions, setTransitions] = useState<MoveTransition[]>([])
   const [moves, setMoves] = useState<Array<[string, string[]]>>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -52,8 +52,24 @@ export default function RenderFlows() {
   >([])
   const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const getLsTransitions = useZustandStore((state) => state.getLsTransitions)
+  const setLsTransitions = useZustandStore((state) => state.setLsTransitions)
 
   const modalRef = useRef<HTMLDivElement>(null)
+  const totalRelevantTransitionsCanDo: number = overrideTransitions.filter(
+    ({ canDo, moveFrom }) =>
+      canDo &&
+      selectedCategory === moveFrom.category &&
+      moveFrom.displayName === selectedMove,
+  ).length
+  const totalFlowTransitions =
+    moves?.reduce((acc, [, strings]) => acc + strings.length, 0) || 0
+  const totalImpossiblesFromMoveA = overrideTransitions.filter(
+    ({ isImpossible, moveFrom }) =>
+      isImpossible &&
+      selectedCategory === moveFrom.category &&
+      moveFrom.displayName === selectedMove,
+  ).length
 
   const options = [
     { id: 'job-1', label: 'I can do it! ❤️‍🔥', description: 'Success' },
@@ -70,6 +86,12 @@ export default function RenderFlows() {
     },
   ]
   // --------------hooks--------
+  //onload getCurrentLsTransitions and set to override local state
+  useEffect(() => {
+    setOverrideTransitions(getLsTransitions() || [])
+  }, [getLsTransitions])
+
+  //Sets transitions from flow on load
   useEffect(() => {
     const allTrans = extractMoveTransitions(getLsFlows())
     //filters transitions to just MoveA
@@ -84,9 +106,12 @@ export default function RenderFlows() {
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
-    const fadeOutTimer = setTimeout(() => setVisible(false), 2000)
+    const fadeOutTimer = setTimeout(
+      () => setNotification({ notificationVisible: false, message: '' }),
+      2000,
+    )
     return () => clearTimeout(fadeOutTimer)
-  }, [visible])
+  }, [notificationVisible])
 
   //Hide
   useEffect(() => {
@@ -138,7 +163,7 @@ export default function RenderFlows() {
         </p>
         <p>
           {selectedMove &&
-            `${flowTransitions.length}/${moves?.reduce((acc, [, strings]) => acc + strings.length, 0) || 0}`}
+            `${flowTransitions.length + totalRelevantTransitionsCanDo}/${totalFlowTransitions - totalImpossiblesFromMoveA}`}
         </p>
       </section>
       {/* ---------------MOVES---------------- */}
@@ -227,7 +252,7 @@ export default function RenderFlows() {
                               moveTo.category === category &&
                               moveTo.displayName === move
                             )
-                          }) || isOverridden?.canDo
+                          }) || !!isOverridden?.canDo
 
                         return (
                           <article
@@ -241,6 +266,15 @@ export default function RenderFlows() {
                                   checked={isChecked}
                                   type="checkbox"
                                   onClick={() => {
+                                    //send notification if flow is overriding the ability to turn off
+                                    if (isChecked && !isOverridden?.canDo) {
+                                      setNotification({
+                                        notificationVisible: true,
+                                        message: 'Flow is overriding this move',
+                                      })
+                                      return
+                                    }
+
                                     setOverrideTransitions((prev) => {
                                       if (isOverridden) {
                                         const index = prev.findIndex(
@@ -343,23 +377,24 @@ export default function RenderFlows() {
       {/* ---------------END OF MOVES------------ */}
 
       {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
-      <Notification visible={visible} message={notificationMessage} />
+      <Notification visible={notificationVisible} message={message} />
+      <p>{`Transitions from flows: ${flowTransitions.length}`}</p>
+      <p>{`Transitions manually set here: ${totalRelevantTransitionsCanDo}`}</p>
+      <p>{`Moves total: ${totalFlowTransitions}`}</p>
+      <p>{`Impossible moves: ${totalImpossiblesFromMoveA}`}</p>
 
       {
         <div className="flex justify-evenly px-2 py-5 text-xs">
           <section>
-            <Link
-              className="rounded border border-indigo-500 px-3 py-2 text-center text-indigo-500"
-              href="/yourmoves"
+            <button
+              onClick={(_) => {
+                setNotification({ notificationVisible: true, message: 'Saved' })
+                setLsTransitions(overrideTransitions)
+              }}
+              className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
             >
-              Go to Learn Move
-            </Link>
-            <Link
-              href="/yourmoves"
-              className="rounded border border-indigo-500 px-3 py-2 text-center text-indigo-500"
-            >
-              Go to Your Moves
-            </Link>
+              SAVE
+            </button>
           </section>
         </div>
       }
@@ -407,7 +442,7 @@ export default function RenderFlows() {
                 </button>
               </div>
               {/* Modal body */}
-              <div className="p-4 md:p-5">
+              <article className="p-4 md:p-5">
                 <p>{`Backflip -> Chocolate hunter`}</p>
                 <p className="mb-4 text-gray-500 dark:text-gray-400">
                   Update the status:
@@ -460,11 +495,12 @@ export default function RenderFlows() {
                 >
                   Save
                 </button>
-              </div>
+              </article>
             </div>
           </div>
         </div>
       )}
+      {/* //-----------------end of modal------------ */}
     </main>
   )
 }

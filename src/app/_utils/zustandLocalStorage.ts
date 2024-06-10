@@ -17,6 +17,7 @@ import {
   lsPower,
   lsSuicides,
   lsToprock,
+  lsTransitions,
   lsUserLearning,
   lsUserMoves,
   ZustandGlobalStore,
@@ -65,6 +66,8 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //============root level===============
         //-----Setters (Root Level Keys)-----
+        setLsTransitions: (transitions) =>
+          set({ [lsTransitions]: transitions }),
         setLsConcepts: (concepts) => set({ [lsConcepts]: concepts }),
         setLsCombos: (combo, comboId) =>
           set((state) => {
@@ -89,6 +92,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         setLsBattle: (battle) => set({ [lsBattle]: battle }),
 
         //-----Getters (Root level keys )------
+        getLsTransitions: () => get()[lsTransitions],
         getLsConcepts: () => get()[lsConcepts],
         getLsFlows: () => get()[lsFlows],
         getLsBattle: () => get()[lsBattle],

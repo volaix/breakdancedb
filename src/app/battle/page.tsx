@@ -547,8 +547,7 @@ export default function RenderBattlePage() {
       <section className="flex justify-center">
         {/* -----------ADD ROUND------------- */}
         <button
-          className="flex h-fit items-center justify-center rounded border border-indigo-500 px-3 py-2 text-center text-xs text-indigo-500
- "
+          className="flex h-fit items-center justify-center rounded border border-indigo-500 px-3 py-2 text-center text-xs text-indigo-500 "
           onClick={() =>
             setYourRounds((prevRounds) =>
               produce(prevRounds, (newRounds) => {
@@ -577,9 +576,7 @@ export default function RenderBattlePage() {
               setNotification({ visible: true, message: 'Battle Saved' })
               console.log('saved')
             }}
-            className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white
-  
- hover:bg-indigo-600 focus:outline-none"
+            className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
           >
             SAVE
           </button>

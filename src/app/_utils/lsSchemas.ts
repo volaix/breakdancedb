@@ -5,6 +5,7 @@ import {
   lsConcepts,
   lsDanceList,
   lsFlows,
+  lsTransitions,
   lsUserLearning,
   lsUserMoves,
 } from './lsTypes'
@@ -223,7 +224,22 @@ export const FlowDictionary = z.record(
   }),
 )
 
+export const BasicMoveSchema = z.object({
+  category: z.string(),
+  displayName: z.string(),
+  id: z.never().optional(),
+})
+
+export const MoveTransitionSchema = z.object({
+  moveTransitionId: z.string().optional(),
+  moveFrom: BasicMoveSchema,
+  moveTo: BasicMoveSchema,
+  canDo: z.boolean().optional(),
+  isImpossible: z.boolean().optional(),
+})
+
 export const GlobalStateProperties = z.object({
+  [lsTransitions]: z.array(MoveTransitionSchema).optional(),
   [lsConcepts]: z.array(z.string()).optional(),
   [lsCombos]: comboDictionarySchema.optional(),
   [lsBattle]: z
@@ -237,10 +253,4 @@ export const GlobalStateProperties = z.object({
   [lsUserMoves]: z.record(z.array(z.string())),
   [lsUserLearning]: z.array(MoveSchema),
   [lsDanceList]: z.array(z.string()),
-})
-
-export const BasicMoveSchema = z.object({
-  category: GlobalStateProperties.shape[lsUserMoves].keySchema,
-  displayName: z.string(),
-  id: z.never().optional(),
 })

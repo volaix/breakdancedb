@@ -7,6 +7,8 @@ import {
   Round,
   lsFlows,
 } from './lsTypes'
+import { z } from 'zod'
+import { MoveTransitionSchema } from './lsSchemas'
 
 //---------------JS HELPERS-------------------
 /**
@@ -61,13 +63,7 @@ export const extractComboIds = (rounds: Round[]): ComboId[] =>
     //Flats to ComboId[]
     .flat(1)
 
-export type MoveTransition = {
-  moveTransitionId?: string
-  moveFrom: BasicMove
-  moveTo: BasicMove
-  canDo?: boolean
-  isImpossible?: boolean
-}
+export type MoveTransition = z.infer<typeof MoveTransitionSchema>
 
 export const extractMoveTransitions = (
   flows: GlobalStateProperties[typeof lsFlows],
@@ -80,14 +76,15 @@ export const extractMoveTransitions = (
       category: keyMove.category,
       displayName: keyMove.displayName,
     }
+    const moveFrom: BasicMove = {
+      category: entryMove.category,
+      displayName: entryMove.displayName,
+    }
+    const moveTransA: MoveTransition = {
+      moveFrom,
+      moveTo: midMove,
+    }
     return [
-      {
-        moveFrom: {
-          category: entryMove.category,
-          displayName: entryMove.displayName,
-        },
-        moveTo: midMove,
-      },
       {
         moveFrom: midMove,
         moveTo: {
