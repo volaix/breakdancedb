@@ -15,32 +15,16 @@ import {
   FlowId,
   GlobalStateProperties,
   MoveCategories,
-  lsBlowups,
   lsDrops,
-  lsFloorwork,
   lsFootwork,
   lsFreezes,
-  lsMisc,
   lsPower,
-  lsSuicides,
   lsToprock,
   lsUserMoves,
 } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { extractMoveTransitions } from '../_utils/lib'
 import { MoveTransition } from '../_utils/lib'
-
-const categories: Category[] = [
-  lsToprock,
-  lsFootwork,
-  lsPower,
-  lsFreezes,
-  lsFloorwork,
-  lsSuicides,
-  lsDrops,
-  lsBlowups,
-  lsMisc,
-]
 
 const likeRanking = new Map<number, string>([
   [5, 'Super Cool!'],
@@ -115,6 +99,8 @@ export default function RenderFlows() {
     (state) => state.getLsUserMovesByKey,
   )
   const [moveTransitions, setMoveTransitions] = useState<MoveTransition[]>()
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const [categories, setCategories] = useState<string[]>()
 
   //----------------functions----------------
   const isSameMove = (move1: BasicMove, move2: BasicMove): boolean =>
@@ -143,6 +129,11 @@ export default function RenderFlows() {
   )
 
   //---------------------------hooks---------------------------------
+  //sets categories
+  useEffect(() => {
+    setCategories(Object.keys(getLsUserMoves()))
+  }, [getLsUserMoves])
+
   /**
  * For ADV. OPT. Hide Uniques
   Set move transitions
@@ -365,11 +356,12 @@ export default function RenderFlows() {
                               })
                         }
                       >
-                        {categories.map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
+                        {categories &&
+                          categories.map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <svg

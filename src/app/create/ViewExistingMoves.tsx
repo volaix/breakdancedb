@@ -8,31 +8,14 @@ import {
   FlowId,
   GlobalStateProperties,
   MoveCategories,
-  lsBlowups,
   lsDrops,
-  lsFloorwork,
   lsFootwork,
   lsFreezes,
-  lsMisc,
   lsPower,
-  lsSuicides,
   lsToprock,
   lsUserMoves,
 } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-
-//TODO: This should be derived from state
-const categories: Category[] = [
-  lsToprock,
-  lsFootwork,
-  lsPower,
-  lsFreezes,
-  lsFloorwork,
-  lsSuicides,
-  lsDrops,
-  lsBlowups,
-  lsMisc,
-]
 
 //------------------------localtypes-------------------------------
 type Category = keyof GlobalStateProperties[typeof lsUserMoves]
@@ -90,6 +73,14 @@ export default function ExistingMoves() {
   }, [getLsUserMovesByKey, selectedCategory])
 
   //---------------------------hooks---------------------------------
+
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const [categories, setCategories] = useState<string[]>()
+  //sets categories
+  useEffect(() => {
+    setCategories(Object.keys(getLsUserMoves()))
+  }, [getLsUserMoves])
+
   //on mount
   useEffect(() => {
     shuffleLearning()
@@ -134,11 +125,12 @@ export default function ExistingMoves() {
                             })
                           }
                         >
-                          {categories.map((category) => (
-                            <option key={category} value={category}>
-                              {category}
-                            </option>
-                          ))}
+                          {categories &&
+                            categories.map((category) => (
+                              <option key={category} value={category}>
+                                {category}
+                              </option>
+                            ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                           <svg
