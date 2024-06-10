@@ -204,7 +204,6 @@ export default function RenderFlows() {
           >
             {moves &&
               moves.map(([category, moves], moveIndex) => {
-                const isImpossible = false
                 return (
                   <article key={moveIndex}>
                     <h3 className="mb-1 text-base font-bold">{category}</h3>
@@ -220,6 +219,7 @@ export default function RenderFlows() {
                             )
                           },
                         )
+                        const isImpossible = isOverridden?.isImpossible
 
                         const isChecked =
                           flowTransitions.some(({ moveTo }) => {
@@ -293,7 +293,35 @@ export default function RenderFlows() {
                               )}
                               <button
                                 onClick={() =>
-                                  console.log('mark as impossible')
+                                  setOverrideTransitions((prev) => {
+                                    if (isOverridden) {
+                                      const overrideIndex = prev.findIndex(
+                                        (move) =>
+                                          move.moveTransitionId ===
+                                          isOverridden.moveTransitionId,
+                                      )
+                                      return overrideIndex > -1 && isOverridden
+                                        ? prev.toSpliced(overrideIndex, 1, {
+                                            ...isOverridden,
+                                            isImpossible: !isImpossible,
+                                          })
+                                        : prev
+                                    }
+                                    const newTrans: MoveTransition = {
+                                      canDo: isChecked,
+                                      moveTransitionId: makeMoveTransitionId(),
+                                      isImpossible: true,
+                                      moveFrom: {
+                                        category: selectedCategory || '',
+                                        displayName: selectedMove || '',
+                                      },
+                                      moveTo: {
+                                        category,
+                                        displayName: move,
+                                      },
+                                    }
+                                    return [...prev, newTrans]
+                                  })
                                 }
                                 className={`ml-1 mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${isImpossible ? 'opacity-100' : 'opacity-20'}`}
                                 type="button"
