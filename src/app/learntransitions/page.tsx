@@ -6,6 +6,10 @@ import { useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { MoveTransition, extractMoveTransitions } from '../_utils/lib'
+import {
+  makeMoveTransitionId,
+  makePositionTransitionId,
+} from '../_utils/lsGenerators'
 
 type SelectedMove = {
   selectedMove?: string
@@ -206,14 +210,25 @@ export default function RenderFlows() {
                     <h3 className="mb-1 text-base font-bold">{category}</h3>
                     <section className="flex flex-col">
                       {moves.map((move, moveIndex) => {
-                        const checkedFromFlow = flowTransitions.some(
-                          ({ moveTo }) => {
+                        const isOverridden = overrideTransitions.find(
+                          ({ moveTo, moveFrom }) => {
+                            return (
+                              moveTo.category === category &&
+                              moveTo.displayName === move &&
+                              moveFrom.category === selectedCategory &&
+                              moveFrom.displayName === selectedMove
+                            )
+                          },
+                        )
+
+                        const isChecked =
+                          flowTransitions.some(({ moveTo }) => {
                             return (
                               moveTo.category === category &&
                               moveTo.displayName === move
                             )
-                          },
-                        )
+                          }) || isOverridden?.canDo
+
                         return (
                           <article
                             className="mb-3 flex flex-col"
@@ -223,23 +238,39 @@ export default function RenderFlows() {
                               {!!isImpossible || (
                                 <input
                                   className="mr-2"
-                                  checked={checkedFromFlow}
+                                  checked={isChecked}
                                   type="checkbox"
                                   onClick={() => {
                                     setOverrideTransitions((prev) => {
-                                      const newTrans = {
-                                        // transitionId:
+                                      if (isOverridden) {
+                                        const index = prev.findIndex(
+                                          (move) =>
+                                            move.moveTransitionId ===
+                                            isOverridden.moveTransitionId,
+                                        )
+                                        return index > -1 && isOverridden
+                                          ? prev.toSpliced(index, 1, {
+                                              ...isOverridden,
+                                              isImpossible: false,
+                                              canDo: !isChecked,
+                                            })
+                                          : prev
+                                      }
+                                      const newTrans: MoveTransition = {
+                                        canDo: !isChecked,
+                                        moveTransitionId:
+                                          makeMoveTransitionId(),
                                         isImpossible: false,
                                         moveFrom: {
-                                          category: selectedCategory,
-                                          displayName: selectedMove,
+                                          category: selectedCategory || '',
+                                          displayName: selectedMove || '',
                                         },
                                         moveTo: {
                                           category,
                                           displayName: move,
                                         },
                                       }
-                                      return [...prev]
+                                      return [...prev, newTrans]
                                     })
                                   }}
                                 />

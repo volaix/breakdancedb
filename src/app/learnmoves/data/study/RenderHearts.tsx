@@ -3,7 +3,7 @@ import {
   Move,
   MovementGroup,
   PositionId,
-  TransitionId,
+  PositionTransitionId,
 } from '@/app/_utils/lsTypes'
 import {
   makeDefaultPosition,
@@ -116,7 +116,7 @@ const getUpdatedMoveSlowRating = ({
     } else {
       console.log('ERROR: Could not find transitionId in movementGroup')
 
-      const transitionId: TransitionId =
+      const transitionId: PositionTransitionId =
         movementGroup.transitionId || makePositionTransitionId()
 
       //return move with a default transition

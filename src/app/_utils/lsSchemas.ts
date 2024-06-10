@@ -42,6 +42,7 @@ export const POSITION_PREFIX = 'position-'
 export const COMBO_PREFIX = 'combo-'
 export const ROUND_PREFIX = 'round-'
 export const TRANSITION_PREFIX = 'transition-'
+export const MOVE_TRANSITION_PREFIX = 'move-transition-'
 export const MOVEMENT_PREFIX = 'movement-'
 
 // Schemas using the constants
@@ -86,6 +87,13 @@ export const transitionIdSchema = z
     validateId(TRANSITION_PREFIX, id, ctx)
   })
   .brand<'TransitionId'>()
+
+export const moveTransitionIdSchema = z
+  .string()
+  .superRefine((id, ctx) => {
+    validateId(MOVE_TRANSITION_PREFIX, id, ctx)
+  })
+  .brand<'MoveTransitionId'>()
 
 export const movementIdSchema = z
   .string()

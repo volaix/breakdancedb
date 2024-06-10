@@ -18,8 +18,9 @@ import {
   PositionId,
   RoundId,
   Transition,
-  TransitionId as PositionTransitionId,
+  PositionTransitionId as PositionTransitionId,
   Transitions,
+  MoveTransitionId,
 } from './lsTypes'
 import { MOVE_PREFIX } from './lsSchemas'
 
@@ -60,6 +61,9 @@ export const makeRoundId = (): RoundId => {
 
 export const makePositionTransitionId = (): PositionTransitionId => {
   return `${TRANSITION_PREFIX}${v4()}` as PositionTransitionId
+}
+export const makeMoveTransitionId = (): MoveTransitionId => {
+  return `${TRANSITION_PREFIX}${v4()}` as MoveTransitionId
 }
 
 export const makeMovementId = (): MovementId => {

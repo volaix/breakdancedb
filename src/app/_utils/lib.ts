@@ -62,10 +62,11 @@ export const extractComboIds = (rounds: Round[]): ComboId[] =>
     .flat(1)
 
 export type MoveTransition = {
-  transitionId?: string
-  isImpossible?: boolean
+  moveTransitionId?: string
   moveFrom: BasicMove
   moveTo: BasicMove
+  canDo?: boolean
+  isImpossible?: boolean
 }
 
 export const extractMoveTransitions = (

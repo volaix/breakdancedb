@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 import {
   BasicMoveSchema,
   FlowDictionary,
@@ -27,6 +25,7 @@ import {
   TypeLoopOptions,
 } from './lsSchemas'
 import { Brand } from './typehelpers'
+import { z } from 'zod'
 
 //---------------Local Storage Values One Liners --------------------
 export type Transitions = Transition[]
@@ -35,7 +34,8 @@ export type LocalStorageValues = GlobalStateProperties[LocalStorageKeys]
 
 export type PositionId = z.infer<typeof positionIdSchema>
 export type MovementId = z.infer<typeof movementIdSchema>
-export type TransitionId = z.infer<typeof transitionIdSchema>
+export type PositionTransitionId = z.infer<typeof transitionIdSchema>
+export type MoveTransitionId = z.infer<typeof transitionIdSchema>
 export type MoveId = z.infer<typeof moveIdSchema>
 export type ComboId = z.infer<typeof comboIdSchema>
 export type RoundId = z.infer<typeof roundIdSchema>

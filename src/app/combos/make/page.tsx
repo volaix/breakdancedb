@@ -16,7 +16,7 @@ import {
   KeyOfMoves,
   MoveCategories,
   MoveId,
-  TransitionId,
+  PositionTransitionId,
   lsToprock,
 } from '../../_utils/lsTypes'
 import {
@@ -61,7 +61,7 @@ type SelectedComboNumber = boolean[]
 
 type SelectedComboSeq = {
   [key: number]: {
-    id?: FlowId | MoveId | TransitionId | 'custom'
+    id?: FlowId | MoveId | PositionTransitionId | 'custom'
     type: 'flow' | 'move' | 'custom' | 'transition'
     moves: string[]
   }
