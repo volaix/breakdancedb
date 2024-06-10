@@ -5,6 +5,7 @@ import {
   lsConcepts,
   lsDanceList,
   lsFlows,
+  lsTransitions,
   lsUserLearning,
   lsUserMoves,
 } from './lsTypes'
@@ -42,6 +43,7 @@ export const POSITION_PREFIX = 'position-'
 export const COMBO_PREFIX = 'combo-'
 export const ROUND_PREFIX = 'round-'
 export const TRANSITION_PREFIX = 'transition-'
+export const MOVE_TRANSITION_PREFIX = 'move-transition-'
 export const MOVEMENT_PREFIX = 'movement-'
 
 // Schemas using the constants
@@ -86,6 +88,13 @@ export const transitionIdSchema = z
     validateId(TRANSITION_PREFIX, id, ctx)
   })
   .brand<'TransitionId'>()
+
+export const moveTransitionIdSchema = z
+  .string()
+  .superRefine((id, ctx) => {
+    validateId(MOVE_TRANSITION_PREFIX, id, ctx)
+  })
+  .brand<'MoveTransitionId'>()
 
 export const movementIdSchema = z
   .string()
@@ -215,7 +224,22 @@ export const FlowDictionary = z.record(
   }),
 )
 
+export const BasicMoveSchema = z.object({
+  category: z.string(),
+  displayName: z.string(),
+  id: z.never().optional(),
+})
+
+export const MoveTransitionSchema = z.object({
+  moveTransitionId: z.string().optional(),
+  moveFrom: BasicMoveSchema,
+  moveTo: BasicMoveSchema,
+  canDo: z.boolean().optional(),
+  isImpossible: z.boolean().optional(),
+})
+
 export const GlobalStateProperties = z.object({
+  [lsTransitions]: z.array(MoveTransitionSchema).optional(),
   [lsConcepts]: z.array(z.string()).optional(),
   [lsCombos]: comboDictionarySchema.optional(),
   [lsBattle]: z
@@ -229,10 +253,4 @@ export const GlobalStateProperties = z.object({
   [lsUserMoves]: z.record(z.array(z.string())),
   [lsUserLearning]: z.array(MoveSchema),
   [lsDanceList]: z.array(z.string()),
-})
-
-export const BasicMoveSchema = z.object({
-  category: GlobalStateProperties.shape[lsUserMoves].keySchema,
-  displayName: z.string(),
-  id: z.never().optional(),
 })

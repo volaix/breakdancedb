@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 import {
   BasicMoveSchema,
   FlowDictionary,
@@ -27,6 +25,7 @@ import {
   TypeLoopOptions,
 } from './lsSchemas'
 import { Brand } from './typehelpers'
+import { z } from 'zod'
 
 //---------------Local Storage Values One Liners --------------------
 export type Transitions = Transition[]
@@ -35,7 +34,8 @@ export type LocalStorageValues = GlobalStateProperties[LocalStorageKeys]
 
 export type PositionId = z.infer<typeof positionIdSchema>
 export type MovementId = z.infer<typeof movementIdSchema>
-export type TransitionId = z.infer<typeof transitionIdSchema>
+export type PositionTransitionId = z.infer<typeof transitionIdSchema>
+export type MoveTransitionId = z.infer<typeof transitionIdSchema>
 export type MoveId = z.infer<typeof moveIdSchema>
 export type ComboId = z.infer<typeof comboIdSchema>
 export type RoundId = z.infer<typeof roundIdSchema>
@@ -48,6 +48,7 @@ export const lsUserLearning = 'userLearning'
 export const lsDanceList = 'danceList'
 export const lsCombos = 'combos'
 export const lsConcepts = 'concepts'
+export const lsTransitions = 'moveTransitions'
 export const lsBattle = 'battle'
 
 //---------categories------- deprecated
@@ -112,6 +113,9 @@ type ZustandMiddlewareMutators = [
 export type ZustandGlobalStore = GlobalStateProperties & {
   //============root level===============
   //-----Setters (Root Level Keys)-----
+  setLsTransitions: (
+    transitions: GlobalStateProperties[typeof lsTransitions],
+  ) => void
   setLsConcepts: (concepts: GlobalStateProperties[typeof lsConcepts]) => void
   setLsCombos: (
     combo: NonNullable<ComboDictionary[keyof ComboDictionary]>,
@@ -124,6 +128,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   setDanceList: (list: string[]) => void
   setLsBattle: (battle: GlobalStateProperties[typeof lsBattle]) => void
   //-----Getters (Root level keys )------
+  getLsTransitions: () => GlobalStateProperties[typeof lsTransitions]
   getLsConcepts: () => GlobalStateProperties[typeof lsConcepts]
   getLsBattle: () => GlobalStateProperties[typeof lsBattle]
   getLsFlows: () => GlobalStateProperties[typeof lsFlows]

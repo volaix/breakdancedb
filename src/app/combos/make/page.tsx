@@ -16,14 +16,14 @@ import {
   KeyOfMoves,
   MoveCategories,
   MoveId,
-  TransitionId,
+  PositionTransitionId,
   lsToprock,
 } from '../../_utils/lsTypes'
 import {
   makeComboId,
   makeFlowId,
   makeMoveId,
-  makeTransitionId,
+  makePositionTransitionId,
 } from '../../_utils/lsGenerators'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
 import { BRAND } from 'zod'
@@ -43,7 +43,7 @@ const idMap: Record<
   flow: makeFlowId(), //only used as safety
   move: makeMoveId(),
   custom: 'custom',
-  transition: makeTransitionId(),
+  transition: makePositionTransitionId(),
 }
 
 function convertComboMovesToSelectedComboSeq(
@@ -61,7 +61,7 @@ type SelectedComboNumber = boolean[]
 
 type SelectedComboSeq = {
   [key: number]: {
-    id?: FlowId | MoveId | TransitionId | 'custom'
+    id?: FlowId | MoveId | PositionTransitionId | 'custom'
     type: 'flow' | 'move' | 'custom' | 'transition'
     moves: string[]
   }

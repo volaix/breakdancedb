@@ -3,13 +3,13 @@ import {
   Move,
   MovementGroup,
   PositionId,
-  TransitionId,
+  PositionTransitionId,
 } from '@/app/_utils/lsTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,
   makePositionId,
-  makeTransitionId,
+  makePositionTransitionId,
 } from '@/app/_utils/lsGenerators'
 import { useZustandStore } from '@/app/_utils/zustandLocalStorage'
 import { produce } from 'immer'
@@ -116,8 +116,8 @@ const getUpdatedMoveSlowRating = ({
     } else {
       console.log('ERROR: Could not find transitionId in movementGroup')
 
-      const transitionId: TransitionId =
-        movementGroup.transitionId || makeTransitionId()
+      const transitionId: PositionTransitionId =
+        movementGroup.transitionId || makePositionTransitionId()
 
       //return move with a default transition
       return produce(move, (draft) => {

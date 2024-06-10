@@ -5,7 +5,7 @@ import {
   makeDefaultTransition,
   makeMovementId,
   makePositionId,
-  makeTransitionId,
+  makePositionTransitionId,
 } from '@/app/_utils/lsGenerators'
 import { Dispatch, MouseEventHandler, SetStateAction, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -134,7 +134,7 @@ export default function RenderMovementGroup({
         displayName: 'new-transition',
         from: localMovements[indexNumber - 1].positionId || makePositionId(),
         to: position ? position.positionId : makePositionId(),
-        transitionId: makeTransitionId(),
+        transitionId: makePositionTransitionId(),
       }),
   } = getPositionAndTransition(movement, move)
   //----------------use effect-----------
@@ -209,7 +209,7 @@ export default function RenderMovementGroup({
             displayName: 'new-movement-b',
             movementId: makeMovementId(),
             positionId: makePositionId(),
-            transitionId: makeTransitionId(),
+            transitionId: makePositionTransitionId(),
           }),
         }
         //-------------updates local+db------------

@@ -18,8 +18,9 @@ import {
   PositionId,
   RoundId,
   Transition,
-  TransitionId,
+  PositionTransitionId as PositionTransitionId,
   Transitions,
+  MoveTransitionId,
 } from './lsTypes'
 import { MOVE_PREFIX } from './lsSchemas'
 
@@ -32,27 +33,9 @@ const uuidPattern =
 export const isLegacyId = (id: string): boolean => {
   return validate(id) === true
 }
-// const isMoveId = (id: string): boolean => {
-//   return new RegExp(`^move-${uuidPattern}$`).test(id)
-// }
 export const isFlowId = (id: string): id is FlowId => {
   return new RegExp(`^flow-${uuidPattern}$`).test(id)
 }
-// const isPositionId = (id: string): boolean => {
-//   return new RegExp(`^position-${uuidPattern}$`).test(id)
-// }
-// const isComboId = (id: string): boolean => {
-//   return new RegExp(`^combo-${uuidPattern}$`).test(id)
-// }
-// const isRoundId = (id: string): boolean => {
-//   return new RegExp(`^round-${uuidPattern}$`).test(id)
-// }
-const isTransitionId = (id: string): boolean => {
-  return new RegExp(`^transition-${uuidPattern}$`).test(id)
-}
-// const isMovementId = (id: string): boolean => {
-//   return new RegExp(`^movement-${uuidPattern}$`).test(id)
-// }
 
 // ------------------------ID GENERATORS-----------------------------
 
@@ -76,8 +59,11 @@ export const makeRoundId = (): RoundId => {
   return `${ROUND_PREFIX}${v4()}` as RoundId
 }
 
-export const makeTransitionId = (): TransitionId => {
-  return `${TRANSITION_PREFIX}${v4()}` as TransitionId
+export const makePositionTransitionId = (): PositionTransitionId => {
+  return `${TRANSITION_PREFIX}${v4()}` as PositionTransitionId
+}
+export const makeMoveTransitionId = (): MoveTransitionId => {
+  return `${TRANSITION_PREFIX}${v4()}` as MoveTransitionId
 }
 
 export const makeMovementId = (): MovementId => {
@@ -130,7 +116,7 @@ export const makeDefaultTransition = ({
   from: PositionId
   to: PositionId
   slowRating?: number
-  transitionId: TransitionId
+  transitionId: PositionTransitionId
 }): Transition => {
   return {
     displayName,
@@ -177,7 +163,7 @@ export const makeTransitions = ({
       displayName: displayNames[index],
       from: position.positionId,
       to: getPositionId(posArray, index),
-      transitionId: makeTransitionId(),
+      transitionId: makePositionTransitionId(),
     })
   })
 }
