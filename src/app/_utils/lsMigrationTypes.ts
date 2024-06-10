@@ -7,11 +7,7 @@ import {
   lsFootwork,
   lsPower,
   lsFreezes,
-  lsFloorwork,
-  lsSuicides,
   lsDrops,
-  lsBlowups,
-  lsMisc,
   lsUserLearning,
   Move,
   lsDanceList,
@@ -51,11 +47,7 @@ export const isGlobalStateV2 = (
     [lsFootwork]: string[]
     [lsPower]: string[]
     [lsFreezes]: string[]
-    [lsFloorwork]: string[]
-    [lsSuicides]: string[]
     [lsDrops]: string[]
-    [lsBlowups]: string[]
-    [lsMisc]: string[]
   }
   [lsUserLearning]: Move[]
   [lsDanceList]: string[]

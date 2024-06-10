@@ -56,11 +56,7 @@ export const lsToprock = 'toprock'
 export const lsFootwork = 'footwork'
 export const lsPower = 'power'
 export const lsFreezes = 'freezes'
-export const lsFloorwork = 'floorwork'
-export const lsSuicides = 'suicides'
 export const lsDrops = 'drops'
-export const lsBlowups = 'blowups'
-export const lsMisc = 'misc'
 
 export type LocalStorageKeys = keyof GlobalStateProperties
 

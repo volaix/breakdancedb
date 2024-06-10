@@ -35,8 +35,7 @@ export default function RenderPageYourMoves() {
           <button
             disabled={movesOrConcepts}
             onClick={() => setMovesOrConcepts(true)}
-            className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 
-  disabled:text-white dark:enabled:text-gray-300"
+            className="px-4 py-1 focus:outline-none disabled:bg-indigo-500 disabled:text-white dark:enabled:text-gray-300"
           >
             Moves
           </button>

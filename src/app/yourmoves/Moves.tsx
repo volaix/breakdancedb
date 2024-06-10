@@ -3,14 +3,6 @@ import { useForm } from 'react-hook-form'
 import { Notification } from '../_components/Notification'
 import {
   GlobalStateProperties,
-  lsBlowups,
-  lsDrops,
-  lsFloorwork,
-  lsFootwork,
-  lsFreezes,
-  lsMisc,
-  lsPower,
-  lsSuicides,
   lsToprock,
   lsUserMoves,
 } from '../_utils/lsTypes'
@@ -28,24 +20,6 @@ const hasDuplicates = (array: string[]): boolean => {
   return uniqueItems.size !== array.length
 }
 
-/**
- * gets mapped as categories user can select
- */
-const categories: {
-  label: string
-  key: keyof GlobalStateProperties[typeof lsUserMoves]
-}[] = [
-  { label: 'Toprocks', key: lsToprock },
-  { label: 'Footwork', key: lsFootwork },
-  { label: 'Power', key: lsPower },
-  { label: 'Freezes', key: lsFreezes },
-  { label: 'Floorwork', key: lsFloorwork },
-  { label: 'Suicides', key: lsSuicides },
-  { label: 'Drops', key: lsDrops },
-  { label: 'Blow Ups', key: lsBlowups },
-  { label: 'Misc', key: lsMisc },
-]
-
 //---------------------------types---------------------------------
 
 type Inputs = {
@@ -61,20 +35,21 @@ export default function Moves() {
     message?: string
     timeShown?: number
   }>(null)
+  const [categories, setCategories] = useState<string[]>()
 
-  //key of category selected
-  const [selectedKey, setSelectedKey] =
-    useState<keyof GlobalStateProperties[typeof lsUserMoves]>(lsToprock)
-
-  //category string with n\ from zustand global state
-  const [lsMoves, setLsMoves] = useState<string>('')
-
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const setLsUserMovesByKey = useZustandStore(
     (state) => state.setLsUserMovesByKey,
   )
   const getLsUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
+  //key of category selected
+  const [selectedKey, setSelectedKey] =
+    useState<keyof GlobalStateProperties[typeof lsUserMoves]>(lsToprock)
+
+  //category string with n\ from zustand global state
+  const [lsMoves, setLsMoves] = useState<string>('')
 
   const {
     register,
@@ -87,6 +62,11 @@ export default function Moves() {
   //value of categoryMoves textarea
   const unsavedMoveList = watch('categoryMoves', '')
   //-----------------------------hooks------------------------------
+  //sets categories
+  useEffect(() => {
+    setCategories(Object.keys(getLsUserMoves()))
+  }, [getLsUserMoves])
+
   //Show Notifcation for 2 seconds
   useEffect(() => {
     const fadeOutTimer = setTimeout(
@@ -145,28 +125,29 @@ export default function Moves() {
         <nav className="body-font flex flex-wrap items-center justify-center text-base text-gray-300 md:ml-4 md:mr-auto md:border-l md:py-1 md:pl-4 dark:md:border-gray-700">
           {
             //------category select------------
-            categories.map((category) => {
-              const selected = selectedKey === category.key
-              return (
-                <label
-                  key={category.key}
-                  className={`mr-5 
+            categories &&
+              categories.map((key) => {
+                const selected = selectedKey === key
+                return (
+                  <label
+                    key={key}
+                    className={`mr-5  capitalize
                         dark:${selected && 'text-white'}
                         ${selected && `text-gray-900`}
                         `}
-                >
-                  <input
-                    type="radio"
-                    className="hidden"
-                    name="categories"
-                    value={category.label}
-                    checked={selected}
-                    onChange={() => handleChangeCategory(category.key)}
-                  />
-                  {category.label}
-                </label>
-              )
-            })
+                  >
+                    <input
+                      type="radio"
+                      className="hidden"
+                      name="categories"
+                      value={key}
+                      checked={selected}
+                      onChange={() => handleChangeCategory(key)}
+                    />
+                    {key}
+                  </label>
+                )
+              })
           }
         </nav>
       </section>

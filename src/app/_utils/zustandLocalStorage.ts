@@ -1,28 +1,24 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 import {
   GlobalStateProperties,
   lsBattle,
-  lsBlowups,
   lsCombos,
   lsConcepts,
   lsDanceList,
   lsDrops,
-  lsFloorwork,
   lsFlows,
   lsFootwork,
   lsFreezes,
-  lsMisc,
   lsPower,
-  lsSuicides,
   lsToprock,
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
   ZustandGlobalStore,
 } from './lsTypes'
-import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 
 const currentVersion: number = 3
 
@@ -32,15 +28,11 @@ const currentVersion: number = 3
 export const initialState: GlobalStateProperties = {
   [lsFlows]: null,
   [lsUserMoves]: {
-    [lsToprock]: [],
-    [lsFootwork]: [],
-    [lsPower]: [],
-    [lsFreezes]: [],
-    [lsFloorwork]: [],
-    [lsSuicides]: [],
-    [lsDrops]: [],
-    [lsBlowups]: [],
-    [lsMisc]: [],
+    [lsToprock]: ['hiptwist', 'salsastep', 'charleston'],
+    [lsFootwork]: ['6 step', '3 step', '2 step', 'pretzel'],
+    [lsPower]: ['windmill', 'swipe'],
+    [lsFreezes]: ['baby freeze', 'headstand', 'chairfreeze'],
+    [lsDrops]: ['pindrop', 'corkscrew', 'scoop'],
   },
   [lsUserLearning]: [],
   [lsDanceList]: ['head', 'shoulders', 'knees'],
