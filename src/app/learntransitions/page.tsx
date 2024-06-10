@@ -176,40 +176,45 @@ export default function RenderTransitions() {
             h-64 overflow-y-scroll rounded p-4"
           >
             {moves &&
-              moves.map(([category, moves], moveIndex) => (
-                <article key={moveIndex}>
-                  <h3 className="mb-1 text-base font-bold">{category}</h3>
-                  <section className="flex flex-col">
-                    {moves.map((move, moveIndex) => (
-                      <label key={moveIndex} className="mb-1">
-                        <input
-                          type="radio"
-                          name="baseMove"
-                          checked={
-                            selectedMove === move &&
-                            selectedCategory === category
-                          }
-                          className="mr-2 text-blue-500"
-                          value={move}
-                          onClick={() => {
-                            //deselect if selected
-                            if (selectedMove === move) {
-                              setSelectedMove({})
+              moves.map(([category, moves], moveIndex) => {
+                //dont show empty categories
+                if (moves.length < 1) return
+
+                return (
+                  <article key={moveIndex}>
+                    <h3 className="mb-1 text-base font-bold">{category}</h3>
+                    <section className="flex flex-col">
+                      {moves.map((move, moveIndex) => (
+                        <label key={moveIndex} className="mb-1">
+                          <input
+                            type="radio"
+                            name="baseMove"
+                            checked={
+                              selectedMove === move &&
+                              selectedCategory === category
                             }
-                          }}
-                          onChange={(e) => {
-                            setSelectedMove({
-                              selectedMove: e.target.value,
-                              selectedCategory: category,
-                            })
-                          }}
-                        />
-                        {move}
-                      </label>
-                    ))}
-                  </section>
-                </article>
-              ))}
+                            className="mr-2 text-blue-500"
+                            value={move}
+                            onClick={() => {
+                              //deselect if selected
+                              if (selectedMove === move) {
+                                setSelectedMove({})
+                              }
+                            }}
+                            onChange={(e) => {
+                              setSelectedMove({
+                                selectedMove: e.target.value,
+                                selectedCategory: category,
+                              })
+                            }}
+                          />
+                          {move}
+                        </label>
+                      ))}
+                    </section>
+                  </article>
+                )
+              })}
           </section>
           <button
             className="mt-5 rounded-md border border-indigo-500 p-1 text-2xs text-indigo-500"
