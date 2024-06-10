@@ -23,7 +23,7 @@ import {
   makeComboId,
   makeFlowId,
   makeMoveId,
-  makeTransitionId,
+  makePositionTransitionId,
 } from '../../_utils/lsGenerators'
 import { useZustandStore } from '../../_utils/zustandLocalStorage'
 import { BRAND } from 'zod'
@@ -43,7 +43,7 @@ const idMap: Record<
   flow: makeFlowId(), //only used as safety
   move: makeMoveId(),
   custom: 'custom',
-  transition: makeTransitionId(),
+  transition: makePositionTransitionId(),
 }
 
 function convertComboMovesToSelectedComboSeq(
