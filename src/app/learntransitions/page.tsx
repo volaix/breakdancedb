@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { MoveTransition, extractMoveTransitions } from '../_utils/lib'
 
 type SelectedMove = {
   selectedMove?: string
@@ -39,22 +40,14 @@ export default function RenderFlows() {
   const [notificationMessage, setNotificationMessage] = useState<string>('')
   const [textAreaValue, setTextAreaValue] = useState<string>('')
   const [ratingVal, setRatingVal] = useState<number>(1)
+  const [flowTransitions, setTransitions] = useState<MoveTransition[]>([])
   const [moves, setMoves] = useState<Array<[string, string[]]>>([])
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  // --------------hooks--------
-  //Show Notifcation for 2 seconds
-  useEffect(() => {
-    const fadeOutTimer = setTimeout(() => setVisible(false), 2000)
-    return () => clearTimeout(fadeOutTimer)
-  }, [visible])
-
-  //Hide
-  useEffect(() => {
-    setMoves(Object.entries(getLsUserMoves()))
-  }, [getLsUserMoves])
-  //-------------------------handlers--------------------------------
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+
   const modalRef = useRef<HTMLDivElement>(null)
+
   const options = [
     { id: 'job-1', label: 'I can do it! ❤️‍🔥', description: 'Success' },
     { id: 'job-2', label: 'Too hard 🐸', description: 'Attempt' },
@@ -69,13 +62,31 @@ export default function RenderFlows() {
       description: 'Not going to try',
     },
   ]
+  // --------------hooks--------
+  useEffect(() => {
+    const allTrans = extractMoveTransitions(getLsFlows())
+    //filters transitions to just MoveA
+    setTransitions(
+      allTrans.filter(
+        ({ moveFrom }) =>
+          moveFrom.category === selectedCategory &&
+          moveFrom.displayName === selectedMove,
+      ),
+    )
+  }, [getLsFlows, selectedCategory, selectedMove])
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      setIsOpen(false)
-    }
-  }
+  //Show Notifcation for 2 seconds
+  useEffect(() => {
+    const fadeOutTimer = setTimeout(() => setVisible(false), 2000)
+    return () => clearTimeout(fadeOutTimer)
+  }, [visible])
 
+  //Hide
+  useEffect(() => {
+    setMoves(Object.entries(getLsUserMoves()))
+  }, [getLsUserMoves])
+
+  //Modal Handling
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
@@ -87,6 +98,14 @@ export default function RenderFlows() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isOpen])
+
+  //-------------------------handlers--------------------------------
+  //Modal Click Outside
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setIsOpen(false)
+    }
+  }
 
   //-----------------------render--------------------
   return (
@@ -112,7 +131,7 @@ export default function RenderFlows() {
         </p>
         <p>
           {selectedMove &&
-            `1/${moves?.reduce((acc, [, strings]) => acc + strings.length, 0) || 0}`}
+            `${flowTransitions.length}/${moves?.reduce((acc, [, strings]) => acc + strings.length, 0) || 0}`}
         </p>
       </section>
       {/* ---------------MOVES---------------- */}
@@ -183,42 +202,58 @@ export default function RenderFlows() {
                   <article key={moveIndex}>
                     <h3 className="mb-1 text-base font-bold">{category}</h3>
                     <section className="flex flex-col">
-                      {moves.map((move, moveIndex) => (
-                        <article className="mb-3 flex flex-col" key={moveIndex}>
-                          <label className="">
-                            {!!isImpossible || (
-                              <input
-                                className="mr-2"
-                                type="checkbox"
-                                onClick={() => {
-                                  console.log('clicked')
-                                }}
-                              />
-                            )}
-                            <span
-                              className={`${isImpossible && 'line-through'}`}
-                            >
-                              {move}
-                            </span>
-                          </label>
-                          <section className="flex">
-                            <button
-                              onClick={() => setIsOpen(true)}
-                              className={`mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${!isImpossible ? 'opacity-100' : 'opacity-20'}`}
-                              type="button"
-                            >
-                              Attempt
-                            </button>
-                            <button
-                              onClick={() => console.log('mark as impossible')}
-                              className={`ml-1 mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${isImpossible ? 'opacity-100' : 'opacity-20'}`}
-                              type="button"
-                            >
-                              Impossible
-                            </button>
-                          </section>
-                        </article>
-                      ))}
+                      {moves.map((move, moveIndex) => {
+                        const checkedFromFlow = flowTransitions.some(
+                          ({ moveTo }) => {
+                            return (
+                              moveTo.category === category &&
+                              moveTo.displayName === move
+                            )
+                          },
+                        )
+                        return (
+                          <article
+                            className="mb-3 flex flex-col"
+                            key={moveIndex}
+                          >
+                            <label className="">
+                              {!!isImpossible || (
+                                <input
+                                  className="mr-2"
+                                  checked={checkedFromFlow}
+                                  type="checkbox"
+                                  onClick={() => {
+                                    console.log('clicked')
+                                  }}
+                                />
+                              )}
+                              <span
+                                className={`${isImpossible && 'line-through'}`}
+                              >
+                                {move}
+                              </span>
+                            </label>
+                            <section className="flex">
+                              <button
+                                onClick={() => setIsOpen(true)}
+                                className={`mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${!isImpossible ? 'opacity-100' : 'opacity-20'}`}
+                                type="button"
+                              >
+                                Attempt
+                              </button>
+                              <button
+                                onClick={() =>
+                                  console.log('mark as impossible')
+                                }
+                                className={`ml-1 mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${isImpossible ? 'opacity-100' : 'opacity-20'}`}
+                                type="button"
+                              >
+                                Impossible
+                              </button>
+                            </section>
+                          </article>
+                        )
+                      })}
                     </section>
                   </article>
                 )
