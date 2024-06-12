@@ -11,6 +11,14 @@ const nextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5090/api/:path*', // Proxy to C# Backend
+      },
+    ]
+  },
 }
 
 export default nextConfig

@@ -9,6 +9,13 @@
 # testing
 /coverage
 
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+bin/
+obj/
+
 # next.js
 /.next/
 /out/

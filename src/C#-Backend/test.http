@@ -1,0 +1,3 @@
+### Test WriteAsync Response
+GET http://localhost:5090/api/mongodb
+Accept: application/json
