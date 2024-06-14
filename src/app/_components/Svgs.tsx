@@ -96,9 +96,9 @@ export const RenderGreyTick = ({ ...props }: SVGProps<SVGSVGElement>) => (
       {...props}
       fill="none"
       stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2.5"
       className="h-3 w-3"
       viewBox="0 0 24 24"
     >
