@@ -27,7 +27,17 @@ export default async function RenderHero() {
             {`${!session ? 'Sign in' : 'Sign out'}`}
           </button>
         </form>
-        <p className="text-xs leading-none">Or continue in offline mode</p>
+        {!session && (
+          <p className="text-xs leading-none">Or continue in offline mode</p>
+        )}
+        {session?.user && (
+          <section className="flex w-full flex-col">
+            <p>All your info:</p>
+            <pre className="max-w-60 overflow-auto break-words break-all bg-slate-200 text-xs  leading-none">
+              {JSON.stringify(session, null, 3)}
+            </pre>
+          </section>
+        )}
       </article>
     </section>
   )
