@@ -17,6 +17,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 import RenderThunder from '../_components/RenderChilli'
 import { useRouter } from 'next/navigation'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
+import { SignIn } from '../_components/SignIn'
 
 const battleRankings = new Map([
   [1, 'I tried'],

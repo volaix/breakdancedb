@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function RenderHero() {
@@ -11,9 +10,8 @@ export default function RenderHero() {
           </h1>
           <br className="hidden lg:inline-block" />
           <p className="mb-8 text-xs leading-relaxed">
-            Ditch the scrapbook. Record your footworks. Practice systematically.
-            Flow in the cypher. Remember sets. Welcome to your new breakdance
-            database for footwork.
+            Ditch the scrapbook. Practice systematically. Connect every move, to
+            every other move. Remember your combos.
           </p>
           <div className="flex justify-center">
             <Link href={{ pathname: '/learnmoves' }}>
