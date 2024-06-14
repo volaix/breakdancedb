@@ -1,14 +1,10 @@
-'use client'
-import { useEffect, useState } from 'react'
-// @format
 import RenderHero from './RenderHero'
 import RenderStep from './RenderSteps'
+import RenderTree from './RenderTree'
 
 export default function RenderHome() {
-  // const [data, setData] = useState(null)
-
   return (
-    <div className="mt-20 flex flex-col items-center">
+    <div className="flex flex-col items-center">
       {false && (
         <>
           <h1>Data from Backend:</h1>
@@ -37,7 +33,8 @@ export default function RenderHome() {
         </>
       )}
       <RenderHero />
-      <RenderStep />
+      {/* <RenderStep /> */}
+      <RenderTree />
     </div>
   )
 }
