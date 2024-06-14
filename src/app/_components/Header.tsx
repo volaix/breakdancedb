@@ -1,11 +1,8 @@
 'use client'
 
-import { MouseEventHandler, useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { SignIn } from './SignIn'
-import RenderHome from '../page'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Renders the top header used on every page. Usually thrown in the template.tsx
@@ -144,9 +141,9 @@ export default function RenderHeader() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m1 1 4 4 4-4"
               />
             </svg>
