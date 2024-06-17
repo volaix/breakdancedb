@@ -6,7 +6,7 @@ import { auth } from '../../auth'
 
 export default async function RenderHero() {
   const session = await auth()
-  console.log('session: ', session)
+  const sessionExists = session?.expires
   return (
     <section className="body-font container mx-auto flex max-w-xs flex-col items-center px-5 pt-24 text-gray-600">
       <hgroup className="flex flex-col items-center text-center">
@@ -19,18 +19,21 @@ export default async function RenderHero() {
         </p>
       </hgroup>
       <article className="flex flex-col justify-center text-center">
-        <form className="" action={!session ? signInAction : signOutAction}>
+        <form
+          className=""
+          action={!sessionExists ? signInAction : signOutAction}
+        >
           <button
             type="submit"
             className="focus-visible:ring-ring border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded border  bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
           >
-            {`${!session?.user ? 'Sign in' : 'Sign out'}`}
+            {`${!sessionExists ? 'Sign in' : 'Sign out'}`}
           </button>
         </form>
-        {!session && (
+        {!sessionExists && (
           <p className="text-xs leading-none">Or continue in offline mode</p>
         )}
-        {session?.user && (
+        {sessionExists && (
           <section className="flex w-full flex-col">
             <p>All your info:</p>
             <pre className="max-w-60 overflow-auto break-words break-all bg-slate-200 text-xs  leading-none">
