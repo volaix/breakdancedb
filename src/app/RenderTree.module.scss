@@ -88,6 +88,9 @@ $reverse: false;
   display: inline-block;
   border-radius: 5px;
   color: #333;
+  @media (prefers-color-scheme: dark){
+    color: rgb(143, 143, 143)
+  }
   position: relative;
   top: $border-width;
 
@@ -95,36 +98,3 @@ $reverse: false;
     transform: rotate(180deg);
   }
 }
-
-.tree li a:hover,
-.tree li a:hover + ul li a {
-  background: #e9453f;
-  color: #fff;
-  border: $border-width solid #e9453f;
-  @at-root .tree & {
-    background: #35b416;
-  }
-}
-
-/* Style the parent when its child has a certain class */
-.parent {
-  &:has(a:hover) {
-    background: yellow;
-    color: #fff;
-    border: $border-width solid #e9453f;
-    background-color: greenyellow;
-  }
-}
-
-.tree li a:hover + ul li::after,
-.tree li a:hover + ul li::before,
-.tree li a:hover + ul::before,
-.tree li a:hover + ul ul::before {
-  border-color: #e9453f;
-}
-
-// .tree li a:hover {
-//   @at-root .parent-class & {
-//     color: red;
-//   }
-// }
