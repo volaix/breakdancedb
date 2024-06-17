@@ -2,7 +2,7 @@ import styles from './RenderTree.module.scss'
 
 export default function RenderTree() {
   return (
-    <div className={`mt-5 text-2xs   ${styles.tree}`}>
+    <div className={`mt-5 text-2xs dark:text-white  ${styles.tree}`}>
       <ul>
         <li className="">
           <a>List all Moves</a>

@@ -195,14 +195,14 @@ export default function RenderHeader() {
                 </Link>
               )}
             </article>
-            <ul className="my-2 pb-2 text-center text-sm  text-gray-700 dark:text-gray-200">
-              <li className="my-2 border-b border-gray-200 text-xs">
+            <ul className="my-2 pb-2 text-center text-sm  text-gray-700 ">
+              <li className="my-2 border-b border-gray-500 text-xs">
                 <Link href="/dblist">View Stats</Link>
               </li>
-              <li className="my-2 border-b border-gray-200 text-xs">
+              <li className="my-2 border-b border-gray-500 text-xs">
                 <Link href="/importexport"> Import / Export </Link>
               </li>
-              <li className="my-2 border-b border-gray-200 text-xs">
+              <li className="my-2 border-b border-gray-500 text-xs">
                 <Link href="/warmup">Warmup Protocol‍</Link>
               </li>
             </ul>
