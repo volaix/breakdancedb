@@ -1,12 +1,13 @@
 'use server'
-
-import Link from 'next/link'
-import { signInAction, signOutAction } from './_utils/actions'
 import { auth } from '../../auth'
+import RenderSaveUser from './SaveUser'
+import { signInAction, signOutAction } from './_utils/actions'
 
 export default async function RenderHero() {
   const session = await auth()
   const sessionExists = session?.expires
+
+  // ---------------------------render---------------------------
   return (
     <section className="body-font container mx-auto flex max-w-xs flex-col items-center px-5 pt-24 text-gray-600">
       <hgroup className="flex flex-col items-center text-center">
@@ -41,6 +42,7 @@ export default async function RenderHero() {
             </pre>
           </section>
         )}
+        {false && sessionExists && <RenderSaveUser session={session} />}
       </article>
     </section>
   )
