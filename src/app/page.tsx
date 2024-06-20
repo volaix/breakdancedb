@@ -1,40 +1,28 @@
+import RenderButtonTest from './RenderButtonTest'
 import RenderHero from './RenderHero'
-import RenderStep from './RenderSteps'
 import RenderTree from './RenderTree'
+import { connectedToMongo } from './_utils/actions'
 
-export default function RenderHome() {
+const RenderHome = ({ isConnected }: { isConnected: boolean }) => {
+  // const isConnected = serverConnected.then((res) => res.props.isConnected)
   return (
     <div className="flex flex-col items-center">
-      {false && (
-        <>
-          <h1>Data from Backend:</h1>
-          <button
-            className="border stroke-black"
-            onClick={() => {
-              console.log('FE Running fetch')
-              // fetch('/api/hey')
-              fetch('/api/mongodb')
-                .then((response) => {
-                  if (!response.ok) {
-                    throw new Error('Network response was not ok')
-                  }
-                  return response.json()
-                })
-                .then((data) => {
-                  console.log('data after json()', data)
-                  // setData(data)
-                })
-                .catch((error) => console.error('Error fetching data:', error))
-            }}
-          >
-            get data
-          </button>
-          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-        </>
-      )}
       <RenderHero />
-      {/* <RenderStep /> */}
+      {isConnected ? (
+        <div>Connected to MongoDB</div>
+      ) : (
+        <div>Not Connected to MongoDB</div>
+      )}
+      <RenderButtonTest />
       <RenderTree />
     </div>
   )
+}
+
+export default async function RenderHomePage() {
+  //todo have loading state
+  const isConnected = await connectedToMongo().then(
+    (res) => res.props.isConnected,
+  )
+  return <RenderHome isConnected={isConnected} />
 }
