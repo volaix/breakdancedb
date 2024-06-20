@@ -1,6 +1,7 @@
 'use server'
 
 import { auth, signIn, signOut } from 'auth'
+import dbClientPromise from '../../db/mongodb'
 
 export const signInAction = async () => {
   console.log('trying to sign in')
@@ -12,7 +13,8 @@ export const signOutAction = async () => {
   await signOut()
 }
 
-export const saveUser = async (userId: string, localStorage: string) => {
+export const saveUser = async (userId: string, localStorage: {}) => {
+  console.log('running saveuser')
   const session = await auth()
   try {
     const response = await fetch('https://api.example.com/data')
@@ -27,6 +29,16 @@ export const saveUser = async (userId: string, localStorage: string) => {
   }
 }
 
-const loadUser = async () => {
-  console.log('loadUser')
+export const connectedToMongo = async () => {
+  try {
+    await dbClientPromise.connect()
+    return {
+      props: { isConnected: true },
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      props: { isConnected: false },
+    }
+  }
 }
