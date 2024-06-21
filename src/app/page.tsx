@@ -1,10 +1,14 @@
+'use server'
+
 import RenderButtonTest from './RenderButtonTest'
 import RenderHero from './RenderHero'
 import RenderTree from './RenderTree'
 import { connectedToMongo } from './_utils/actions'
+import { auth } from '../../auth'
 
-const RenderHome = ({ isConnected }: { isConnected: boolean }) => {
-  // const isConnected = serverConnected.then((res) => res.props.isConnected)
+const RenderHome = async ({ isConnected }: { isConnected: boolean }) => {
+  const session = await auth()
+
   return (
     <div className="flex flex-col items-center">
       <RenderHero />
@@ -13,7 +17,7 @@ const RenderHome = ({ isConnected }: { isConnected: boolean }) => {
       ) : (
         <div>Not Connected to MongoDB</div>
       )}
-      <RenderButtonTest />
+      <RenderButtonTest session={session} />
       <RenderTree />
     </div>
   )

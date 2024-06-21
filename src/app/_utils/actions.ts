@@ -4,7 +4,6 @@ import { auth, signIn, signOut } from 'auth'
 import dbClientPromise from '../../db/mongodb'
 
 export const signInAction = async () => {
-  console.log('trying to sign in')
   await signIn()
 }
 
