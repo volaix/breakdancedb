@@ -118,7 +118,7 @@ export default function RenderImportExport() {
         <div className="mb-4 mt-2 flex w-10 justify-center">
           <div className="inline-flex h-1 w-16 rounded-full bg-indigo-500"></div>
         </div>
-        <div className="text-base text-black dark:text-white">Export</div>
+        <label className="text-base text-black dark:text-white">Export</label>
         <button
           className="m-2 w-2/3 rounded border-0 bg-indigo-500 px-6 py-2 text-center text-white  hover:bg-indigo-600 focus:outline-none"
           onClick={handleDownload}

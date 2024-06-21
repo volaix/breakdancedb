@@ -132,6 +132,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   getLsUserMoves: () => GlobalStateProperties[typeof lsUserMoves]
   getLsUserLearning: () => Move[]
   getDanceList: () => string[]
+  // getState: () => GlobalStateProperties
 
   //============nested================
   //--------flows---------

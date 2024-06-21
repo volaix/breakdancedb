@@ -1,40 +1,22 @@
-import RenderHero from './RenderHero'
-import RenderStep from './RenderSteps'
-import RenderTree from './RenderTree'
+'use server'
 
-export default function RenderHome() {
+import RenderButtonTest from './RenderButtonTest'
+import RenderHero from './RenderHero'
+import RenderTree from './RenderTree'
+import { auth } from '../../auth'
+
+const RenderHome = async ({ isConnected }: { isConnected?: boolean }) => {
+  const session = await auth()
+
   return (
     <div className="flex flex-col items-center">
-      {false && (
-        <>
-          <h1>Data from Backend:</h1>
-          <button
-            className="border stroke-black"
-            onClick={() => {
-              console.log('FE Running fetch')
-              // fetch('/api/hey')
-              fetch('/api/mongodb')
-                .then((response) => {
-                  if (!response.ok) {
-                    throw new Error('Network response was not ok')
-                  }
-                  return response.json()
-                })
-                .then((data) => {
-                  console.log('data after json()', data)
-                  // setData(data)
-                })
-                .catch((error) => console.error('Error fetching data:', error))
-            }}
-          >
-            get data
-          </button>
-          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-        </>
-      )}
       <RenderHero />
-      {/* <RenderStep /> */}
+      <RenderButtonTest userLoggedIn={!!session?.expires} />
       <RenderTree />
     </div>
   )
+}
+
+export default async function RenderHomePage() {
+  return <RenderHome />
 }

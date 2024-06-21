@@ -92,6 +92,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
+        // getState: () => get(),
 
         //============nested================
         //---------flows------

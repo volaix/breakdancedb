@@ -86,10 +86,21 @@ export default function RenderViewCombos() {
         <section className="flex flex-col"></section>
       </section>
       {/* ------------------end of advanced options------------- */}
+      {/* ----------------simple view--------------- */}
+      {false && (
+        <section>
+          <label className="mb-5 inline-flex cursor-pointer items-center">
+            <input type="checkbox" value="" className="peer sr-only" />
+            <div className="peer relative h-5 w-9 rounded-full  bg-gray-200 ring-0 after:absolute after:start-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none rtl:peer-checked:after:-translate-x-full dark:border-gray-600 dark:bg-gray-700"></div>
+            <span className="text-sx ms-3 ">Simple View</span>
+          </label>
+        </section>
+      )}
       {/* ---------render combo boxes ------------ */}
       <section className="columns-3 gap-1 space-y-2 pt-5 sm:columns-5 lg:columns-8">
         {combos &&
           Object.entries(combos).map(([comboId, comboVal], i) => {
+            const simpleView = false
             if (!comboVal) return
             const { displayName, notes, execution, sequence } = comboVal
             //Advanced Option
@@ -98,6 +109,8 @@ export default function RenderViewCombos() {
               combosInBattle?.includes(comboId as ComboId)
             ) {
               return
+            }
+            if (simpleView) {
             }
 
             return (
@@ -116,7 +129,11 @@ export default function RenderViewCombos() {
                   <div className="mt-2 flex flex-row-reverse justify-center">
                     {Array.from(Array(5)).map((_, i) => {
                       return (
-                        <RenderThunder key={i} checked={i === 5 - execution} />
+                        <RenderThunder
+                          onChange={() => {}}
+                          key={i}
+                          checked={i === 5 - execution}
+                        />
                       )
                     })}
                   </div>

@@ -3,7 +3,6 @@
 import { auth, signIn, signOut } from 'auth'
 
 export const signInAction = async () => {
-  console.log('trying to sign in')
   await signIn()
 }
 
@@ -12,7 +11,8 @@ export const signOutAction = async () => {
   await signOut()
 }
 
-export const saveUser = async (userId: string, localStorage: string) => {
+export const saveUser = async (userId: string, localStorage: {}) => {
+  console.log('running saveuser')
   const session = await auth()
   try {
     const response = await fetch('https://api.example.com/data')
@@ -25,8 +25,4 @@ export const saveUser = async (userId: string, localStorage: string) => {
   } catch (error) {
     console.error(error)
   }
-}
-
-const loadUser = async () => {
-  console.log('loadUser')
 }
