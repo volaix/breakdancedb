@@ -10,16 +10,12 @@ const getUserCollection = async () => {
 
 export async function GET() {
   const session = await auth()
-  console.log('session: ', session)
   try {
-    const user = (await getUserCollection())
-      .find({ user: session?.user })
-      .limit(1)
-      .toArray()
+    const user = await (
+      await getUserCollection()
+    ).findOne({ user: session?.user }, { projection: { _id: 0, userDb: 1 } })
 
-    console.log('got:', user)
-
-    return NextResponse.json({ data: user }, { status: 200 })
+    return NextResponse.json({ userDb: user?.userDb }, { status: 200 })
   } catch (e) {
     console.error(e)
   }
@@ -28,7 +24,6 @@ export async function GET() {
 export async function PUT(req: NextRequest, res: NextResponse) {
   const session = await auth()
   const data: NextUser = await req.json()
-  console.log('server received data:', data)
 
   const query = { user: session?.user } //key
   const update = {
@@ -45,8 +40,6 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
 export async function DELETE(req: NextRequest, res: NextResponse) {
   const session = await auth()
-  const data: NextUser = await req.json()
   await (await getUserCollection()).deleteOne({ user: session?.user })
-
-  return NextResponse.json({ data: data }, { status: 200 })
+  return NextResponse.json({ message: 'successfully deleted' }, { status: 200 })
 }
