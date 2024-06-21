@@ -1,10 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { GET } from './api/movies/route'
 import { Session } from 'next-auth'
-import { signInAction, signOutAction } from './_utils/actions'
 import RenderSaveUser from './SaveUser'
+import { signInAction, signOutAction } from './_utils/actions'
 
 export type NextUser = {
   id: string
@@ -17,52 +15,38 @@ export default function RenderButtonTest({
 }: {
   session: Session | null
 }) {
-  const [movies, setMovies] = useState()
+  const userLoggedIn = session?.expires
 
-  const sessionExists = session?.expires
-
-  const readMovies = async () => {
-    const itemListRes = await fetch('/api/movies')
+  const downloadUserData = async () => {
+    // session?.user?.id
+    const itemListRes = await fetch('/api/user')
     const data = await itemListRes.json()
-    setMovies(data.data)
+    console.log('data to set in zustand', data.data)
   }
-  const createMovies = async () => {
-    fetch('/api/movies', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: 'uniqueId',
-        name: 'initial name',
-        payload: 'initial payload',
-      } as NextUser),
-    })
-  }
-  const updateMovies = async () => {
-    fetch('/api/movies', {
+  const uploadUserData = async () => {
+    fetch('/api/user', {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: 'uniqueId',
-        name: 'third name',
+        id: session?.user?.id,
+        name: session?.user?.name, // to be deleted from schema. i dont want to know.
         payload: 'third payload',
       } as NextUser),
     })
   }
-  const deleteMovie = async () => {
-    fetch('/api/movies', {
+  const deleteUserData = async () => {
+    fetch('/api/user', {
       method: 'DELETE',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: 'uniqueId' }),
+      body: JSON.stringify({ id: session?.user?.id }),
     })
+    await signOutAction()
   }
 
   return (
@@ -70,19 +54,19 @@ export default function RenderButtonTest({
       <article className="flex flex-col justify-center text-center">
         <form
           className=""
-          action={!sessionExists ? signInAction : signOutAction}
+          action={!userLoggedIn ? signInAction : signOutAction}
         >
           <button
             type="submit"
             className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
           >
-            {`${!sessionExists ? 'Sign in' : 'Sign out'}`}
+            {`${!userLoggedIn ? 'Sign in' : 'Sign out'}`}
           </button>
         </form>
-        {!sessionExists && (
+        {!userLoggedIn && (
           <p className="text-xs leading-none">Or continue in offline mode</p>
         )}
-        {sessionExists && (
+        {userLoggedIn && (
           <section className="flex w-full flex-col">
             <p>All your info:</p>
             <pre className="max-w-60 overflow-auto break-words break-all bg-slate-200 text-xs  leading-none">
@@ -90,12 +74,30 @@ export default function RenderButtonTest({
             </pre>
           </section>
         )}
-        {false && sessionExists && <RenderSaveUser session={session} />}
+        {false && userLoggedIn && <RenderSaveUser session={session} />}
       </article>
-      <button onClick={createMovies}>CREATE</button>
-      <button onClick={readMovies}>READ</button>
-      <button onClick={updateMovies}>UPDATE</button>
-      <button onClick={deleteMovie}>DELETE</button>
+      {userLoggedIn && (
+        <>
+          <button
+            className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+            onClick={uploadUserData}
+          >
+            Upload to Cloud
+          </button>
+          <button
+            className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+            onClick={downloadUserData}
+          >
+            Download from Cloud
+          </button>
+          <button
+            className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+            onClick={deleteUserData}
+          >
+            Delete from Cloud
+          </button>
+        </>
+      )}
     </>
   )
 }

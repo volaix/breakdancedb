@@ -28,7 +28,7 @@ export const saveUser = async (userId: string, localStorage: {}) => {
   }
 }
 
-export const connectedToMongo = async () => {
+export const connectToMongodb = async () => {
   try {
     await dbClientPromise.connect()
     return {

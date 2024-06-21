@@ -3,20 +3,20 @@
 import RenderButtonTest from './RenderButtonTest'
 import RenderHero from './RenderHero'
 import RenderTree from './RenderTree'
-import { connectedToMongo } from './_utils/actions'
+import { connectToMongodb } from './_utils/actions'
 import { auth } from '../../auth'
 
-const RenderHome = async ({ isConnected }: { isConnected: boolean }) => {
+const RenderHome = async ({ isConnected }: { isConnected?: boolean }) => {
   const session = await auth()
 
   return (
     <div className="flex flex-col items-center">
       <RenderHero />
-      {isConnected ? (
+      {/* {isConnected ? (
         <div>Connected to MongoDB</div>
       ) : (
         <div>Not Connected to MongoDB</div>
-      )}
+      )} */}
       <RenderButtonTest session={session} />
       <RenderTree />
     </div>
@@ -24,9 +24,8 @@ const RenderHome = async ({ isConnected }: { isConnected: boolean }) => {
 }
 
 export default async function RenderHomePage() {
-  //todo have loading state
-  const isConnected = await connectedToMongo().then(
-    (res) => res.props.isConnected,
-  )
-  return <RenderHome isConnected={isConnected} />
+  // const isConnected = await connectToMongodb().then(
+  //   (res) => res.props.isConnected,
+  // )
+  return <RenderHome /*isConnected={isConnected}*/ />
 }
