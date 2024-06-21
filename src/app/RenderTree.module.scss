@@ -88,8 +88,8 @@ $reverse: false;
   display: inline-block;
   border-radius: 5px;
   color: #333;
-  @media (prefers-color-scheme: dark){
-    color: rgb(143, 143, 143)
+  @media (prefers-color-scheme: dark) {
+    color: rgb(143, 143, 143);
   }
   position: relative;
   top: $border-width;
