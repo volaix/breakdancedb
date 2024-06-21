@@ -1,7 +1,6 @@
 'use server'
 
 import { auth, signIn, signOut } from 'auth'
-import dbClientPromise from '../../db/mongodb'
 
 export const signInAction = async () => {
   await signIn()
@@ -25,19 +24,5 @@ export const saveUser = async (userId: string, localStorage: {}) => {
     console.log(data)
   } catch (error) {
     console.error(error)
-  }
-}
-
-export const connectToMongodb = async () => {
-  try {
-    await dbClientPromise.connect()
-    return {
-      props: { isConnected: true },
-    }
-  } catch (e) {
-    console.error(e)
-    return {
-      props: { isConnected: false },
-    }
   }
 }

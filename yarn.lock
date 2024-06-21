@@ -20,6 +20,26 @@
     preact "10.11.3"
     preact-render-to-string "5.2.3"
 
+"@auth/core@0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@auth/core/-/core-0.33.0.tgz#e58dea1c3f23b8b49b2b7a8d40d2c6d1a3fe60fc"
+  integrity sha512-QPWvnoAbolCO7I8/h3xITwS59bjA2fZRG+p4Qf2ZSMuPE3AFO9xYI3xjwdXZ0jl772aL7Ya8ZUedxCatXgwMZg==
+  dependencies:
+    "@panva/hkdf" "^1.1.1"
+    "@types/cookie" "0.6.0"
+    cookie "0.6.0"
+    jose "^5.1.3"
+    oauth4webapi "^2.10.4"
+    preact "10.11.3"
+    preact-render-to-string "5.2.3"
+
+"@auth/mongodb-adapter@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@auth/mongodb-adapter/-/mongodb-adapter-3.3.0.tgz#ad028843f27fdc03b7efd243ccb84b7243aaf613"
+  integrity sha512-K1QqKgEuecvLHYolgGqZL+PUB1LghMwS695032grJsKGSymvkv4GTxXXEQeFn9zFPPJxcLQXPy86aSsyLWRlJw==
+  dependencies:
+    "@auth/core" "0.33.0"
+
 "@babel/runtime@^7.23.2":
   version "7.24.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.5.tgz#230946857c053a36ccc66e1dd03b17dd0c4ed02c"
@@ -2126,6 +2146,11 @@ npm-run-path@^5.1.0:
   integrity sha512-ppwTtiJZq0O/ai0z7yfudtBpWIoxM8yE6nHi1X47eFR2EWORqfbu6CnPlNsjeN683eT0qG6H/Pyf9fCcvjnnnQ==
   dependencies:
     path-key "^4.0.0"
+
+oauth4webapi@^2.10.4:
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/oauth4webapi/-/oauth4webapi-2.11.1.tgz#8d79e6b0d54ead203094f185a11031f3f9978465"
+  integrity sha512-aNzOnL98bL6izG97zgnZs1PFEyO4WDVRhz2Pd066NPak44w5ESLRCYmJIyey8avSBPOMtBjhF3ZDDm7bIb7UOg==
 
 oauth4webapi@^2.9.0:
   version "2.10.4"
