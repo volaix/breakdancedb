@@ -9,15 +9,13 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
-    ],
-  },
-  async rewrites() {
-    return [
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:5090/api/:path*', // Proxy to C# Backend
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/u/**',
       },
-    ]
+    ],
   },
 }
 
