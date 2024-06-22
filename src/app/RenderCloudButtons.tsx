@@ -12,21 +12,31 @@ export type NextUser = {
   payload: string
 }
 
-export default function RenderButtonTest({
+export default function RenderCloudButtons({
   userLoggedIn,
+  userDate,
 }: {
   userLoggedIn: boolean
+  userDate: string
 }) {
   //---------------------STATE----------------------
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
+  const [lastEdited, setLastEdited] = useState<string | null>(null)
   const replaceGlobalState = useZustandStore(
     (state) => state.replaceGlobalState,
   )
 
   //-------------------HOOKS--------------------
+  //On mount updates lastEdited
+  useEffect(() => {
+    if (userDate) {
+      setLastEdited(userDate)
+    }
+  }, [userDate])
+
   //Show Notifcation for 2 seconds
   useEffect(() => {
     const fadeOutTimer = setTimeout(
@@ -42,7 +52,6 @@ export default function RenderButtonTest({
       const itemListRes = await fetch('/api/user')
       const { userDb } = await itemListRes.json()
       setNotification({ visible: true, message: 'Download successful' })
-      //confirm data is correct then
       replaceGlobalState(userDb)
     } catch (error) {
       console.error(error)
@@ -54,20 +63,20 @@ export default function RenderButtonTest({
         'cannot find breakdancedb data in your local storage.',
       )
 
-    fetch('/api/user', {
+    await fetch('/api/user', {
       method: 'PUT',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: localStorage[zustandLocalStorage],
-      // body: JSON.stringify({
-      //   userGlobalState: JSON.stringify(localStorage[zustandLocalStorage]),
-      // }),
-    }).then((res) => {
-      console.log('res: ', res)
-      setNotification({ visible: true, message: 'Upload successful' })
     })
+
+    setNotification({ visible: true, message: 'Upload successful' })
+
+    const user = await fetch('/api/user')
+    const { editedAt } = await user.json()
+    setLastEdited(editedAt)
   }
   const deleteUserData = async () => {
     fetch('/api/user', {
@@ -99,12 +108,21 @@ export default function RenderButtonTest({
           <p className="text-xs leading-none">Or continue in offline mode</p>
         )}
       </article>
+      {lastEdited && (
+        <section className="mb-2 text-center text-2xs">
+          <div>Cloud Data Last Uploaded on:</div>
+          <div>{`${new Date(lastEdited)}}`}</div>
+        </section>
+      )}
+      {/* //TODO BUG DOESNT RUN */}
+      {userLoggedIn && !lastEdited && <div>cloud data not found.</div>}
+
       <Notification
         visible={!!notification?.visible}
         message={notification?.message || ''}
       />
       {userLoggedIn && (
-        <section className="space-y-2 text-center">
+        <section className="flex flex-col space-y-2 text-center">
           <button
             className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex  h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
             onClick={uploadUserData}
