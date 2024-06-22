@@ -9,11 +9,6 @@ const getUserCollection = async () => {
   return await dbClientPromise.db('BreakdanceDB').collection('userData')
 }
 
-export const getUserData = async (): Promise<User | null> => {
-  const session = await auth()
-  return session?.user ?? null
-}
-
 export async function GET() {
   const session = await auth()
   try {

@@ -3,7 +3,13 @@ import { SessionProvider, useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 import { ClientHeader } from './ClientHeader'
-import { getUserData } from '../api/user/route'
+import { auth } from 'auth'
+import { User } from 'next-auth'
+
+const getUserData = async (): Promise<User | null> => {
+  const session = await auth()
+  return session?.user ?? null
+}
 
 export default async function Header() {
   const user = await getUserData()
