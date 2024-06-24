@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Notification } from '../_components/Notification'
-import {
-  GlobalStateProperties,
-  lsToprock,
-  lsUserMoves,
-} from '../_utils/lsTypes'
+import { GlobalStateProperties, lsUserMoves } from '../_utils/lsTypes'
 import { isValidKey } from '../_utils/lsValidation'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import {
+  RenderAddButtonSVG,
+  RenderDeleteButtonSVG,
+  RenderTrashButtonSvg,
+} from '../_components/Svgs'
 
 //---------------------------utils---------------------------------
 const makeArray = (moveString: string): string[] =>
@@ -25,6 +26,7 @@ const hasDuplicates = (array: string[]): boolean => {
 type Inputs = {
   categoryMoves: string
 }
+
 export default function Moves() {
   //-----------------------------state---------------------------
   const [saveText, setSaveText] = useState('Save')
@@ -35,18 +37,18 @@ export default function Moves() {
     message?: string
     timeShown?: number
   }>(null)
-  const [categories, setCategories] = useState<string[]>()
+  const [categories, setCategories] = useState<string[] | null>(null)
+  const [showInput, setInput] = useState<{ [key: string]: boolean }>()
 
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  const setLsUserMovesByKey = useZustandStore(
-    (state) => state.setLsUserMovesByKey,
-  )
-  const getLsUserMovesByKey = useZustandStore(
+  const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const setCategoryValue = useZustandStore((state) => state.setLsUserMovesByKey)
+  const getCategoryValueByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
+  const deleteCategory = useZustandStore((state) => state.deleteUserMovesByKey)
   //key of category selected
   const [selectedKey, setSelectedKey] =
-    useState<keyof GlobalStateProperties[typeof lsUserMoves]>(lsToprock)
+    useState<keyof GlobalStateProperties[typeof lsUserMoves]>()
 
   //category string with n\ from zustand global state
   const [lsMoves, setLsMoves] = useState<string>('')
@@ -59,13 +61,19 @@ export default function Moves() {
     formState: { errors },
   } = useForm<Inputs>()
 
+  const {
+    register: registerNewCategory,
+    handleSubmit: submitNewCategory,
+    reset: resetNewCategory,
+  } = useForm<{ newCategory: string }>()
+
   //value of categoryMoves textarea
   const unsavedMoveList = watch('categoryMoves', '')
   //-----------------------------hooks------------------------------
   //sets categories
   useEffect(() => {
-    setCategories(Object.keys(getLsUserMoves()))
-  }, [getLsUserMoves])
+    setCategories(Object.keys(getUserMoves()))
+  }, [getUserMoves])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
@@ -87,9 +95,13 @@ export default function Moves() {
 
   //onload get moves from global state
   useEffect(() => {
-    setLsMoves(makeString(getLsUserMovesByKey(selectedKey)))
-    setSaveButtonActive(false)
-  }, [getLsUserMovesByKey, selectedKey])
+    if (selectedKey) {
+      setLsMoves(makeString(getCategoryValueByKey(selectedKey)))
+      setSaveButtonActive(false)
+    } else {
+      setSelectedKey(categories?.[0])
+    }
+  }, [categories, getCategoryValueByKey, selectedKey])
 
   //if textarea has changed, enable save button
   useEffect(() => {
@@ -115,37 +127,91 @@ export default function Moves() {
       alert('save before changing categories')
     } else {
       setSelectedKey(category)
-      setLsMoves(makeString(getLsUserMovesByKey(category)))
+      setLsMoves(makeString(getCategoryValueByKey(category)))
     }
   }
 
   return (
     <article className="body-font mx-auto text-gray-400 md:w-2/3 lg:w-1/2">
       <section className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
-        <nav className="body-font flex flex-wrap items-center justify-center text-base text-gray-300 md:ml-4 md:mr-auto md:border-l md:py-1 md:pl-4 dark:md:border-gray-700">
+        <nav className="body-font flex flex-wrap items-center justify-center text-base text-gray-300 dark:md:border-gray-700">
           {
             //------category select------------
             categories &&
-              categories.map((key) => {
+              categories.map((key, categoryIndex) => {
                 const selected = selectedKey === key
                 return (
-                  <label
+                  <article
                     key={key}
-                    className={`mr-5  capitalize
-                        dark:${selected && 'text-white'}
-                        ${selected && `text-gray-900`}
-                        `}
+                    className={`mr-5 flex dark:${selected && 'text-white'} ${selected && `text-gray-900`}`}
                   >
-                    <input
-                      type="radio"
-                      className="hidden"
-                      name="categories"
-                      value={key}
-                      checked={selected}
-                      onChange={() => handleChangeCategory(key)}
-                    />
-                    {key}
-                  </label>
+                    <label
+                      className={`mr-1 capitalize
+                        `}
+                    >
+                      <input
+                        type="radio"
+                        className="hidden"
+                        name="categories"
+                        value={key}
+                        checked={selected}
+                        onChange={() => handleChangeCategory(key)}
+                      />
+                      {key}
+                    </label>
+                    {selected && !showInput?.[key] && (
+                      <section className="flex items-center">
+                        <RenderAddButtonSVG
+                          onClick={() => {
+                            setInput({ [key]: true })
+                            resetNewCategory({ newCategory: '' })
+                          }}
+                          className={` dark:${selected && 'fill-white'} ${selected ? ' fill-gray-900' : 'fill-gray-300'}  mr-0.5 size-2`}
+                        />
+                        <RenderTrashButtonSvg
+                          onClick={() => {
+                            if (categories.length > 1) {
+                              deleteCategory(key)
+                              setSelectedKey(categories?.[categoryIndex - 1])
+                              setCategories(Object.keys(getUserMoves()))
+                            }
+                          }}
+                          className="size-2"
+                        />
+                      </section>
+                    )}
+                    {showInput?.[key] && (
+                      <form
+                        className="flex items-center"
+                        onSubmit={(e) => {
+                          setInput({ [key]: false })
+                        }}
+                      >
+                        <input
+                          className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                          type="text"
+                          placeholder="New Category"
+                          {...registerNewCategory('newCategory', {
+                            required: true,
+                          })}
+                        />
+                        <RenderAddButtonSVG
+                          onClick={submitNewCategory(({ newCategory }) => {
+                            setCategoryValue(newCategory, [])
+                            setInput({ [key]: false })
+                            setCategories(Object.keys(getUserMoves()))
+                          })}
+                          className={`ml-1 size-8 fill-indigo-500`}
+                        />
+                        <RenderDeleteButtonSVG
+                          onClick={() => {
+                            setInput({ [key]: false })
+                          }}
+                          className="mb-0.5 size-12"
+                        />
+                      </form>
+                    )}
+                  </article>
                 )
               })
           }
@@ -154,6 +220,9 @@ export default function Moves() {
       {/* ------------form----------- */}
       <form
         onSubmit={handleSubmit((data) => {
+          console.log('data: ', data)
+
+          console.log('selectedKey: ', selectedKey)
           const movesArr = makeArray(data.categoryMoves)
           if (hasDuplicates(movesArr)) {
             setSaveButtonActive(false)
@@ -164,33 +233,37 @@ export default function Moves() {
             sortMovesInTextArea()
             // setLsMoves(makeString(movesArr.sort()))
             return
-          } else if (isValidKey(selectedKey)) {
-            setLsUserMovesByKey(selectedKey, movesArr)
-            setLsMoves(makeString(getLsUserMovesByKey(selectedKey)))
+          } else if (
+            selectedKey &&
+            categories &&
+            isValidKey(selectedKey, categories)
+          ) {
+            setCategoryValue(selectedKey, movesArr)
+            setLsMoves(makeString(getCategoryValueByKey(selectedKey)))
             setSaveText('Saved')
             setSaveButtonActive(false)
             setNotification({ message: 'Saved', visible: true })
           }
         })}
-        className="relative -m-2 flex w-full flex-wrap p-2"
+        className="relative flex w-full flex-wrap p-2"
       >
         {/* --------------------text area form--------------------------- */}
         {/* ---------------loaded text------------------------ */}
-        <label className="absolute ml-1 mt-5 text-[9px]">
-          {`${hasLoaded ? selectedKey + ' loaded' : 'Not loaded'}`}
-        </label>
         <h2 className="text-sm capitalize leading-7 text-gray-600 dark:text-gray-400">
           {`Your ${selectedKey ? selectedKey + 's' : 'moves'}`}
         </h2>
+        <label className="absolute ml-1 mt-5 text-[9px]">
+          {`${hasLoaded ? selectedKey + ' loaded' : 'Not loaded'}`}
+        </label>
         {/* ---------------text area------------------------ */}
-        <section className="flex max-w-xs space-x-4 p-4">
+        <section className="flex max-w-full space-x-4 p-4">
           {/* -----------------left textarea------------------- */}
           <textarea
             {...register('categoryMoves')}
             className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
           />
           {/* --------------------right json view-------------------- */}
-          <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs">
+          <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs md:max-w-full">
             {JSON.stringify(unsavedMoveList.split(/\r\n|\r|\n/), null, 1)}
           </pre>
         </section>
@@ -205,8 +278,7 @@ export default function Moves() {
         <section className="mt-5 flex w-full justify-center">
           {/* ----------sort button------- */}
           <button
-            className="flex items-center justify-center rounded border border-indigo-500 px-8 py-2 text-center text-indigo-500 
- "
+            className="flex items-center justify-center rounded border border-indigo-500 px-8 py-2 text-center text-indigo-500 "
             onClick={(e) => {
               //prevents form submit
               e.preventDefault()
@@ -219,8 +291,7 @@ export default function Moves() {
           <button
             disabled={!saveButtonActive}
             type="submit"
-            className="flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white 
-  hover:bg-indigo-600 focus:outline-none disabled:opacity-50"
+            className="flex rounded border-0 bg-indigo-500 px-8 py-2 text-lg text-white hover:bg-indigo-600 focus:outline-none disabled:opacity-50"
           >
             {saveText}
           </button>

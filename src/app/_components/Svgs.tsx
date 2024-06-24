@@ -128,11 +128,33 @@ export const RenderRedoIcon = ({ ...props }: SVGProps<SVGSVGElement>) => (
  * @returns
  */
 export const RenderAddButtonSVG = ({ ...props }: SVGProps<SVGSVGElement>) => (
-  <svg {...props} height="100%" width="100%" viewBox="0 0 122.88 122.88">
+  <svg height="100%" width="100%" viewBox="0 0 122.88 122.88" {...props}>
     <path
       pointerEvents={'none'}
       d="M61.44,0A61.46,61.46,0,1,1,18,18,61.25,61.25,0,0,1,61.44,0ZM88.6,56.82v9.24a4,4,0,0,1-4,4H70V84.62a4,4,0,0,1-4,4H56.82a4,4,0,0,1-4-4V70H38.26a4,4,0,0,1-4-4V56.82a4,4,0,0,1,4-4H52.84V38.26a4,4,0,0,1,4-4h9.24a4,4,0,0,1,4,4V52.84H84.62a4,4,0,0,1,4,4Zm8.83-31.37a50.92,50.92,0,1,0,14.9,36,50.78,50.78,0,0,0-14.9-36Z"
     />
+  </svg>
+)
+
+export const RenderTrashButtonSvg = ({ ...props }: SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-trash2 h-4 w-4"
+    {...props}
+  >
+    <path pointerEvents="none" d="M3 6h18"></path>
+    <path pointerEvents="none" d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+    <path pointerEvents="none" d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+    <line x1="10" x2="10" y1="11" y2="17"></line>
+    <line x1="14" x2="14" y1="11" y2="17"></line>
   </svg>
 )
 

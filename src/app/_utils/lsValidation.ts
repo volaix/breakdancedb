@@ -1,7 +1,7 @@
 import { LocalStorageValues, lsUserMoves } from './lsTypes'
 import { validate } from 'uuid'
 import { BasicFlow, MoveId, Move } from './lsTypes'
-import { initialState } from './zustandLocalStorage'
+import { initialState, zustandLocalStorage } from './zustandLocalStorage'
 import { GlobalStateProperties } from './lsTypes'
 
 /**
@@ -68,13 +68,7 @@ export const isFlow = (val: unknown): val is BasicFlow => {
  */
 export const isValidKey = (
   key: string,
+  categories: string[],
 ): key is keyof GlobalStateProperties[typeof lsUserMoves] => {
-  if (
-    initialState[lsUserMoves][
-      key as keyof GlobalStateProperties[typeof lsUserMoves]
-    ]
-  ) {
-    return true
-  }
-  return false
+  return categories.includes(key)
 }

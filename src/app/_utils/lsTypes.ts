@@ -149,6 +149,9 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     key: keyof GlobalStateProperties[typeof lsUserMoves],
   ) => GlobalStateProperties[typeof lsUserMoves][KeyOfMoves]
   getLsUserMoveCategories: () => Array<KeyOfMoves>
+  deleteUserMovesByKey: (
+    key: keyof GlobalStateProperties[typeof lsUserMoves],
+  ) => void
   //=================================
   //------Reinitialization----------
   replaceGlobalState: (state: {
