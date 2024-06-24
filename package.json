@@ -26,7 +26,7 @@
     "@auth/mongodb-adapter": "^3.3.0",
     "immer": "^10.1.1",
     "mongodb": "^6.7.0",
-    "next": "^14.2.4",
+    "next": "^14.1.2",
     "next-auth": "^5.0.0-beta.19",
     "react": "^18",
     "react-dom": "^18",

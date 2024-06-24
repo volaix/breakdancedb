@@ -2112,7 +2112,7 @@ next-auth@^5.0.0-beta.19:
   dependencies:
     "@auth/core" "0.32.0"
 
-next@^14.2.4:
+next@^14.1.2:
   version "14.2.4"
   resolved "https://registry.yarnpkg.com/next/-/next-14.2.4.tgz#ef66c39c71e2d8ad0a3caa0383c8933f4663e4d1"
   integrity sha512-R8/V7vugY+822rsQGQCjoLhMuC9oFj9SOi4Cl4b2wjDrseD0LRZ10W7R6Czo4w9ZznVSshKjuIomsRjvm9EKJQ==
