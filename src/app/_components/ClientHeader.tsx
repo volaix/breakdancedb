@@ -85,7 +85,7 @@ export function ClientHeader({
                     <a href="/yourmoves">📚 Your Moves 📚</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learntransitions">🧐 Transitions 🧐</a>
+                    <a href="/learntransitions">✅ Transitions ✅</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/learnflows">💪 RNG Set 💪</a>
@@ -93,15 +93,15 @@ export function ClientHeader({
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/combos">🤖 Make Set 🤖</a>
                   </li>
-                  <li className="my-2 border-b border-gray-400 uppercase">
+                  {/* <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/battle">🥊 Battle 🥊</a>
-                  </li>
-                  <li className="my-2 border-b border-gray-400 uppercase">
+                  </li> */}
+                  {/* <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/learnmoves">🌱 Train Moves 🌱</a>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <a href="/create">🎨 Create Move 🎨</a>
-                  </li>
+                  </li> */}
                   {inDevelopment || (
                     <li className="my-2 border-b border-gray-400 uppercase">
                       <a href="/nodes">Nodeview</a>
