@@ -29,14 +29,6 @@ APP = A power user's move database
 2. yarn dev
 3. [http://localhost:3000](http://localhost:3000)
 
-## Techs
-
-- React - nextjs
-- localstorage for db
-- immer - mutable for updating nested structures
-- Tailwind CSS
-- Zustand for localstorage management and state
-
 ## Deploy
 
 1. yarn build
@@ -44,9 +36,6 @@ APP = A power user's move database
 
 # Stretch Goal
 
-- addon tags: hand placements, anti hooks, "opposite side"
-- user profiles on server
-- shared data state between devices
 - shared moves matcher to practice together
 - begin to catalog every breaking movement with words and images
 - bigdata- most loved transitions, most learned but isolated moves
