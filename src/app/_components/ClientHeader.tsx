@@ -214,6 +214,13 @@ export function ClientHeader({
                   Warmup Protocol‍
                 </Link>
               </li>
+              {
+                <li className="my-2 border-b border-gray-500 text-xs">
+                  <Link onClick={() => setIsSettingsOpen(false)} href="/">
+                    {hasUser ? 'Sign out' : 'Sign out'}
+                  </Link>
+                </li>
+              }
             </ul>
           </section>
         </div>
