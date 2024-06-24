@@ -2,16 +2,11 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { RenderRedoIcon } from '../_components/Svgs'
 import {
-  BasicFlow,
   BasicMove,
   FlowDictionary,
   FlowId,
   GlobalStateProperties,
   MoveCategories,
-  lsDrops,
-  lsFootwork,
-  lsFreezes,
-  lsPower,
   lsToprock,
   lsUserMoves,
 } from '../_utils/lsTypes'
@@ -58,18 +53,19 @@ export default function ExistingMoves() {
     (state) => state.getLsUserMovesByKey,
   )
   const displayMoves = !!learning
-  const [selectedCategory, setSelectedCategory] = useState<SelectedCategory>({
-    selectedCategory: lsToprock,
-  })
+  const [selectedCategory, setSelectedCategory] =
+    useState<SelectedCategory | null>(null)
   //----------------functions----------------
 
   const shuffleLearning = useCallback(() => {
-    const shuffleSingleKey = (key: 'selectedCategory') =>
-      pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
+    if (selectedCategory) {
+      const shuffleSingleKey = (key: 'selectedCategory') =>
+        pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
 
-    setLearning({
-      selectedCategory: shuffleSingleKey('selectedCategory'),
-    })
+      setLearning({
+        selectedCategory: shuffleSingleKey('selectedCategory'),
+      })
+    }
   }, [getLsUserMovesByKey, selectedCategory])
 
   //---------------------------hooks---------------------------------
@@ -104,7 +100,7 @@ export default function ExistingMoves() {
             </div>
           )}
           {/* ----------------dropdowns----------- */}
-          {displayMoves && (
+          {displayMoves && selectedCategory && (
             <div className="flex w-full flex-col gap-4 text-xs">
               {(['selectedCategory'] as Array<keyof SelectedCategory>).map(
                 (movePosition, i) => (
