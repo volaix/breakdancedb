@@ -6,7 +6,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { Notification } from '../_components/Notification'
 import RenderThunder from '../_components/RenderChilli'
 import { RenderRedoIcon } from '../_components/Svgs'
-import { extractComboIds } from '../_utils/lib'
+import {
+  MoveTransition,
+  extractComboIds,
+  extractMoveTransitions,
+} from '../_utils/lib'
 import {
   BasicFlow,
   BasicMove,
@@ -15,16 +19,9 @@ import {
   FlowId,
   GlobalStateProperties,
   MoveCategories,
-  lsDrops,
-  lsFootwork,
-  lsFreezes,
-  lsPower,
-  lsToprock,
   lsUserMoves,
 } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { extractMoveTransitions } from '../_utils/lib'
-import { MoveTransition } from '../_utils/lib'
 
 const likeRanking = new Map<number, string>([
   [5, 'Super Cool!'],
@@ -79,60 +76,73 @@ export default function RenderFlows() {
   const [textAreaValue, setTextAreaValue] = useState<string>('')
   const [singleCategory, setSingleCategory] = useState<boolean>(true)
   const [selectedCategory, setSelectedCategory] =
-    useState<SelectedCategoryState>({
-      entryMove: lsToprock,
-      keyMove: lsToprock,
-      exitMove: lsToprock,
-    })
+    useState<SelectedCategoryState | null>(null)
   const [ratingVal, setRatingVal] = useState<number>(1)
   const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
   const [movesUsedInBattle, setMovesUsedInBattle] = useState<BasicMove[]>()
   const [hideMovesIfFlow, setHideMovesIfFlow] = useState<boolean>(false)
   const [movesUsedInFlow, setMovesUsedInFlow] = useState<BasicMove[]>()
+  const [categories, setCategories] = useState<string[]>()
+  const [moveTransitions, setMoveTransitions] = useState<MoveTransition[]>()
 
-  const displayMoves = !!learning
-  const setLsFlow = useZustandStore((state) => state.setLsFlow)
-  const getLsBattle = useZustandStore((state) => state.getLsBattle)
-  const getLsFlows = useZustandStore((state) => state.getLsFlows)
-  const getLsCombosById = useZustandStore((state) => state.getLsComboById)
-  const getLsUserMovesByKey = useZustandStore(
+  const setFlow = useZustandStore((state) => state.setLsFlow)
+  const getBattle = useZustandStore((state) => state.getLsBattle)
+  const getFlows = useZustandStore((state) => state.getLsFlows)
+  const getCombosById = useZustandStore((state) => state.getLsComboById)
+  const getUserMovesByKey = useZustandStore(
     (state) => state.getLsUserMovesByKey,
   )
-  const [moveTransitions, setMoveTransitions] = useState<MoveTransition[]>()
-  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
-  const [categories, setCategories] = useState<string[]>()
+  const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const getUserMoveCategories = useZustandStore(
+    (state) => state.getLsUserMoveCategories,
+  )
 
+  const displayMoves = !!learning
   //----------------functions----------------
   const isSameMove = (move1: BasicMove, move2: BasicMove): boolean =>
     move1.displayName === move2.displayName && move1.category === move2.category
 
   const shuffleLearning = useCallback(
     (single?: keyof BasicFlow) => {
-      const shuffleSingleKey = (key: keyof BasicFlow) =>
-        pickRandomString(getLsUserMovesByKey(selectedCategory[key]))
-
-      if (single) {
-        setLearning((prevLearning) =>
-          prevLearning
-            ? { ...prevLearning, [single]: shuffleSingleKey(single) }
-            : null,
-        )
+      if (!selectedCategory) {
+        return
       } else {
-        setLearning({
-          entryMove: shuffleSingleKey('entryMove'),
-          keyMove: shuffleSingleKey('keyMove'),
-          exitMove: shuffleSingleKey('exitMove'),
-        })
+        const shuffleSingleKey = (key: keyof BasicFlow) =>
+          pickRandomString(getUserMovesByKey(selectedCategory[key]))
+        if (single) {
+          setLearning((prevLearning) =>
+            prevLearning
+              ? { ...prevLearning, [single]: shuffleSingleKey(single) }
+              : null,
+          )
+        } else {
+          setLearning({
+            entryMove: shuffleSingleKey('entryMove'),
+            keyMove: shuffleSingleKey('keyMove'),
+            exitMove: shuffleSingleKey('exitMove'),
+          })
+        }
       }
     },
-    [getLsUserMovesByKey, selectedCategory],
+    [getUserMovesByKey, selectedCategory],
   )
 
   //---------------------------hooks---------------------------------
-  //sets categories
+  //sets categories on mount
   useEffect(() => {
-    setCategories(Object.keys(getLsUserMoves()))
-  }, [getLsUserMoves])
+    const categories = getUserMoveCategories()
+    setCategories(categories)
+    setSelectedCategory({
+      entryMove: categories[0],
+      keyMove: categories[0],
+      exitMove: categories[0],
+    })
+  }, [getUserMoveCategories])
+
+  //Shuffle learning on mount
+  useEffect(() => {
+    shuffleLearning()
+  }, [shuffleLearning])
 
   /**
  * For ADV. OPT. Hide Uniques
@@ -140,7 +150,7 @@ export default function RenderFlows() {
  */
   useEffect(() => {
     if (!hideUnique) return
-    const lsFlowsLocal = getLsFlows()
+    const lsFlowsLocal = getFlows()
     if (!lsFlowsLocal) return
 
     const moveTransitions: MoveTransition[] =
@@ -149,31 +159,31 @@ export default function RenderFlows() {
     setMoveTransitions(moveTransitions)
 
     // setMovesUsedInFlow(basicMoves)
-  }, [getLsFlows, hideMovesIfFlow, hideUnique])
+  }, [getFlows, hideMovesIfFlow, hideUnique])
 
   //if hideMovesIfFlow flag, set movesUsedInFlow
   useEffect(() => {
     if (!hideMovesIfFlow) return
-    const lsFlows = getLsFlows()
+    const lsFlows = getFlows()
     if (!lsFlows) return
     const flowIds: FlowId[] = Object.keys(lsFlows) as FlowId[]
     const basicMoves: BasicMove[] = flowIds.flatMap((flowId) =>
       makeBasicMoves(flowId, lsFlows),
     )
     setMovesUsedInFlow(basicMoves)
-  }, [getLsFlows, hideMovesIfFlow])
+  }, [getFlows, hideMovesIfFlow])
 
   //if hideMovesIfBattle flag, set movesUsedInBattle
   useEffect(() => {
     if (!hideMovesIfBattle) return
-    const lsBattle = getLsBattle()
+    const lsBattle = getBattle()
     if (!lsBattle) return
 
-    const lsFlows = getLsFlows()
+    const lsFlows = getFlows()
     const movesFromFlowIds: BasicMove[] = extractComboIds(lsBattle.rounds)
       //FlowId[] used in lsBattle
       .map((comboId): FlowId[] | undefined => {
-        const comboVal = getLsCombosById(comboId)
+        const comboVal = getCombosById(comboId)
         if (!comboVal) return
 
         const comboMoves: ComboMove[] = comboVal.sequence.filter(
@@ -189,12 +199,7 @@ export default function RenderFlows() {
       .flat(1)
 
     setMovesUsedInBattle(movesFromFlowIds)
-  }, [getLsBattle, getLsCombosById, getLsFlows, hideMovesIfBattle])
-
-  //on mount
-  useEffect(() => {
-    shuffleLearning()
-  }, [shuffleLearning])
+  }, [getBattle, getCombosById, getFlows, hideMovesIfBattle])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
@@ -206,7 +211,8 @@ export default function RenderFlows() {
   //update local storage when user clicks yes
   const onClickYes = () => {
     if (learning) {
-      setLsFlow(
+      if (!selectedCategory) return
+      setFlow(
         {
           entryMove: {
             displayName: learning.entryMove,
@@ -321,7 +327,7 @@ export default function RenderFlows() {
             </div>
           )}
           {/* //----------------------FLOW INFORMATION AREA----------------------- */}
-          {displayMoves && (
+          {displayMoves && selectedCategory && (
             <div className="mb-5 flex w-full flex-col gap-4 p-4 text-xs">
               {(
                 ['entryMove', 'keyMove', 'exitMove'] as Array<
@@ -397,7 +403,7 @@ export default function RenderFlows() {
                               }))
                             }}
                           >
-                            {getLsUserMovesByKey(selectedCategory[movePosition])
+                            {getUserMovesByKey(selectedCategory[movePosition])
                               .toSorted()
                               .map((moveStr) => {
                                 //---------ADV. OPT. FUNCTION -----------
