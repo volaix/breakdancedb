@@ -130,6 +130,15 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsUserMoveCategories: () => {
           return Object.keys(get()[lsUserMoves])
         },
+        deleteUserMovesByKey: (
+          key: keyof GlobalStateProperties[typeof lsUserMoves],
+        ) => {
+          return set((state) => {
+            console.log('Deleting ', key)
+            if (!state[lsUserMoves]) return
+            delete state[lsUserMoves][key]
+          })
+        },
 
         //=================================
         //------Reinitialization----------
