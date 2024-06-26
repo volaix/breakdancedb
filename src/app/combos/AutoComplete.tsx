@@ -90,15 +90,34 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
     }
   }, [])
 
+  const addCustomMove = () => {
+    setShowSuggestions(false)
+    comboId &&
+      moveIndex &&
+      addComboMove(comboId as ComboId, moveIndex, {
+        moves: [userEntryValue],
+        id: 'custom',
+        type: 'custom',
+      })
+    updateCombos && updateCombos()
+    closeInput()
+  }
+
   return (
     <section className="" ref={autocompleteRef}>
       <input
+        autoFocus
         ref={inputRef}
         className="rounded-lg border px-2"
         value={userEntryValue}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Add Move"
         onFocus={() => setShowSuggestions(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ',') {
+            addCustomMove()
+          }
+        }}
       />
       {showSuggestions && (
         <ul
@@ -157,6 +176,8 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                                 type: 'transition',
                               },
                             )
+                            updateCombos && updateCombos()
+                            closeInput()
                           }}
                         >
                           <label>{transitionLabel}</label>
@@ -168,6 +189,15 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
               </li>
             )
           })}
+          {filteredOptions.length === 0 &&
+            (() => {
+              return (
+                <li
+                  className="cursor-pointer border-b px-2 hover:bg-gray-100"
+                  onClick={() => addCustomMove()}
+                >{`Create "${userEntryValue}"?`}</li>
+              )
+            })()}
         </ul>
       )}
     </section>
