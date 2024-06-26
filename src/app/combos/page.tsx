@@ -7,8 +7,6 @@ import { comboIdKey, extractComboIds } from '../_utils/lib'
 import { ComboDictionary, ComboId } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
-// import Token from './Token'
-
 import MoveTag from './MoveTag'
 import { isComboId } from '../_utils/lsValidation'
 
