@@ -41,7 +41,7 @@ export default function MoveTag({
           className="cursor-text px-5"
         />
       )}
-      {hasInput && <AutoComplete />}
+      {hasInput && <AutoComplete moveIndex={moveIndex} />}
     </article>
   )
 }
