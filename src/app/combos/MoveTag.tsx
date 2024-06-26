@@ -41,7 +41,7 @@ export default function MoveTag({
           className="cursor-text px-5"
         />
       )}
-      {hasInput && <AutoComplete options={options.map((test) => test.label)} />}
+      {hasInput && <AutoComplete />}
     </article>
   )
 }
