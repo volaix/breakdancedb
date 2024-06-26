@@ -112,6 +112,12 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsComboById(id) {
           return get()[lsCombos]?.[id] || null
         },
+        createComboMove: (comboId, position, comboMove) => {
+          return set((state) => {
+            if (!state[lsCombos]) return
+            state[lsCombos][comboId]?.sequence.splice(position, 0, comboMove)
+          })
+        },
         //-------User Move Keys --------
         setLsUserMovesByKey: (
           key: keyof GlobalStateProperties[typeof lsUserMoves],
