@@ -109,7 +109,7 @@ export const movementIdSchema = z
 export const comboMoveSchema = z.object({
   moves: z.array(z.string()),
   id: z.union([
-    moveIdSchema,
+    moveIdSchema, //these are for learning moves only
     flowIdSchema,
     transitionIdSchema,
     z.literal('custom'),
@@ -204,31 +204,21 @@ export const MoveSchema = z.object({
   loopOption: TypeLoopOptions.optional(),
 })
 
-export const FlowDictionary = z.record(
-  flowIdSchema,
-  z.object({
-    rating: z.number(),
-    entryMove: z.object({
-      displayName: z.string(),
-      category: z.string(),
-    }),
-    keyMove: z.object({
-      displayName: z.string(),
-      category: z.string(),
-    }),
-    exitMove: z.object({
-      displayName: z.string(),
-      category: z.string(),
-    }),
-    notes: z.string().optional(),
-  }),
-)
-
 export const BasicMoveSchema = z.object({
   category: z.string(),
   displayName: z.string(),
   id: z.never().optional(),
 })
+
+export const FlowSchema = z.object({
+  rating: z.number(),
+  entryMove: BasicMoveSchema,
+  keyMove: BasicMoveSchema,
+  exitMove: BasicMoveSchema,
+  notes: z.string().optional(),
+})
+
+export const FlowDictionary = z.record(flowIdSchema, FlowSchema)
 
 export const MoveTransitionSchema = z.object({
   moveTransitionId: z.string().optional(),

@@ -1,8 +1,25 @@
-import { LocalStorageValues, lsUserMoves } from './lsTypes'
+import { ComboId, LocalStorageValues, lsUserMoves } from './lsTypes'
 import { validate } from 'uuid'
 import { BasicFlow, MoveId, Move } from './lsTypes'
-import { initialState, zustandLocalStorage } from './zustandLocalStorage'
 import { GlobalStateProperties } from './lsTypes'
+import { comboIdSchema } from './lsSchemas'
+import { isLegacyId } from './lsGenerators'
+
+/**
+ * Checks if id is a comboId type
+ * @param id id to check is a comboId
+ * @returns boolean
+ */
+export const isComboId = (id?: string): id is ComboId => {
+  if (isLegacyId(id)) return true
+  try {
+    comboIdSchema.parse(id)
+    return true
+  } catch (error) {
+    console.error(error)
+    return false
+  }
+}
 
 /**
  * Checks if the passed value is a typeof moveid
