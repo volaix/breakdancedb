@@ -116,6 +116,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         addComboMove: (comboId, position, comboMove) => {
           return set((state) => {
             if (!state[lsCombos]) return
+
             state[lsCombos][comboId]?.sequence.splice(
               position + 1,
               0,

@@ -16,10 +16,13 @@ type SingleMoveOption = z.infer<typeof BasicMoveSchema> //individual move
 type Option = SingleMoveOption | TransitionOption | FlowOption
 
 const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
+  //-----------------------STATE---------------------------
   const { moveIndex, comboId, updateCombos } = useContext(ComboIdContext) ?? {}
+
   const [userEntryValue, setValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
+
   const transitons = useZustandStore((state) => state.moveTransitions)
   const singleMoves = useZustandStore((state) => state.userMoves)
   const addComboMove = useZustandStore((state) => state.addComboMove)
@@ -57,6 +60,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
   const autocompleteRef = useRef<HTMLInputElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  //-----------------HOOKS-----------------------
   //close dialog if clicks outside
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {

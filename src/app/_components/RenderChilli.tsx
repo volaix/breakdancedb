@@ -20,9 +20,7 @@ export default function RenderThunder({
         checked={checked}
         type="radio"
         id={id}
-        className="peer -ms-5 size-4 cursor-pointer appearance-none border-0 bg-transparent
-  text-transparent
- checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0"
+        className={`peer -ms-5 size-4 ${onChange ? 'cursor-pointer' : 'cursor-default'} appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
       />
       <label
         className={`pointer-events-none text-gray-300 ${color || 'peer-checked:text-yellow-400'}`}
