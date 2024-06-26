@@ -1,18 +1,26 @@
 'use client'
 
 import AutoComplete from './AutoComplete'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import options from './data'
+import { ComboIdContext } from './page'
+import { RenderTrashButtonSvg } from '../_components/Svgs'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { comboIdSchema } from '../_utils/lsSchemas'
+import { isComboId } from '../_utils/lsValidation'
 
 export default function MoveTag({
   moves,
-  moveIndex,
+  deleteable,
 }: {
   moves: string[]
-  moveIndex: number
+  deleteable: boolean
 }) {
   const [hasInput, setHasInput] = useState<boolean>(false)
   const ref = useRef<HTMLElement>(null)
+  const deleteComboMove = useZustandStore((state) => state.deleteComboMove)
+
+  const { moveIndex, comboId, updateCombos } = useContext(ComboIdContext) ?? {}
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -26,12 +34,22 @@ export default function MoveTag({
   }, [])
 
   return (
-    <article ref={ref} className="flex">
-      <section className="flex items-center gap-1 text-ellipsis rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
+    <article ref={ref} className="my-0.5 flex">
+      <section className="flex items-center gap-1 text-ellipsis rounded-sm bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-600/20 dark:hover:bg-blue-900/70">
         <div className="text-[6px] text-gray-400 dark:text-gray-500">
-          {moveIndex + 1}
+          {moveIndex}
         </div>
-        <div>{moves.join(' -> ')}</div>
+        <div className="cursor-move">{moves.join(' -> ')}</div>
+        {deleteable && moveIndex !== undefined && (
+          <div className="cursor-pointer rounded-full px-1 py-1 hover:dark:bg-blue-400/20">
+            <RenderTrashButtonSvg
+              onClick={() => {
+                isComboId(comboId) && deleteComboMove(comboId, moveIndex)
+                updateCombos && updateCombos()
+              }}
+            />
+          </div>
+        )}
       </section>
       {!hasInput && (
         <div
@@ -40,7 +58,7 @@ export default function MoveTag({
           className="cursor-text px-5"
         />
       )}
-      {hasInput && <AutoComplete moveIndex={moveIndex} />}
+      {hasInput && <AutoComplete closeInput={() => setHasInput(false)} />}
     </article>
   )
 }
