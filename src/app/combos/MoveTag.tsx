@@ -11,7 +11,6 @@ export default function MoveTag({
   moves: string[]
   moveIndex: number
 }) {
-  const [input, setInput] = useState('')
   const [hasInput, setHasInput] = useState<boolean>(false)
   const ref = useRef<HTMLElement>(null)
 
