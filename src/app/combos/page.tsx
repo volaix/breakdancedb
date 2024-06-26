@@ -187,10 +187,7 @@ export default function RenderViewCombos() {
                                 value={{ comboId, moveIndex, updateCombos }}
                                 key={moveIndex}
                               >
-                                <MoveTag
-                                  moves={moves}
-                                  deleteable={sequence.length > 1}
-                                />
+                                <MoveTag moves={moves} />
                               </ComboIdContext.Provider>
                             )
                           })}
@@ -231,6 +228,7 @@ export default function RenderViewCombos() {
                             <RenderThunder
                               key={i}
                               checked={i === 5 - execution}
+                              readOnly
                             />
                           )
                         })}

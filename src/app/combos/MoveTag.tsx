@@ -9,13 +9,7 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { comboIdSchema } from '../_utils/lsSchemas'
 import { isComboId } from '../_utils/lsValidation'
 
-export default function MoveTag({
-  moves,
-  deleteable,
-}: {
-  moves: string[]
-  deleteable: boolean
-}) {
+export default function MoveTag({ moves }: { moves: string[] }) {
   const [hasInput, setHasInput] = useState<boolean>(false)
   const ref = useRef<HTMLElement>(null)
   const deleteComboMove = useZustandStore((state) => state.deleteComboMove)
@@ -39,8 +33,8 @@ export default function MoveTag({
         <div className="text-[6px] text-gray-400 dark:text-gray-500">
           {1 + (moveIndex ?? 0)}
         </div>
-        <div className="cursor-move">{moves.join(' -> ')}</div>
-        {deleteable && moveIndex !== undefined && (
+        <div className="">{moves.join(' -> ')}</div>
+        {moveIndex !== undefined && (
           <div className="cursor-pointer rounded-full px-1 py-1 hover:dark:bg-blue-400/20">
             <RenderTrashButtonSvg
               onClick={() => {

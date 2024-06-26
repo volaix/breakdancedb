@@ -6,12 +6,14 @@ export default function RenderThunder({
   onChange,
   id,
   color,
+  readOnly,
 }: {
   color?: string
   id?: string
   size?: string
   onChange?: ChangeEventHandler<HTMLInputElement>
   checked?: boolean
+  readOnly?: true
 }) {
   return (
     <>
@@ -21,6 +23,7 @@ export default function RenderThunder({
         type="radio"
         id={id}
         className={`peer -ms-5 size-4 ${onChange ? 'cursor-pointer' : 'cursor-default'} appearance-none border-0 bg-transparent text-transparent checked:bg-none focus:bg-none focus:ring-0 focus:ring-offset-0`}
+        readOnly={!!readOnly}
       />
       <label
         className={`pointer-events-none text-gray-300 ${color || 'peer-checked:text-yellow-400'}`}

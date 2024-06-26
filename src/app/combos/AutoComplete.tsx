@@ -93,7 +93,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
   const addCustomMove = () => {
     setShowSuggestions(false)
     comboId &&
-      moveIndex &&
+      moveIndex !== undefined &&
       addComboMove(comboId as ComboId, moveIndex, {
         moves: [userEntryValue],
         id: 'custom',
