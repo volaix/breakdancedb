@@ -10,8 +10,14 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 // import Token from './Token'
 
 import MoveTag from './MoveTag'
+import RenderCombo from './RenderCombo'
+import { isComboId } from '../_utils/lsValidation'
 
-export const ComboIdContext = createContext<string | null>(null)
+export const ComboIdContext = createContext<{
+  updateCombos: () => void
+  moveIndex: number
+  comboId: string
+} | null>(null)
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -24,9 +30,8 @@ export default function RenderViewCombos() {
   const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
   const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
-  const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
-
+  const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -128,9 +133,8 @@ export default function RenderViewCombos() {
             </tr>
           </thead>
           {combos &&
-            Object.entries(combos).map(([comboId, comboVal], i) => {
-              if (!comboVal) return
-              const { displayName, notes, execution, sequence } = comboVal
+            Object.entries(combos).map(([comboId, comboVal], comboIndex) => {
+              if (!comboVal || !isComboId(comboId)) return
               //Advanced Option
               if (
                 hideMovesIfBattle &&
@@ -139,38 +143,42 @@ export default function RenderViewCombos() {
                 return
               }
 
+              const { displayName, notes, execution, sequence } = comboVal
               return (
                 <tbody
                   key={comboId}
-                  className=" divide-gray-100 border-t border-gray-100 dark:border-gray-800"
+                  className="divide-gray-100 border-t border-gray-100  dark:border-gray-800"
                 >
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
                     {/* ------------COMBO NUMBER---------- */}
                     <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                       <div className="text-sm">
                         <div className="font-medium text-gray-700">
-                          Combo {i + 1}
+                          Combo {comboIndex + 1}
                         </div>
                         <div className="text-gray-400">{displayName}</div>
                       </div>
                     </td>
                     {/* ---------------MOVES------------ */}
-                    <td className="min-w-72 px-6 py-4 text-2xs ">
+                    <td className="min-w-72 px-6 py-4  text-2xs">
                       {sequence &&
-                        sequence.map(({ moves }, index) => {
+                        sequence.map(({ moves }, moveIndex) => {
                           return (
                             <ComboIdContext.Provider
-                              value={comboId}
-                              key={index}
+                              value={{ comboId, moveIndex, updateCombos }}
+                              key={moveIndex}
                             >
-                              <MoveTag moves={moves} moveIndex={index} />
+                              <MoveTag
+                                moves={moves}
+                                deleteable={sequence.length > 1}
+                              />
                             </ComboIdContext.Provider>
                           )
                         })}
                     </td>
                     {/* ----------------USABILITY------------- */}
                     <td className="px-6 py-4">
-                      <div className="mt-2 inline-flex flex-row-reverse items-center justify-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
+                      <div className=" mt-2 inline-flex flex-row-reverse items-center justify-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
                         {Array.from(Array(5)).map((_, i) => {
                           return (
                             <RenderThunder
@@ -181,7 +189,7 @@ export default function RenderViewCombos() {
                           )
                         })}
                       </div>
-                      {/* <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-600">
+                      {/* <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-green-600 rounded-full bg-green-50">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
                         Active
                       </span> */}
@@ -189,13 +197,13 @@ export default function RenderViewCombos() {
                     {/* -----------------ROLES------------- */}
                     {/* <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-blue-600 rounded-full bg-blue-50">
                           Design
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-600">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-indigo-600 rounded-full bg-indigo-50">
                           Product
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-600">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-violet-50 text-violet-600">
                           Develop
                         </span>
                       </div>
@@ -252,7 +260,7 @@ export default function RenderViewCombos() {
                       </div>
                     </td>
                     {/* -------------------NOTES---------------- */}
-                    {/* <td className="min-w-60 px-6 py-4">
+                    {/* <td className="px-6 py-4 min-w-60">
                       <div className="flex justify-end gap-4 text-xs">
                         {notes}
                       </div>
