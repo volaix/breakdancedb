@@ -15,8 +15,8 @@ type TransitionOption = z.infer<typeof MoveTransitionSchema> //single transition
 type SingleMoveOption = z.infer<typeof BasicMoveSchema> //individual move
 type Option = SingleMoveOption | TransitionOption | FlowOption
 
-const AutoComplete = ({ moveIndex }: { moveIndex: number }) => {
-  const comboId = useContext(ComboIdContext)
+const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
+  const { moveIndex, comboId, updateCombos } = useContext(ComboIdContext) ?? {}
   const [userEntryValue, setValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
@@ -115,11 +115,14 @@ const AutoComplete = ({ moveIndex }: { moveIndex: number }) => {
                     onClick={() => {
                       setValue(suggestion.displayName)
                       comboId &&
+                        moveIndex &&
                         addComboMove(comboId as ComboId, moveIndex, {
                           moves: [suggestion.displayName],
                           id: 'custom',
                           type: 'move',
                         })
+                      updateCombos && updateCombos()
+                      closeInput()
                     }}
                   >
                     <label>{suggestion.displayName}</label>
@@ -138,14 +141,18 @@ const AutoComplete = ({ moveIndex }: { moveIndex: number }) => {
                               suggestion.moveTransitionId,
                             ).data
                             if (!id) return
-                            addComboMove(comboId as ComboId, moveIndex, {
-                              moves: [
-                                suggestion.moveFrom.displayName,
-                                suggestion.moveTo.displayName,
-                              ],
-                              id,
-                              type: 'transition',
-                            })
+                            addComboMove(
+                              comboId as ComboId,
+                              moveIndex as number,
+                              {
+                                moves: [
+                                  suggestion.moveFrom.displayName,
+                                  suggestion.moveTo.displayName,
+                                ],
+                                id,
+                                type: 'transition',
+                              },
+                            )
                           }}
                         >
                           <label>{transitionLabel}</label>
