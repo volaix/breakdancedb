@@ -1,7 +1,7 @@
 'use client'
 //@format
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 import { ComboDictionary, ComboId } from '../_utils/lsTypes'
@@ -10,6 +10,8 @@ import { useZustandStore } from '../_utils/zustandLocalStorage'
 // import Token from './Token'
 
 import MoveTag from './MoveTag'
+
+export const ComboIdContext = createContext<string | null>(null)
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -157,11 +159,12 @@ export default function RenderViewCombos() {
                       {sequence &&
                         sequence.map(({ moves }, index) => {
                           return (
-                            <MoveTag
+                            <ComboIdContext.Provider
+                              value={comboId}
                               key={index}
-                              moves={moves}
-                              moveIndex={index}
-                            />
+                            >
+                              <MoveTag moves={moves} moveIndex={index} />
+                            </ComboIdContext.Provider>
                           )
                         })}
                     </td>
