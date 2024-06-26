@@ -1,13 +1,11 @@
 'use client'
 
-import AutoComplete from './AutoComplete'
 import { useContext, useEffect, useRef, useState } from 'react'
-import options from './data'
-import { ComboIdContext } from './util'
 import { RenderTrashButtonSvg } from '../_components/Svgs'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { comboIdSchema } from '../_utils/lsSchemas'
 import { isComboId } from '../_utils/lsValidation'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
+import AutoComplete from './AutoComplete'
+import { ComboIdContext } from './util'
 
 export default function MoveTag({ moves }: { moves: string[] }) {
   const [hasInput, setHasInput] = useState<boolean>(false)
