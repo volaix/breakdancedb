@@ -1,7 +1,7 @@
 'use client'
 //@format
 import { useRouter } from 'next/navigation'
-import { createContext, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 import { ComboDictionary, ComboId } from '../_utils/lsTypes'
@@ -16,12 +16,7 @@ import {
   RenderTrashButtonSvg,
 } from '../_components/Svgs'
 import AutoComplete from './AutoComplete'
-
-export const ComboIdContext = createContext<{
-  updateCombos: () => void
-  moveIndex: number
-  comboId: string
-} | null>(null)
+import { ComboIdContext } from './util'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -112,7 +107,7 @@ export default function RenderViewCombos() {
       {/* ------------------end of advanced options------------- */}
       {/* -----------------TABLE--------------- */}
       <section className="scroll mx-0 my-5 overflow-hidden overflow-x-auto rounded-lg border border-gray-200 shadow-md md:mx-5 dark:border-gray-700">
-        <table className="w-full border-collapse bg-white  text-left text-sm text-gray-500 dark:bg-gray-900">
+        <table className="w-full border-collapse bg-white text-left text-sm text-gray-500 dark:bg-gray-900">
           <thead className="bg-gray-50 font-medium text-gray-900 dark:bg-slate-900">
             <tr>
               <th
@@ -133,7 +128,7 @@ export default function RenderViewCombos() {
               >
                 Usability
               </th>
-              {/* <th scope="col" className="px-6 py-4 dark:text-white font-medium text-gray-900">
+              {/* <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                 Role
               </th> */}
               <th
@@ -165,7 +160,7 @@ export default function RenderViewCombos() {
               return (
                 <tbody
                   key={comboId}
-                  className="divide-gray-100 border-t border-gray-100  dark:border-gray-800"
+                  className="divide-gray-100 border-t border-gray-100 dark:border-gray-800"
                 >
                   <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
                     {/* ------------COMBO NUMBER---------- */}
@@ -275,7 +270,7 @@ export default function RenderViewCombos() {
                     </td>
                     {/* -------------------NOTES---------------- */}
                     <td className="px-6 py-4">
-                      <div className="flex  gap-4 text-xs">{notes}</div>
+                      <div className="flex gap-4 text-xs">{notes}</div>
                     </td>
                   </tr>
                 </tbody>

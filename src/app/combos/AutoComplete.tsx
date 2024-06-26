@@ -6,7 +6,7 @@ import {
   MoveTransitionSchema,
 } from '../_utils/lsSchemas'
 import { z } from 'zod'
-import { ComboIdContext } from './page'
+import { ComboIdContext } from './util'
 import { ComboId } from '../_utils/lsTypes'
 import { transitionIdSchema } from '../_utils/lsSchemas'
 
