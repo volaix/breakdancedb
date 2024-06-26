@@ -140,7 +140,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   //-------combos----------
   deleteLsCombo: (key: ComboId) => void
   getLsComboById: (id: ComboId) => ComboDictionary[keyof ComboDictionary] | null
-  createComboMove: (
+  addComboMove: (
     comboId: ComboId,
     position: number,
     comboMove: z.infer<typeof comboMoveSchema>,

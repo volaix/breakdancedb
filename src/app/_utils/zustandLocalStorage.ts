@@ -1,9 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+
 import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 import {
   GlobalStateProperties,
+  ZustandGlobalStore,
   lsBattle,
   lsCombos,
   lsConcepts,
@@ -17,7 +19,6 @@ import {
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
-  ZustandGlobalStore,
 } from './lsTypes'
 
 const currentVersion: number = 3
@@ -112,7 +113,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsComboById(id) {
           return get()[lsCombos]?.[id] || null
         },
-        createComboMove: (comboId, position, comboMove) => {
+        addComboMove: (comboId, position, comboMove) => {
           return set((state) => {
             if (!state[lsCombos]) return
             state[lsCombos][comboId]?.sequence.splice(position, 0, comboMove)
