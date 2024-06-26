@@ -39,7 +39,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
     ),
   )
 
-  const options: Option[] = [...transitionOptions, ...basicMoveOptions]
+  const options: Option[] = [...basicMoveOptions, ...transitionOptions]
 
   //filters options on what user has already typed
   const filteredOptions = options.filter((option) => {
