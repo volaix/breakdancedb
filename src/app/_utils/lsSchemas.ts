@@ -109,7 +109,7 @@ export const movementIdSchema = z
 export const comboMoveSchema = z.object({
   moves: z.array(z.string()),
   id: z.union([
-    moveIdSchema,
+    moveIdSchema, //these are for learning moves only
     flowIdSchema,
     transitionIdSchema,
     z.literal('custom'),
