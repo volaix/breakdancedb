@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import {
   BasicMoveSchema,
@@ -6,26 +6,24 @@ import {
   MoveTransitionSchema,
 } from '../_utils/lsSchemas'
 import { z } from 'zod'
+import { ComboIdContext } from './page'
+import { ComboId } from '../_utils/lsTypes'
+import { transitionIdSchema } from '../_utils/lsSchemas'
 
 type FlowOption = z.infer<typeof FlowSchema> //flow
 type TransitionOption = z.infer<typeof MoveTransitionSchema> //single transition
 type SingleMoveOption = z.infer<typeof BasicMoveSchema> //individual move
 type Option = SingleMoveOption | TransitionOption | FlowOption
 
-const AutoComplete = () => {
+const AutoComplete = ({ moveIndex }: { moveIndex: number }) => {
+  const comboId = useContext(ComboIdContext)
   const [userEntryValue, setValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
-  const flows = useZustandStore((state) => state.flows)
   const transitons = useZustandStore((state) => state.moveTransitions)
   const singleMoves = useZustandStore((state) => state.userMoves)
+  const addComboMove = useZustandStore((state) => state.addComboMove)
 
-  const flowOptions: FlowOption[] =
-    (flows &&
-      Object.values(flows).filter(
-        (item): item is NonNullable<typeof item> => item !== undefined,
-      )) ??
-    []
   const transitionOptions: TransitionOption[] = transitons ?? []
   const basicMoveOptions: SingleMoveOption[] = Object.entries(
     singleMoves,
@@ -38,11 +36,7 @@ const AutoComplete = () => {
     ),
   )
 
-  const options: Option[] = [
-    ...flowOptions,
-    ...transitionOptions,
-    ...basicMoveOptions,
-  ]
+  const options: Option[] = [...transitionOptions, ...basicMoveOptions]
 
   //filters options on what user has already typed
   const filteredOptions = options.filter((option) => {
@@ -52,8 +46,6 @@ const AutoComplete = () => {
           return option.displayName
         case isTransition(option):
           return option.moveFrom.displayName
-        case isFlow(option):
-          return option.entryMove.displayName
         default:
           return ''
       }
@@ -94,7 +86,6 @@ const AutoComplete = () => {
     }
   }, [])
 
-  const test = 'a'
   return (
     <section className="" ref={autocompleteRef}>
       <input
@@ -115,7 +106,6 @@ const AutoComplete = () => {
                 className="cursor-pointer border-b px-2 hover:bg-gray-100"
                 onClick={() => {
                   setShowSuggestions(false)
-                  //TODO: add to list
                 }}
                 key={i}
               >
@@ -124,6 +114,12 @@ const AutoComplete = () => {
                     className=""
                     onClick={() => {
                       setValue(suggestion.displayName)
+                      comboId &&
+                        addComboMove(comboId as ComboId, moveIndex, {
+                          moves: [suggestion.displayName],
+                          id: 'custom',
+                          type: 'move',
+                        })
                     }}
                   >
                     <label>{suggestion.displayName}</label>
@@ -135,21 +131,27 @@ const AutoComplete = () => {
                     const transitionLabel = `${suggestion.moveFrom.displayName} -> ${suggestion.moveTo.displayName}`
                     return (
                       <>
-                        <section onClick={() => setValue(transitionLabel)}>
+                        <section
+                          onClick={() => {
+                            setValue(transitionLabel)
+                            const id = transitionIdSchema.safeParse(
+                              suggestion.moveTransitionId,
+                            ).data
+                            if (!id) return
+                            addComboMove(comboId as ComboId, moveIndex, {
+                              moves: [
+                                suggestion.moveFrom.displayName,
+                                suggestion.moveTo.displayName,
+                              ],
+                              id,
+                              type: 'transition',
+                            })
+                          }}
+                        >
                           <label>{transitionLabel}</label>
                           <small className="ml-1">Transition</small>
                         </section>
                       </>
-                    )
-                  })()}
-                {isFlow(suggestion) &&
-                  (() => {
-                    const flowLabel = `${suggestion.entryMove.displayName} -> ${suggestion.keyMove.displayName} -> ${suggestion.exitMove.displayName}`
-                    return (
-                      <section onClick={() => setValue(flowLabel)}>
-                        <label>{flowLabel}</label>
-                        <small className="ml-1">Flow</small>
-                      </section>
                     )
                   })()}
               </li>
@@ -165,7 +167,5 @@ const isSingleMove = (suggestion: Option): suggestion is SingleMoveOption =>
   BasicMoveSchema.safeParse(suggestion).success
 const isTransition = (suggestion: Option): suggestion is TransitionOption =>
   MoveTransitionSchema.safeParse(suggestion).success
-const isFlow = (suggestion: Option): suggestion is FlowOption =>
-  FlowSchema.safeParse(suggestion).success
 
 export default AutoComplete
