@@ -166,7 +166,7 @@ export default function Moves() {
                             setInput({ [key]: true })
                             resetNewCategory({ newCategory: '' })
                           }}
-                          className={` dark:${selected && 'fill-white'} ${selected ? ' fill-gray-900' : 'fill-gray-300'}  mr-0.5 size-2`}
+                          className={`  ${selected ? ' fill-gray-900 dark:fill-white' : 'fill-gray-300'}  mr-0.5 size-2`}
                         />
                         <RenderTrashButtonSvg
                           onClick={() => {
@@ -283,6 +283,7 @@ export default function Moves() {
               //prevents form submit
               e.preventDefault()
               sortMovesInTextArea()
+              setSaveButtonActive(false)
             }}
           >
             <label className="text-lg leading-none">Sort</label>
