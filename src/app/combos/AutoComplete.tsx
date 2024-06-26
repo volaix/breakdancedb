@@ -1,12 +1,66 @@
 import { useState, useEffect, useRef } from 'react'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
+import {
+  BasicMoveSchema,
+  FlowSchema,
+  MoveTransitionSchema,
+} from '../_utils/lsSchemas'
+import { z } from 'zod'
 
-const AutoComplete = ({ options = ['no options loaded'] }) => {
-  const [value, setValue] = useState('')
+type FlowOption = z.infer<typeof FlowSchema> //flow
+type TransitionOption = z.infer<typeof MoveTransitionSchema> //single transition
+type SingleMoveOption = z.infer<typeof BasicMoveSchema> //individual move
+type Option = SingleMoveOption | TransitionOption | FlowOption
+
+const AutoComplete = () => {
+  const [userEntryValue, setValue] = useState('')
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
-  const suggestions = options.filter((option) =>
-    option.toLowerCase().includes(value.toLowerCase()),
+  const flows = useZustandStore((state) => state.flows)
+  const transitons = useZustandStore((state) => state.moveTransitions)
+  const singleMoves = useZustandStore((state) => state.userMoves)
+
+  const flowOptions: FlowOption[] =
+    (flows &&
+      Object.values(flows).filter(
+        (item): item is NonNullable<typeof item> => item !== undefined,
+      )) ??
+    []
+  const transitionOptions: TransitionOption[] = transitons ?? []
+  const basicMoveOptions: SingleMoveOption[] = Object.entries(
+    singleMoves,
+  ).flatMap(([key, value]) =>
+    value.map(
+      (move): SingleMoveOption => ({
+        category: key,
+        displayName: move,
+      }),
+    ),
   )
+
+  const options: Option[] = [
+    ...flowOptions,
+    ...transitionOptions,
+    ...basicMoveOptions,
+  ]
+
+  //filters options on what user has already typed
+  const filteredOptions = options.filter((option) => {
+    const optionText = (() => {
+      switch (true) {
+        case isSingleMove(option):
+          return option.displayName
+        case isTransition(option):
+          return option.moveFrom.displayName
+        case isFlow(option):
+          return option.entryMove.displayName
+        default:
+          return ''
+      }
+    })()
+
+    return optionText.toLowerCase().includes(userEntryValue.toLowerCase())
+  })
 
   const autocompleteRef = useRef<HTMLInputElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -40,38 +94,78 @@ const AutoComplete = ({ options = ['no options loaded'] }) => {
     }
   }, [])
 
+  const test = 'a'
   return (
     <section className="" ref={autocompleteRef}>
       <input
         ref={inputRef}
         className="rounded-lg border px-2"
-        value={value}
+        value={userEntryValue}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Add Move"
         onFocus={() => setShowSuggestions(true)}
       />
       {showSuggestions && (
         <ul
-          className={`absolute max-h-40 overflow-y-auto rounded-md border bg-white ${flipSuggestion && '-mt-48'}`}
+          className={`absolute left-0 top-auto   max-h-40 overflow-y-auto rounded-md border bg-white ${flipSuggestion && '-mt-48'}`}
         >
-          {suggestions.map((suggestion) => (
-            <li
-              className="cursor-pointer border-b px-2 hover:bg-gray-100"
-              // className={``}
-              onClick={() => {
-                setValue(suggestion)
-                setShowSuggestions(false)
-                //TODO: add to list
-              }}
-              key={suggestion}
-            >
-              {suggestion}
-            </li>
-          ))}
+          {filteredOptions.map((suggestion, i) => {
+            return (
+              <li
+                className="cursor-pointer border-b px-2 hover:bg-gray-100"
+                onClick={() => {
+                  setShowSuggestions(false)
+                  //TODO: add to list
+                }}
+                key={i}
+              >
+                {isSingleMove(suggestion) && (
+                  <section
+                    className=""
+                    onClick={() => {
+                      setValue(suggestion.displayName)
+                    }}
+                  >
+                    <label>{suggestion.displayName}</label>
+                    <small className="ml-1">{`Category: ${suggestion.category}`}</small>
+                  </section>
+                )}
+                {isTransition(suggestion) &&
+                  (() => {
+                    const transitionLabel = `${suggestion.moveFrom.displayName} -> ${suggestion.moveTo.displayName}`
+                    return (
+                      <>
+                        <section onClick={() => setValue(transitionLabel)}>
+                          <label>{transitionLabel}</label>
+                          <small className="ml-1">Transition</small>
+                        </section>
+                      </>
+                    )
+                  })()}
+                {isFlow(suggestion) &&
+                  (() => {
+                    const flowLabel = `${suggestion.entryMove.displayName} -> ${suggestion.keyMove.displayName} -> ${suggestion.exitMove.displayName}`
+                    return (
+                      <section onClick={() => setValue(flowLabel)}>
+                        <label>{flowLabel}</label>
+                        <small className="ml-1">Flow</small>
+                      </section>
+                    )
+                  })()}
+              </li>
+            )
+          })}
         </ul>
       )}
     </section>
   )
 }
+
+const isSingleMove = (suggestion: Option): suggestion is SingleMoveOption =>
+  BasicMoveSchema.safeParse(suggestion).success
+const isTransition = (suggestion: Option): suggestion is TransitionOption =>
+  MoveTransitionSchema.safeParse(suggestion).success
+const isFlow = (suggestion: Option): suggestion is FlowOption =>
+  FlowSchema.safeParse(suggestion).success
 
 export default AutoComplete
