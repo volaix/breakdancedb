@@ -10,9 +10,14 @@ import {
   RenderTrashButtonSvg,
 } from '../_components/Svgs'
 
+const splitParam = /\r\n|\r|\n/
+
 //---------------------------utils---------------------------------
 const makeArray = (moveString: string): string[] =>
-  moveString.split('\n').map((str) => str.trim())
+  moveString
+    .split(splitParam)
+    .map((str) => str.trim())
+    .filter((str) => str.length > 0)
 
 const makeString = (moveArray: string[]): string => moveArray.join('\r\n')
 
@@ -260,11 +265,11 @@ export default function Moves() {
           />
           {/* --------------------right json view-------------------- */}
           <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs md:max-w-full">
-            {JSON.stringify(unsavedMoveList.split(/\r\n|\r|\n/), null, 1)}
+            {JSON.stringify(makeArray(unsavedMoveList), null, 1)}
           </pre>
         </section>
         <p className="text-xs">
-          {`above ${unsavedMoveList.split(/\r\n|\r|\n/).length} moves. Saved ${lsMoves.split(/\r\n|\r|\n/).length} moves. New move created each line. `}
+          {`above ${makeArray(unsavedMoveList).length} moves. Saved ${makeArray(lsMoves).length} moves. New move created each line. `}
         </p>
         <Notification
           visible={!!notification?.visible}
@@ -279,7 +284,7 @@ export default function Moves() {
               //prevents form submit
               e.preventDefault()
               sortMovesInTextArea()
-              setSaveButtonActive(false)
+              setSaveButtonActive(true)
             }}
           >
             <label className="text-lg leading-none">Sort</label>
