@@ -12,8 +12,10 @@ import { isComboId } from '../_utils/lsValidation'
 import Link from 'next/link'
 import {
   RenderAddButtonSVG,
+  RenderDownArrow,
   RenderPenSvg,
   RenderTrashButtonSvg,
+  RenderUpArrow,
 } from '../_components/Svgs'
 import AutoComplete from './AutoComplete'
 import { ComboIdContext } from './util'
@@ -32,6 +34,7 @@ export default function RenderViewCombos() {
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
+  const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -228,7 +231,7 @@ export default function RenderViewCombos() {
                           )
                         })}
                       </div>
-                      {/* <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-green-600 rounded-full bg-green-50">
+                      {/* <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-green-600 rounded-full gap-1 bg-green-50">
                         <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
                         Active
                       </span> */}
@@ -236,20 +239,36 @@ export default function RenderViewCombos() {
                     {/* -----------------ROLES------------- */}
                     {/* <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-blue-600 rounded-full bg-blue-50">
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-blue-600 rounded-full gap-1 bg-blue-50">
                           Design
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold text-indigo-600 rounded-full bg-indigo-50">
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-indigo-600 rounded-full gap-1 bg-indigo-50">
                           Product
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-violet-50 text-violet-600">
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full gap-1 bg-violet-50 text-violet-600">
                           Develop
                         </span>
                       </div>
                     </td> */}
                     {/* ----------------ACTIONS------------ */}
                     <td className="px-6 py-4">
-                      <div className="flex justify-end gap-4">
+                      <div className="flex items-center gap-4">
+                        <section>
+                          <RenderUpArrow
+                            onClick={() => {
+                              moveCombo(comboIndex, 'up')
+                              updateCombos()
+                            }}
+                            className="size-6 cursor-pointer fill-gray-500 p-1 pb-0 hover:rounded-lg hover:bg-gray-500/20"
+                          />
+                          <RenderDownArrow
+                            onClick={() => {
+                              moveCombo(comboIndex, 'down')
+                              updateCombos()
+                            }}
+                            className="size-6 cursor-pointer fill-gray-500 p-1 pt-0  hover:rounded-lg hover:bg-gray-500/20"
+                          />
+                        </section>
                         {/* delete button */}
                         <RenderTrashButtonSvg
                           className="size-6 cursor-pointer"
