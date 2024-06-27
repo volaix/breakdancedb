@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Notification } from '../_components/Notification'
 import { GlobalStateProperties, lsUserMoves } from '../_utils/lsTypes'
@@ -10,9 +10,14 @@ import {
   RenderTrashButtonSvg,
 } from '../_components/Svgs'
 
+const splitParam = /\r\n|\r|\n/
+
 //---------------------------utils---------------------------------
 const makeArray = (moveString: string): string[] =>
-  moveString.split('\n').map((str) => str.trim())
+  moveString
+    .split(splitParam)
+    .map((str) => str.trim())
+    .filter((str) => str.length > 0)
 
 const makeString = (moveArray: string[]): string => moveArray.join('\r\n')
 
@@ -133,7 +138,7 @@ export default function Moves() {
 
   return (
     <article className="body-font mx-auto text-gray-400 md:w-2/3 lg:w-1/2">
-      <section className="container mx-auto flex flex-col flex-wrap items-center p-5 md:flex-row">
+      <section className="container mx-auto flex flex-col flex-wrap items-center justify-center p-5 md:flex-row">
         <nav className="body-font flex flex-wrap items-center justify-center text-base text-gray-300 dark:md:border-gray-700">
           {
             //------category select------------
@@ -180,37 +185,49 @@ export default function Moves() {
                         />
                       </section>
                     )}
-                    {showInput?.[key] && (
-                      <form
-                        className="flex items-center"
-                        onSubmit={(e) => {
+                    {showInput?.[key] &&
+                      (() => {
+                        const onSubmit = (newCategory: string) => {
+                          setCategoryValue(newCategory, [])
                           setInput({ [key]: false })
-                        }}
-                      >
-                        <input
-                          className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
-                          type="text"
-                          placeholder="New Category"
-                          {...registerNewCategory('newCategory', {
-                            required: true,
-                          })}
-                        />
-                        <RenderAddButtonSVG
-                          onClick={submitNewCategory(({ newCategory }) => {
-                            setCategoryValue(newCategory, [])
-                            setInput({ [key]: false })
-                            setCategories(Object.keys(getUserMoves()))
-                          })}
-                          className={`ml-1 size-8 fill-indigo-500`}
-                        />
-                        <RenderDeleteButtonSVG
-                          onClick={() => {
-                            setInput({ [key]: false })
-                          }}
-                          className="mb-0.5 size-12"
-                        />
-                      </form>
-                    )}
+                          setCategories(Object.keys(getUserMoves()))
+                        }
+
+                        return (
+                          <form
+                            className="flex items-center"
+                            onSubmit={submitNewCategory(({ newCategory }) => {
+                              onSubmit(newCategory)
+                            })}
+                          >
+                            <input
+                              autoFocus
+                              className="ml-1 w-full rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-1 text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-transparent focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:ring-indigo-900"
+                              type="text"
+                              placeholder="New Category"
+                              {...registerNewCategory('newCategory', {
+                                required: true,
+                              })}
+                            />
+                            <section className="flex items-center">
+                              <RenderAddButtonSVG
+                                onClick={submitNewCategory(
+                                  ({ newCategory }) => {
+                                    onSubmit(newCategory)
+                                  },
+                                )}
+                                className={`ml-1 size-3 fill-indigo-500`}
+                              />
+                              <RenderDeleteButtonSVG
+                                onClick={() => {
+                                  setInput({ [key]: false })
+                                }}
+                                className="size-6"
+                              />
+                            </section>
+                          </form>
+                        )
+                      })()}
                   </article>
                 )
               })
@@ -220,9 +237,6 @@ export default function Moves() {
       {/* ------------form----------- */}
       <form
         onSubmit={handleSubmit((data) => {
-          console.log('data: ', data)
-
-          console.log('selectedKey: ', selectedKey)
           const movesArr = makeArray(data.categoryMoves)
           if (hasDuplicates(movesArr)) {
             setSaveButtonActive(false)
@@ -231,7 +245,6 @@ export default function Moves() {
               visible: true,
             })
             sortMovesInTextArea()
-            // setLsMoves(makeString(movesArr.sort()))
             return
           } else if (
             selectedKey &&
@@ -245,7 +258,7 @@ export default function Moves() {
             setNotification({ message: 'Saved', visible: true })
           }
         })}
-        className="relative flex w-full flex-wrap p-2"
+        className="relative flex w-full flex-col py-2 md:p-2"
       >
         {/* --------------------text area form--------------------------- */}
         {/* ---------------loaded text------------------------ */}
@@ -256,19 +269,19 @@ export default function Moves() {
           {`${hasLoaded ? selectedKey + ' loaded' : 'Not loaded'}`}
         </label>
         {/* ---------------text area------------------------ */}
-        <section className="flex max-w-full space-x-4 p-4">
+        <section className="flex max-w-full space-x-4 py-4 md:p-4">
           {/* -----------------left textarea------------------- */}
           <textarea
             {...register('categoryMoves')}
-            className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
+            className="h-32 w-8/12 max-w-fit resize-none rounded border border-gray-300 bg-gray-100 bg-opacity-50 px-3 py-1 text-xs text-gray-700 outline-none transition-colors duration-200 ease-in-out focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 md:w-1/2 md:max-w-full dark:border-gray-700 dark:bg-gray-800 dark:bg-opacity-40 dark:text-gray-100 dark:focus:bg-gray-900 dark:focus:ring-indigo-900"
           />
           {/* --------------------right json view-------------------- */}
-          <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 p-4 text-[10px] text-xs md:max-w-full">
-            {JSON.stringify(unsavedMoveList.split(/\r\n|\r|\n/), null, 1)}
+          <pre className="h-32 w-4/12 max-w-28 overflow-y-auto rounded-lg bg-gray-100 px-2 py-1 text-2xs md:w-1/2 md:max-w-full">
+            {JSON.stringify(makeArray(unsavedMoveList), null, 1)}
           </pre>
         </section>
-        <p className="text-xs">
-          {`above ${unsavedMoveList.split(/\r\n|\r|\n/).length} moves. Saved ${lsMoves.split(/\r\n|\r|\n/).length} moves. New move created each line. `}
+        <p className="text-xs md:text-center">
+          {`above ${makeArray(unsavedMoveList).length} moves. Saved ${makeArray(lsMoves).length} moves. New move created each line. `}
         </p>
         <Notification
           visible={!!notification?.visible}
@@ -278,12 +291,12 @@ export default function Moves() {
         <section className="mt-5 flex w-full justify-center">
           {/* ----------sort button------- */}
           <button
-            className="flex items-center justify-center rounded border border-indigo-500 px-8 py-2 text-center text-indigo-500 "
+            className=" flex items-center justify-center rounded border border-indigo-500 px-8 py-2 text-center text-indigo-500 "
             onClick={(e) => {
               //prevents form submit
               e.preventDefault()
               sortMovesInTextArea()
-              setSaveButtonActive(false)
+              setSaveButtonActive(true)
             }}
           >
             <label className="text-lg leading-none">Sort</label>
@@ -297,7 +310,7 @@ export default function Moves() {
             {saveText}
           </button>
         </section>
-        <p className="text-[7px]">
+        <p className="text-4xs md:my-4 md:text-center ">
           sort button cannot be undone. Sorts current moves in alphabetical
           order
         </p>
