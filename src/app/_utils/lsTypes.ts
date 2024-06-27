@@ -146,6 +146,10 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     comboMove: z.infer<typeof comboMoveSchema>,
   ) => void
   deleteComboMove: (comboId: ComboId, position: number) => void
+  upDownMoveComboPosition: (
+    currentIndex: number,
+    direction: 'up' | 'down',
+  ) => void
   //-------User Move Keys --------
   setLsUserMovesByKey: (
     key: keyof GlobalStateProperties[typeof lsUserMoves],

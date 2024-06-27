@@ -82,31 +82,53 @@ export function ClientHeader({
                 {/* ----------navigation------------ */}
                 <ul className="flex	min-h-[250px] flex-col items-center justify-between text-black">
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/yourmoves">📚 Your Moves 📚</a>
+                    <Link
+                      onClick={() => setIsNavOpen((prev) => !prev)}
+                      href="/"
+                    >
+                      BreakdanceDB
+                    </Link>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learntransitions">✅ Transitions ✅</a>
+                    <Link onClick={() => setIsNavOpen(false)} href="/yourmoves">
+                      📚 Your Moves 📚
+                    </Link>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/learnflows">💪 RNG Set 💪</a>
+                    <Link
+                      onClick={() => setIsNavOpen(false)}
+                      href="/learntransitions"
+                    >
+                      ✅ Transitions ✅
+                    </Link>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/combos">🤖 Make Set 🤖</a>
+                    <Link
+                      onClick={() => setIsNavOpen(false)}
+                      href="/learnflows"
+                    >
+                      💪 RNG Set 💪
+                    </Link>
                   </li>
-                  {/* <li className="my-2 border-b border-gray-400 uppercase">
+                  <li className="my-2 border-b border-gray-400 uppercase">
+                    <Link onClick={() => setIsNavOpen(false)} href="/combos">
+                      🤖 Make Set 🤖
+                    </Link>
+                  </li>
+                  {/* <li className="my-2 uppercase border-b border-gray-400">
                     <a href="/battle">🥊 Battle 🥊</a>
                   </li> */}
-                  {/* <li className="my-2 border-b border-gray-400 uppercase">
+                  {/* <li className="my-2 uppercase border-b border-gray-400">
                     <a href="/learnmoves">🌱 Train Moves 🌱</a>
                   </li>
-                  <li className="my-2 border-b border-gray-400 uppercase">
+                  <li className="my-2 uppercase border-b border-gray-400">
                     <a href="/create">🎨 Create Move 🎨</a>
                   </li> */}
-                  {inDevelopment || (
-                    <li className="my-2 border-b border-gray-400 uppercase">
+                  {/* {inDevelopment || (
+                    <li className="my-2 uppercase border-b border-gray-400">
                       <a href="/nodes">Nodeview</a>
                     </li>
-                  )}
+                  )} */}
                 </ul>
               </nav>
             </section>
@@ -194,7 +216,7 @@ export function ClientHeader({
                 </Link>
               )}
             </article>
-            <ul className="my-2 pb-2 text-center text-sm  text-gray-700 ">
+            <ul className="my-2 pb-2 text-center text-sm text-gray-700 ">
               <li className="my-2 border-b border-gray-500 text-xs">
                 <Link onClick={() => setIsSettingsOpen(false)} href="/dblist">
                   View Stats

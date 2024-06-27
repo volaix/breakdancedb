@@ -172,8 +172,8 @@ export default function RenderTransitions() {
         <article className="w-1/2 rounded-lg bg-slate-100 p-2 pb-10 dark:bg-gray-800 dark:bg-opacity-40">
           <h2 className="text-lg">Move A</h2>
           <section
-            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark 
-            h-64 overflow-y-scroll rounded p-4"
+            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark h-64 overflow-y-scroll rounded p-4 
+ "
           >
             {moves &&
               moves.map(([category, moves], moveIndex) => {
@@ -229,8 +229,8 @@ export default function RenderTransitions() {
         >
           <h2 className="text-lg">Move B</h2>
           <div
-            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark 
-    mx-4 h-64 overflow-y-scroll rounded"
+            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark mx-4 h-64 overflow-y-scroll rounded 
+ "
           >
             {moves &&
               moves.map(([category, moves], moveIndex) => {

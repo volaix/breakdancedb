@@ -124,6 +124,28 @@ export const useZustandStore = create<ZustandGlobalStore>()(
             )
           })
         },
+        upDownMoveComboPosition: (
+          currentIndex: number,
+          direction: 'up' | 'down',
+        ) => {
+          return set((state) => {
+            if (!state[lsCombos]) return //safety
+
+            let combos = Object.entries(state[lsCombos])
+            let newIndex: number = currentIndex
+            if (direction === 'up') {
+              newIndex = currentIndex - 1
+              if (newIndex < 0) return //safety for already is first element
+            } else if (direction === 'down') {
+              newIndex = currentIndex + 1
+              if (newIndex > combos.length - 1) return //safety for already is last element
+            }
+
+            const [combo] = combos.splice(currentIndex, 1)
+            combos.splice(newIndex, 0, combo)
+            state[lsCombos] = Object.fromEntries(combos)
+          })
+        },
         deleteComboMove(comboId, position) {
           console.log('runniong delete combo move')
           return set((state) => {
