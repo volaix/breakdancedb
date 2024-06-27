@@ -298,7 +298,7 @@ const RenderMakeCombo = () => {
             Object.entries(selectedComboSeq).map(([key, value], index) => {
               return (
                 <li
-                  key={key}
+                  key={index}
                   className={
                     selectedComboNumber.indexOf(true) === Number(key)
                       ? 'text-indigo-500'
@@ -440,7 +440,7 @@ const RenderMakeCombo = () => {
                             }
                           />
                         </label>
-                        {/* <label className=" ml-2">
+                        {/* <label className="ml-2 ">
                           Custom
                           <input
                             type="radio"
@@ -452,7 +452,7 @@ const RenderMakeCombo = () => {
                             }
                           />
                         </label> */}
-                        <label className=" ml-2">
+                        <label className="ml-2 ">
                           Any Singular Category
                           <input
                             type="radio"
@@ -500,7 +500,7 @@ const RenderMakeCombo = () => {
                         if (!b || !a) return 0
                         return b.rating - a.rating
                       })
-                      .map(([flowId, flowVal], _) => {
+                      .map(([flowId, flowVal], flowIndex) => {
                         if (!flowVal) return
                         const { entryMove, exitMove, keyMove, rating, notes } =
                           flowVal
@@ -538,7 +538,7 @@ const RenderMakeCombo = () => {
                         return (
                           <button
                             className={`w-1/3 p-1 ${isSelected && 'bg-lime-300 dark:bg-lime-900 '}`}
-                            key={flowId}
+                            key={flowIndex}
                             onClick={() =>
                               setSelectedComboSeq((prevState) => {
                                 return {
