@@ -220,9 +220,6 @@ export default function Moves() {
       {/* ------------form----------- */}
       <form
         onSubmit={handleSubmit((data) => {
-          console.log('data: ', data)
-
-          console.log('selectedKey: ', selectedKey)
           const movesArr = makeArray(data.categoryMoves)
           if (hasDuplicates(movesArr)) {
             setSaveButtonActive(false)
@@ -231,7 +228,6 @@ export default function Moves() {
               visible: true,
             })
             sortMovesInTextArea()
-            // setLsMoves(makeString(movesArr.sort()))
             return
           } else if (
             selectedKey &&
