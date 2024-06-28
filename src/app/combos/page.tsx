@@ -177,7 +177,8 @@ export default function RenderViewCombos() {
                     </td>
                     {/* ---------------MOVES------------ */}
                     <td className="min-w-72 px-6 py-4 text-2xs">
-                      <section className="flex max-w-72 flex-wrap">
+                      <section className="flex max-w-72 flex-wrap sm:max-w-md">
+                        {/* ------all of the moves----- */}
                         {sequence &&
                           sequence.map(({ moves }, moveIndex) => {
                             return (
@@ -189,9 +190,10 @@ export default function RenderViewCombos() {
                               </ComboIdContext.Provider>
                             )
                           })}
+                        {/* ------add button----- */}
                         {!hasAddMoveInput[comboIndex] && (
                           <RenderAddButtonSVG
-                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
                             onClick={() => {
                               setHasAddMoveInput((prev) =>
                                 prev.toSpliced(comboIndex, 0, true),
@@ -271,7 +273,7 @@ export default function RenderViewCombos() {
                         </section>
                         {/* delete button */}
                         <RenderTrashButtonSvg
-                          className="size-6 cursor-pointer"
+                          className="size-8 cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             deleteLsCombo(comboId as ComboId)
                             updateCombos()
@@ -279,7 +281,7 @@ export default function RenderViewCombos() {
                         />
                         {/* edit button */}
                         <RenderPenSvg
-                          className="size-6 cursor-pointer"
+                          className="size-8 cursor-pointer  p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             console.log('move user to edit combo page')
                             router.push(`/combos/make?${comboIdKey}=${comboId}`)
