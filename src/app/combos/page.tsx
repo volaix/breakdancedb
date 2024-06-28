@@ -140,12 +140,12 @@ export default function RenderViewCombos() {
               >
                 Actions
               </th>
-              <th
+              {/* <th
                 scope="col"
                 className="px-6 py-4 font-medium text-gray-900 dark:text-white"
               >
                 Notes
-              </th>
+              </th> */}
             </tr>
           </thead>
           {combos &&
@@ -288,9 +288,9 @@ export default function RenderViewCombos() {
                       </div>
                     </td>
                     {/* -------------------NOTES---------------- */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <div className="flex gap-4 text-xs">{notes}</div>
-                    </td>
+                    </td> */}
                   </tr>
                 </tbody>
               )
