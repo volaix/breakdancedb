@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { RenderUploadCloudSVG } from './Svgs'
 import { Notification } from './Notification'
+import { updateUserDataClient } from '../_utils/clientActions'
 
 /**
  * Renders the top header used on every page. Usually thrown in the template.tsx
@@ -57,7 +58,8 @@ export function ClientHeader({
   //-----------------render----------------------------------------
   return (
     <>
-      <nav className={`fixed left-2 top-3 `}>
+      {/* hamburger menu */}
+      <nav className={`fixed left-2 top-3 z-10`}>
         <div
           className={`fixed flex w-4/5 max-w-xs items-center justify-between`}
         >
@@ -152,13 +154,14 @@ export function ClientHeader({
         </div>
       </nav>
 
+      {/* notification */}
       <Notification
         visible={!!notification?.visible}
         message={notification?.message || ''}
-        className="fixed"
+        className="fixed z-10"
       />
       {/* upload button */}
-      <section className="fixed right-14 top-5">
+      <section className="fixed right-14 top-5 z-0">
         {loadingCloud && (
           <svg
             className="-ml-1 mr-3 h-5 w-5 animate-spin text-indigo-500"
@@ -183,14 +186,20 @@ export function ClientHeader({
         )}
         {!loadingCloud && (
           <RenderUploadCloudSVG
-            onClick={() => {
+            onClick={async () => {
               setNotification({
                 visible: true,
                 message: 'Uploading to cloud...',
               })
               setLoadingCloud(true)
+              await updateUserDataClient()
+              setLoadingCloud(false)
+              setNotification({
+                visible: true,
+                message: 'Successfully uploaded',
+              })
             }}
-            className="size-4 hover:fill-indigo-500 "
+            className="size-4 fill-slate-400 hover:fill-indigo-500"
           />
         )}
       </section>
