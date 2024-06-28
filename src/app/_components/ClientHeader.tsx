@@ -2,6 +2,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { RenderUploadCloudSVG } from './Svgs'
+import { Notification } from './Notification'
 
 /**
  * Renders the top header used on every page. Usually thrown in the template.tsx
@@ -16,7 +18,11 @@ export function ClientHeader({
   //-----------------state------------------------------------
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const inDevelopment = true
+  const [loadingCloud, setLoadingCloud] = useState(false)
+  const [notification, setNotification] = useState<null | {
+    visible?: boolean
+    message?: string
+  }>(null)
 
   const hasUser = user.name !== null && user.profilePicture !== null
 
@@ -24,6 +30,16 @@ export function ClientHeader({
   const settingsMenu = useRef<HTMLDivElement>(null)
 
   // ----hooks------
+  //Show Notifcation for 2 seconds
+  useEffect(() => {
+    const fadeOutTimer = setTimeout(
+      () => setNotification({ visible: false }),
+      2000,
+    )
+    return () => clearTimeout(fadeOutTimer)
+  }, [notification?.visible])
+
+  //Close settings when click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isSettingsOpen && !settingsMenu.current?.contains(e.target as Node)) {
@@ -135,6 +151,51 @@ export function ClientHeader({
           </nav>
         </div>
       </nav>
+
+      <Notification
+        visible={!!notification?.visible}
+        message={notification?.message || ''}
+        className="fixed"
+      />
+      {/* upload button */}
+      <section className="fixed right-14 top-5">
+        {loadingCloud && (
+          <svg
+            className="-ml-1 mr-3 h-5 w-5 animate-spin text-indigo-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        )}
+        {!loadingCloud && (
+          <RenderUploadCloudSVG
+            onClick={() => {
+              setNotification({
+                visible: true,
+                message: 'Uploading to cloud...',
+              })
+              setLoadingCloud(true)
+            }}
+            className="size-4 hover:fill-indigo-500 "
+          />
+        )}
+      </section>
+
+      {/* profile menu */}
       <div ref={settingsMenu} className="fixed right-2 top-0 ">
         <button
           onClick={() => {
