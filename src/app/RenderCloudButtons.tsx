@@ -7,6 +7,7 @@ import {
   useZustandStore,
   zustandLocalStorage,
 } from './_utils/zustandLocalStorage'
+import { updateUserDataClient } from './_utils/clientActions'
 
 export type NextUser = {
   payload: string
@@ -58,22 +59,9 @@ export default function RenderCloudButtons({
     }
   }
   const uploadUserData = async () => {
-    if (!localStorage[zustandLocalStorage])
-      return console.error(
-        'cannot find breakdancedb data in your local storage.',
-      )
-
-    await fetch('/api/user', {
-      method: 'PUT',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: localStorage[zustandLocalStorage],
-    })
-
+    setNotification({ visible: true, message: 'Attempting to upload' })
+    await updateUserDataClient()
     setNotification({ visible: true, message: 'Upload successful' })
-
     const user = await fetch('/api/user')
     const { editedAt } = await user.json()
     setLastEdited(editedAt)
