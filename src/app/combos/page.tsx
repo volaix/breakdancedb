@@ -20,6 +20,8 @@ import {
 import AutoComplete from './AutoComplete'
 import { ComboIdContext } from './util'
 
+const usabilityText = ['Inactive', 'WIP', 'Active']
+
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
  * a "history page"
@@ -35,6 +37,7 @@ export default function RenderViewCombos() {
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
+  const updateExecution = useZustandStore((state) => state.updateExecution)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -222,21 +225,29 @@ export default function RenderViewCombos() {
                     </td>
                     {/* ----------------USABILITY------------- */}
                     <td className="px-6 py-4">
-                      <div className="mt-2 inline-flex cursor-default flex-row-reverse items-center justify-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600 dark:bg-gray-800">
-                        {Array.from(Array(5)).map((_, i) => {
-                          return (
-                            <RenderThunder
-                              key={i}
-                              checked={i === 5 - execution}
-                              readOnly
-                            />
+                      <span
+                        onClick={() => {
+                          updateExecution(
+                            comboId,
+                            execution < 3 ? execution + 1 : 1,
                           )
-                        })}
-                      </div>
-                      {/* <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-green-600 rounded-full gap-1 bg-green-50">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                        Active
-                      </span> */}
+                          updateCombos()
+                        }}
+                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2  py-1 text-xs font-semibold
+                        ${execution === 3 && 'bg-green-50 text-green-600'}
+                        ${execution === 2 && 'bg-yellow-50 text-yellow-600'}
+                        ${execution === 1 && 'bg-gray-100 text-gray-600'}
+                        `}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full 
+                          ${execution === 3 && 'bg-green-600'}
+                          ${execution === 2 && 'bg-yellow-600'}
+                          ${execution === 1 && 'bg-gray-600'}
+                          `}
+                        ></span>
+                        {usabilityText[execution - 1] || 'Issue Loading'}
+                      </span>
                     </td>
                     {/* -----------------ROLES------------- */}
                     {/* <td className="px-6 py-4">

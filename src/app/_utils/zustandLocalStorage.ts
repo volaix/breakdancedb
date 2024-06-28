@@ -147,10 +147,17 @@ export const useZustandStore = create<ZustandGlobalStore>()(
           })
         },
         deleteComboMove(comboId, position) {
-          console.log('runniong delete combo move')
           return set((state) => {
             if (!state[lsCombos]) return
             state[lsCombos][comboId]?.sequence.splice(position, 1)
+          })
+        },
+        updateExecution(comboId, executionVal) {
+          return set((state) => {
+            if (!state[lsCombos]) return //safety
+            const combo = state[lsCombos][comboId]
+            if (!combo) return //safety
+            combo.execution = executionVal
           })
         },
         //-------User Move Keys --------
