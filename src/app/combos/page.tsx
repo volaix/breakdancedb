@@ -32,6 +32,7 @@ export default function RenderViewCombos() {
   //------------------------------state---------------------------------
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
+  const [showChangeName, setShowChangeName] = useState<boolean[]>([])
   const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const [hasAddMoveInput, setHasAddMoveInput] = useState<boolean[]>([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
@@ -40,6 +41,7 @@ export default function RenderViewCombos() {
   const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
   const updateExecution = useZustandStore((state) => state.updateExecution)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
+  const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -56,13 +58,14 @@ export default function RenderViewCombos() {
     setCombos(getLsCombos() || null)
   }, [getLsCombos])
 
-  //updates flows using localstorage
+  //on mount get combos
   useEffect(() => {
-    setCombos(getLsCombos() || null)
-  }, [getLsCombos])
+    updateCombos()
+  }, [updateCombos])
 
-  //initialises add move inputs
+  //initialises add move & change name inputs
   useEffect(() => {
+    setShowChangeName(Object.keys(combos || {}).map(() => false))
     setHasAddMoveInput(
       (combos && Object.keys(combos).map((comboKeys) => false)) ?? [],
     )
@@ -188,10 +191,47 @@ export default function RenderViewCombos() {
                     {/* ------------COMBO NUMBER---------- */}
                     <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                       <div className="text-sm">
-                        <div className="font-medium text-gray-700">
+                        <div className="text-gray-400 dark:font-medium dark:text-gray-700">
                           Combo {comboIndex + 1}
                         </div>
-                        <div className="text-gray-400">{displayName}</div>
+                        {!showChangeName[comboIndex] && (
+                          <span
+                            className="font-medium text-gray-700 dark:text-gray-400 "
+                            onDoubleClick={() => {
+                              setShowChangeName((prev) =>
+                                prev.toSpliced(comboIndex, 1, true),
+                              )
+                            }}
+                          >
+                            {displayName || (
+                              <span className="text-gray-300">untitled</span>
+                            )}
+                          </span>
+                        )}
+                        {showChangeName[comboIndex] && (
+                          <input
+                            type="text"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Escape') {
+                                setShowChangeName((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
+                                )
+                              } else if (e.key === 'Enter') {
+                                updateDisplayName(
+                                  comboId,
+                                  (e.target as HTMLInputElement).value,
+                                )
+                                setShowChangeName((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
+                                )
+                                updateCombos()
+                              }
+                            }}
+                            autoFocus
+                            defaultValue={displayName}
+                            className="border p-1"
+                          />
+                        )}
                       </div>
                     </td>
                     {/* ---------------MOVES------------ */}
@@ -307,13 +347,13 @@ export default function RenderViewCombos() {
                           }}
                         />
                         {/* edit button */}
-                        <RenderPenSvg
+                        {/* <RenderPenSvg
                           className="size-8 cursor-pointer  p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             console.log('move user to edit combo page')
                             router.push(`/combos/make?${comboIdKey}=${comboId}`)
                           }}
-                        />
+                        /> */}
                       </div>
                     </td>
                     {/* -------------------NOTES---------------- */}

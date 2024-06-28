@@ -152,6 +152,14 @@ export const useZustandStore = create<ZustandGlobalStore>()(
             state[lsCombos][comboId]?.sequence.splice(position, 1)
           })
         },
+        updateDisplayName(comboId, displayName) {
+          return set((state) => {
+            if (!state[lsCombos]) return //safety
+            const combo = state[lsCombos][comboId]
+            if (!combo) return //safety
+            combo.displayName = displayName
+          })
+        },
         updateExecution(comboId, executionVal) {
           return set((state) => {
             if (!state[lsCombos]) return //safety
