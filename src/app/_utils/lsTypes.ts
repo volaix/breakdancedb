@@ -150,6 +150,8 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     currentIndex: number,
     direction: 'up' | 'down',
   ) => void
+  updateDisplayName: (comboId: ComboId, displayName: string) => void
+  updateExecution: (comboId: ComboId, executionVal: number) => void
   //-------User Move Keys --------
   setLsUserMovesByKey: (
     key: keyof GlobalStateProperties[typeof lsUserMoves],

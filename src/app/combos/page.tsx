@@ -19,6 +19,9 @@ import {
 } from '../_components/Svgs'
 import AutoComplete from './AutoComplete'
 import { ComboIdContext } from './util'
+import { makeComboId } from '../_utils/lsGenerators'
+
+const usabilityText = ['Inactive', 'WIP', 'Active']
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -29,12 +32,16 @@ export default function RenderViewCombos() {
   //------------------------------state---------------------------------
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
+  const [showChangeName, setShowChangeName] = useState<boolean[]>([])
   const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const [hasAddMoveInput, setHasAddMoveInput] = useState<boolean[]>([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
+  const updateExecution = useZustandStore((state) => state.updateExecution)
+  const setLsCombos = useZustandStore((state) => state.setLsCombos)
+  const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -51,13 +58,14 @@ export default function RenderViewCombos() {
     setCombos(getLsCombos() || null)
   }, [getLsCombos])
 
-  //updates flows using localstorage
+  //on mount get combos
   useEffect(() => {
-    setCombos(getLsCombos() || null)
-  }, [getLsCombos])
+    updateCombos()
+  }, [updateCombos])
 
-  //initialises add move inputs
+  //initialises add move & change name inputs
   useEffect(() => {
+    setShowChangeName(Object.keys(combos || {}).map(() => false))
     setHasAddMoveInput(
       (combos && Object.keys(combos).map((comboKeys) => false)) ?? [],
     )
@@ -78,8 +86,22 @@ export default function RenderViewCombos() {
       </header>
       {/* ------------ADD COMBO------------- */}
       <section className="flex justify-center">
-        <button className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
-          <Link href="/combos/make">Add Combo</Link>
+        <button
+          onClick={() => {
+            setLsCombos(
+              {
+                displayName: 'new combo',
+                execution: 1,
+                sequence: [],
+                notes: '',
+              },
+              makeComboId(),
+            )
+            updateCombos()
+          }}
+          className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+        >
+          Add New Combo
         </button>
       </section>
       {/* -----------------advanced options---------------- */}
@@ -169,15 +191,53 @@ export default function RenderViewCombos() {
                     {/* ------------COMBO NUMBER---------- */}
                     <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                       <div className="text-sm">
-                        <div className="font-medium text-gray-700">
+                        <div className="text-gray-400 dark:font-medium dark:text-gray-700">
                           Combo {comboIndex + 1}
                         </div>
-                        <div className="text-gray-400">{displayName}</div>
+                        {!showChangeName[comboIndex] && (
+                          <span
+                            className="font-medium text-gray-700 dark:text-gray-400 "
+                            onDoubleClick={() => {
+                              setShowChangeName((prev) =>
+                                prev.toSpliced(comboIndex, 1, true),
+                              )
+                            }}
+                          >
+                            {displayName || (
+                              <span className="text-gray-300">untitled</span>
+                            )}
+                          </span>
+                        )}
+                        {showChangeName[comboIndex] && (
+                          <input
+                            type="text"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Escape') {
+                                setShowChangeName((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
+                                )
+                              } else if (e.key === 'Enter') {
+                                updateDisplayName(
+                                  comboId,
+                                  (e.target as HTMLInputElement).value,
+                                )
+                                setShowChangeName((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
+                                )
+                                updateCombos()
+                              }
+                            }}
+                            autoFocus
+                            defaultValue={displayName}
+                            className="border p-1"
+                          />
+                        )}
                       </div>
                     </td>
                     {/* ---------------MOVES------------ */}
                     <td className="min-w-72 px-6 py-4 text-2xs">
-                      <section className="flex max-w-72 flex-wrap">
+                      <section className="flex max-w-72 flex-wrap sm:max-w-md">
+                        {/* ------all of the moves----- */}
                         {sequence &&
                           sequence.map(({ moves }, moveIndex) => {
                             return (
@@ -189,9 +249,10 @@ export default function RenderViewCombos() {
                               </ComboIdContext.Provider>
                             )
                           })}
+                        {/* ------add button----- */}
                         {!hasAddMoveInput[comboIndex] && (
                           <RenderAddButtonSVG
-                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
                             onClick={() => {
                               setHasAddMoveInput((prev) =>
                                 prev.toSpliced(comboIndex, 0, true),
@@ -220,21 +281,29 @@ export default function RenderViewCombos() {
                     </td>
                     {/* ----------------USABILITY------------- */}
                     <td className="px-6 py-4">
-                      <div className="mt-2 inline-flex cursor-default flex-row-reverse items-center justify-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600 dark:bg-gray-800">
-                        {Array.from(Array(5)).map((_, i) => {
-                          return (
-                            <RenderThunder
-                              key={i}
-                              checked={i === 5 - execution}
-                              readOnly
-                            />
+                      <span
+                        onClick={() => {
+                          updateExecution(
+                            comboId,
+                            execution < 3 ? execution + 1 : 1,
                           )
-                        })}
-                      </div>
-                      {/* <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-green-600 rounded-full gap-1 bg-green-50">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                        Active
-                      </span> */}
+                          updateCombos()
+                        }}
+                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2  py-1 text-xs font-semibold
+                        ${execution === 3 && 'bg-green-50 text-green-600'}
+                        ${execution === 2 && 'bg-yellow-50 text-yellow-600'}
+                        ${execution === 1 && 'bg-gray-100 text-gray-600'}
+                        `}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full 
+                          ${execution === 3 && 'bg-green-600'}
+                          ${execution === 2 && 'bg-yellow-600'}
+                          ${execution === 1 && 'bg-gray-600'}
+                          `}
+                        ></span>
+                        {usabilityText[execution - 1] || 'Issue Loading'}
+                      </span>
                     </td>
                     {/* -----------------ROLES------------- */}
                     {/* <td className="px-6 py-4">
@@ -271,20 +340,20 @@ export default function RenderViewCombos() {
                         </section>
                         {/* delete button */}
                         <RenderTrashButtonSvg
-                          className="size-6 cursor-pointer"
+                          className="size-8 cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             deleteLsCombo(comboId as ComboId)
                             updateCombos()
                           }}
                         />
                         {/* edit button */}
-                        <RenderPenSvg
-                          className="size-6 cursor-pointer"
+                        {/* <RenderPenSvg
+                          className="size-8 cursor-pointer  p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             console.log('move user to edit combo page')
                             router.push(`/combos/make?${comboIdKey}=${comboId}`)
                           }}
-                        />
+                        /> */}
                       </div>
                     </td>
                     {/* -------------------NOTES---------------- */}

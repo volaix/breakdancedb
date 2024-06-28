@@ -138,7 +138,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                     onClick={() => {
                       setValue(suggestion.displayName)
                       comboId &&
-                        moveIndex &&
+                        moveIndex !== undefined &&
                         addComboMove(comboId as ComboId, moveIndex, {
                           moves: [suggestion.displayName],
                           id: 'custom',
@@ -164,18 +164,16 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                               suggestion.moveTransitionId,
                             ).data
                             if (!id) return
-                            addComboMove(
-                              comboId as ComboId,
-                              moveIndex as number,
-                              {
+                            comboId &&
+                              moveIndex !== undefined &&
+                              addComboMove(comboId as ComboId, moveIndex, {
                                 moves: [
                                   suggestion.moveFrom.displayName,
                                   suggestion.moveTo.displayName,
                                 ],
                                 id,
                                 type: 'transition',
-                              },
-                            )
+                              })
                             updateCombos && updateCombos()
                             closeInput()
                           }}
