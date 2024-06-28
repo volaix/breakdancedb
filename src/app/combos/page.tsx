@@ -19,6 +19,7 @@ import {
 } from '../_components/Svgs'
 import AutoComplete from './AutoComplete'
 import { ComboIdContext } from './util'
+import { makeComboId } from '../_utils/lsGenerators'
 
 const usabilityText = ['Inactive', 'WIP', 'Active']
 
@@ -38,6 +39,7 @@ export default function RenderViewCombos() {
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
   const updateExecution = useZustandStore((state) => state.updateExecution)
+  const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const router = useRouter()
 
   //-----------------------------hooks-------------------------------
@@ -81,8 +83,22 @@ export default function RenderViewCombos() {
       </header>
       {/* ------------ADD COMBO------------- */}
       <section className="flex justify-center">
-        <button className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none">
-          <Link href="/combos/make">Add Combo</Link>
+        <button
+          onClick={() => {
+            setLsCombos(
+              {
+                displayName: 'new combo',
+                execution: 1,
+                sequence: [],
+                notes: '',
+              },
+              makeComboId(),
+            )
+            updateCombos()
+          }}
+          className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+        >
+          Add New Combo
         </button>
       </section>
       {/* -----------------advanced options---------------- */}
