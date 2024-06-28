@@ -34,7 +34,7 @@ type Inputs = {
 
 export default function Moves() {
   //-----------------------------state---------------------------
-  const [saveText, setSaveText] = useState('Save')
+  const [saveText, setSaveText] = useState('Save Local')
   const [hasLoaded, setHasLoaded] = useState<boolean>(false)
   const [saveButtonActive, setSaveButtonActive] = useState<boolean>(false)
   const [notification, setNotification] = useState<null | {
@@ -112,6 +112,7 @@ export default function Moves() {
   useEffect(() => {
     if (unsavedMoveList !== lsMoves) {
       setSaveButtonActive(true)
+      setSaveText('Save Local')
     } else {
       setSaveButtonActive(false)
     }
