@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
-import { FlowDictionary, FlowId, PositionId } from '../_utils/lsTypes'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { RenderDeleteButtonSVG, RenderRedHoldButton } from '../_components/Svgs'
+import { RenderRedXSVG } from '../_components/Svgs'
 import { isFlowId, isLegacyId } from '../_utils/lsGenerators'
+import { FlowDictionary, FlowId } from '../_utils/lsTypes'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
  * Renders all the completed flows the user has done. In future this will essentially be
@@ -58,7 +58,7 @@ export default function RenderCompletedMoves() {
               return (
                 <article className="break-inside-avoid-column" key={key}>
                   <section className="relative flex h-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 px-3 pb-3 pt-5 text-center dark:bg-gray-800 dark:bg-opacity-40">
-                    <RenderDeleteButtonSVG
+                    <RenderRedXSVG
                       onClick={() => {
                         if (isFlowId(key) || isLegacyId(key)) {
                           deleteLsFlow(key as FlowId)

@@ -6,7 +6,7 @@ import { isValidKey } from '../_utils/lsValidation'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import {
   RenderAddButtonSVG,
-  RenderDeleteButtonSVG,
+  RenderRedXSVG,
   RenderTrashButtonSvg,
 } from '../_components/Svgs'
 
@@ -219,7 +219,7 @@ export default function Moves() {
                                 )}
                                 className={`ml-1 size-3 fill-indigo-500`}
                               />
-                              <RenderDeleteButtonSVG
+                              <RenderRedXSVG
                                 onClick={() => {
                                   setInput({ [key]: false })
                                 }}
