@@ -2,24 +2,22 @@
 //@format
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import RenderThunder from '../_components/RenderChilli'
-import { comboIdKey, extractComboIds } from '../_utils/lib'
+import { extractComboIds } from '../_utils/lib'
 import { ComboDictionary, ComboId } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
-import MoveTag from './MoveTag'
-import { isComboId } from '../_utils/lsValidation'
-import Link from 'next/link'
 import {
   RenderAddButtonSVG,
+  RenderDiceSvg,
   RenderDownArrow,
-  RenderPenSvg,
   RenderTrashButtonSvg,
   RenderUpArrow,
 } from '../_components/Svgs'
-import AutoComplete from './AutoComplete'
-import { ComboIdContext } from './util'
 import { makeComboId } from '../_utils/lsGenerators'
+import { isComboId } from '../_utils/lsValidation'
+import AutoComplete from './AutoComplete'
+import MoveTag from './MoveTag'
+import { ComboIdContext } from './util'
 
 const usabilityText = ['Inactive', 'WIP', 'Active']
 
@@ -33,8 +31,9 @@ export default function RenderViewCombos() {
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
   const [showChangeName, setShowChangeName] = useState<boolean[]>([])
+  const [showRngInput, setShowRngInput] = useState<boolean[]>([])
   const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
-  const [hasAddMoveInput, setHasAddMoveInput] = useState<boolean[]>([])
+  const [showAddMoveToCombo, setAddMoveToCombo] = useState<boolean[]>([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
@@ -63,12 +62,12 @@ export default function RenderViewCombos() {
     updateCombos()
   }, [updateCombos])
 
-  //initialises add move & change name inputs
+  //initialises inputs as false
   useEffect(() => {
-    setShowChangeName(Object.keys(combos || {}).map(() => false))
-    setHasAddMoveInput(
-      (combos && Object.keys(combos).map((comboKeys) => false)) ?? [],
-    )
+    const comboBooleans = Object.keys(combos || {}).map(() => false)
+    setShowRngInput(comboBooleans)
+    setShowChangeName(comboBooleans)
+    setAddMoveToCombo(comboBooleans)
   }, [combos])
 
   //-----------------------------render---------------------------------
@@ -250,17 +249,18 @@ export default function RenderViewCombos() {
                             )
                           })}
                         {/* ------add button----- */}
-                        {!hasAddMoveInput[comboIndex] && (
-                          <RenderAddButtonSVG
-                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
-                            onClick={() => {
-                              setHasAddMoveInput((prev) =>
-                                prev.toSpliced(comboIndex, 0, true),
-                              )
-                            }}
-                          />
-                        )}
-                        {hasAddMoveInput[comboIndex] && (
+                        {!showAddMoveToCombo[comboIndex] &&
+                          !showRngInput[comboIndex] && (
+                            <RenderAddButtonSVG
+                              className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                              onClick={() => {
+                                setAddMoveToCombo((prev) =>
+                                  prev.toSpliced(comboIndex, 1, true),
+                                )
+                              }}
+                            />
+                          )}
+                        {showAddMoveToCombo[comboIndex] && (
                           <ComboIdContext.Provider
                             value={{
                               comboId,
@@ -270,8 +270,37 @@ export default function RenderViewCombos() {
                           >
                             <AutoComplete
                               closeInput={() => {
-                                setHasAddMoveInput((prev) =>
-                                  prev.toSpliced(comboIndex, 0, false),
+                                setAddMoveToCombo((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
+                                )
+                              }}
+                            />
+                          </ComboIdContext.Provider>
+                        )}
+                        {/* ----------RANDOM BUTTON--------- */}
+                        {!showRngInput[comboIndex] &&
+                          !showAddMoveToCombo[comboIndex] && (
+                            <RenderDiceSvg
+                              className="my-0.5 ml-1 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-red-600 stroke-2 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                              onClick={() => {
+                                setShowRngInput((prev) =>
+                                  prev.toSpliced(comboIndex, 1, true),
+                                )
+                              }}
+                            />
+                          )}
+                        {showRngInput[comboIndex] && (
+                          <ComboIdContext.Provider
+                            value={{
+                              comboId,
+                              moveIndex: sequence.length,
+                              updateCombos,
+                            }}
+                          >
+                            <AutoComplete
+                              closeInput={() => {
+                                setShowRngInput((prev) =>
+                                  prev.toSpliced(comboIndex, 1, false),
                                 )
                               }}
                             />
