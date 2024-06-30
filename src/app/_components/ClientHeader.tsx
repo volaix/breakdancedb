@@ -130,7 +130,7 @@ export function ClientHeader({
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
                     <Link onClick={() => setIsNavOpen(false)} href="/combos">
-                      🤖 Make Set 🤖
+                      🤖 Combos 🤖
                     </Link>
                   </li>
                   {/* <li className="my-2 uppercase border-b border-gray-400">
