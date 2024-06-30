@@ -254,9 +254,7 @@ export const RenderTrashButtonSvg = ({ ...props }: SVGProps<SVGSVGElement>) => (
  * @param param onclick
  * @returns
  */
-export const RenderDeleteButtonSVG = ({
-  ...props
-}: SVGProps<SVGSVGElement>) => (
+export const RenderRedXSVG = ({ ...props }: SVGProps<SVGSVGElement>) => (
   <svg {...props} x="0px" y="0px" viewBox="0 0 595.275 841.891">
     <g>
       <path
