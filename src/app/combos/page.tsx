@@ -15,7 +15,7 @@ import {
 } from '../_components/Svgs'
 import { makeComboId } from '../_utils/lsGenerators'
 import { isComboId } from '../_utils/lsValidation'
-import AutoComplete from './AutoComplete'
+import AutoComplete from './MoveAutoComplete'
 import MoveTag from './MoveTag'
 import { ComboIdContext } from './util'
 

@@ -4,7 +4,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { RenderTrashButtonSvg } from '../_components/Svgs'
 import { isComboId } from '../_utils/lsValidation'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import AutoComplete from './AutoComplete'
+import AutoComplete from './MoveAutoComplete'
 import { ComboIdContext } from './util'
 
 export default function MoveTag({ moves }: { moves: string[] }) {
