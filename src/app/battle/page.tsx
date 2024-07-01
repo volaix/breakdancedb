@@ -9,9 +9,9 @@ import RenderThunder from '../_components/RenderChilli'
 import {
   RenderAddButtonSVG,
   RenderBrainSvg,
-  RenderDeleteButtonSVG,
   RenderEditButton,
   RenderInfoSVG,
+  RenderRedXSVG,
 } from '../_components/Svgs'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 import { makeRoundId } from '../_utils/lsGenerators'
@@ -142,7 +142,7 @@ export default function RenderBattlePage() {
                 className="relative mb-5 flex h-full w-full flex-col overflow-hidden rounded-lg bg-gray-100 bg-opacity-75 p-1 px-3 pb-6 pt-2 dark:bg-gray-800 dark:bg-opacity-40"
                 key={id}
               >
-                <RenderDeleteButtonSVG
+                <RenderRedXSVG
                   className="size-4 self-end"
                   onClick={(_) =>
                     setYourRounds((prevRounds) =>
@@ -402,7 +402,7 @@ export default function RenderBattlePage() {
                             {/* --------end of info--------- */}
                             {/* -------------DELETE------------ */}
                             <section className="ml-1">
-                              <RenderDeleteButtonSVG
+                              <RenderRedXSVG
                                 className="size-4 self-end fill-slate-500 text-slate-600"
                                 onClick={(_) =>
                                   setYourRounds((prevRounds) =>

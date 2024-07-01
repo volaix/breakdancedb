@@ -1,14 +1,15 @@
-import { useState, useEffect, useRef, useContext } from 'react'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { z } from 'zod'
+
+import { RenderRedXSVG } from '../_components/Svgs'
 import {
   BasicMoveSchema,
   FlowSchema,
   MoveTransitionSchema,
 } from '../_utils/lsSchemas'
-import { z } from 'zod'
-import { ComboIdContext } from './util'
 import { ComboId } from '../_utils/lsTypes'
-import { transitionIdSchema } from '../_utils/lsSchemas'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { ComboIdContext } from './util'
 
 type FlowOption = z.infer<typeof FlowSchema> //flow
 type TransitionOption = z.infer<typeof MoveTransitionSchema> //single transition
@@ -23,11 +24,11 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
 
-  const transitons = useZustandStore((state) => state.moveTransitions)
+  // const transitons = useZustandStore((state) => state.moveTransitions)
   const singleMoves = useZustandStore((state) => state.userMoves)
   const addComboMove = useZustandStore((state) => state.addComboMove)
 
-  const transitionOptions: TransitionOption[] = transitons ?? []
+  // const transitionOptions: TransitionOption[] = transitons ?? []
   const basicMoveOptions: SingleMoveOption[] = Object.entries(
     singleMoves,
   ).flatMap(([key, value]) =>
@@ -39,7 +40,11 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
     ),
   )
 
-  const options: Option[] = [...basicMoveOptions, ...transitionOptions]
+  const options: Option[] = [
+    ...basicMoveOptions,
+
+    // ...transitionOptions
+  ]
 
   //filters options on what user has already typed
   const filteredOptions = options.filter((option) => {
@@ -47,8 +52,8 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
       switch (true) {
         case isSingleMove(option):
           return option.displayName
-        case isTransition(option):
-          return option.moveFrom.displayName
+        // case isTransition(option):
+        //   return option.moveFrom.displayName
         default:
           return ''
       }
@@ -105,6 +110,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
 
   return (
     <section className="" ref={autocompleteRef}>
+      {/* -----------INPUT----------- */}
       <input
         autoFocus
         ref={inputRef}
@@ -117,11 +123,17 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
           if (e.key === 'Enter' || e.key === ',') {
             addCustomMove()
           }
+          //Note: cannot add e.key === 'escape'. Cancels input selection before is detected.
         }}
       />
+      <RenderRedXSVG
+        className="absolute -mt-5 ml-28 size-4 cursor-pointer"
+        onClick={() => closeInput()}
+      />
+      {/* -----------SUGGESTIONS LIST----------- */}
       {showSuggestions && (
         <ul
-          className={`absolute left-0 top-auto   max-h-40 overflow-y-auto rounded-md border bg-white ${flipSuggestion && '-mt-48'}`}
+          className={`absolute left-0 top-auto max-h-40 w-full overflow-y-auto rounded-md border bg-white sm:left-auto sm:w-fit ${flipSuggestion && '-mt-48'}`}
         >
           {filteredOptions.map((suggestion, i) => {
             return (
@@ -152,7 +164,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                     <small className="ml-1">{`Category: ${suggestion.category}`}</small>
                   </section>
                 )}
-                {isTransition(suggestion) &&
+                {/* {isTransition(suggestion) &&
                   (() => {
                     const transitionLabel = `${suggestion.moveFrom.displayName} -> ${suggestion.moveTo.displayName}`
                     return (
@@ -183,7 +195,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                         </section>
                       </>
                     )
-                  })()}
+                  })()} */}
               </li>
             )
           })}
@@ -204,7 +216,7 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
 
 const isSingleMove = (suggestion: Option): suggestion is SingleMoveOption =>
   BasicMoveSchema.safeParse(suggestion).success
-const isTransition = (suggestion: Option): suggestion is TransitionOption =>
-  MoveTransitionSchema.safeParse(suggestion).success
+// const isTransition = (suggestion: Option): suggestion is TransitionOption =>
+//   MoveTransitionSchema.safeParse(suggestion).success
 
 export default AutoComplete
