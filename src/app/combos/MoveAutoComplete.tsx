@@ -120,7 +120,6 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
         placeholder="Add Move"
         onFocus={() => setShowSuggestions(true)}
         onKeyDown={(e) => {
-          console.log('e: ', e.key)
           if (e.key === 'Enter' || e.key === ',') {
             addCustomMove()
           }
