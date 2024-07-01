@@ -1,7 +1,6 @@
 'use client'
 //@format
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { extractComboIds } from '../_utils/lib'
 import { ComboDictionary, ComboId } from '../_utils/lsTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
@@ -15,7 +14,7 @@ import {
 } from '../_components/Svgs'
 import { makeComboId } from '../_utils/lsGenerators'
 import { isComboId } from '../_utils/lsValidation'
-import AutoComplete from './MoveAutoComplete'
+import MoveAutoComplete from './MoveAutoComplete'
 import MoveTag from './MoveTag'
 import { ComboIdContext } from './util'
 
@@ -41,9 +40,20 @@ export default function RenderViewCombos() {
   const updateExecution = useZustandStore((state) => state.updateExecution)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
-  const router = useRouter()
+  const addComboMove = useZustandStore((state) => state.addComboMove)
+  const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
+
+  // const comboEntries = Object.entries(combos ?? {})
 
   //-----------------------------hooks-------------------------------
+  const comboEntries = useMemo(() => Object.entries(combos ?? {}), [combos])
+
+  const allMoves = useMemo(() => {
+    if (!combos) return null
+
+    return Object.values(getUserMoves()).flatMap((moves) => moves)
+  }, [getUserMoves, combos])
+
   //Advanced Option: Set Combos used in Battle
   useEffect(() => {
     if (!hideMovesIfBattle) return
@@ -169,173 +179,169 @@ export default function RenderViewCombos() {
               </th> */}
             </tr>
           </thead>
-          {combos &&
-            Object.entries(combos).map(([comboId, comboVal], comboIndex) => {
-              if (!comboVal || !isComboId(comboId)) return
-              //Advanced Option
-              if (
-                hideMovesIfBattle &&
-                combosInBattle?.includes(comboId as ComboId)
-              ) {
-                return
-              }
+          {comboEntries.map(([comboId, comboVal], comboIndex) => {
+            if (!comboVal || !isComboId(comboId)) return
+            //Advanced Option
+            if (
+              hideMovesIfBattle &&
+              combosInBattle?.includes(comboId as ComboId)
+            ) {
+              return
+            }
 
-              const { displayName, notes, execution, sequence } = comboVal
-              return (
-                <tbody
-                  key={comboId}
-                  className="divide-gray-100 border-t border-gray-100 dark:border-gray-800"
-                >
-                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
-                    {/* ------------COMBO NUMBER---------- */}
-                    <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                      <div className="text-sm">
-                        <div className="text-gray-400 dark:font-medium dark:text-gray-700">
-                          Combo {comboIndex + 1}
-                        </div>
-                        {!showChangeName[comboIndex] && (
-                          <span
-                            className="font-medium text-gray-700 dark:text-gray-400 "
-                            onDoubleClick={() => {
+            const { displayName, notes, execution, sequence } = comboVal
+            return (
+              <tbody
+                key={comboId}
+                className="divide-gray-100 border-t border-gray-100 dark:border-gray-800"
+              >
+                <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
+                  {/* ------------COMBO NUMBER---------- */}
+                  <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                    <div className="text-sm">
+                      <div className="text-gray-400 dark:font-medium dark:text-gray-700">
+                        Combo {comboIndex + 1}
+                      </div>
+                      {!showChangeName[comboIndex] && (
+                        <span
+                          className="font-medium text-gray-700 dark:text-gray-400 "
+                          onDoubleClick={() => {
+                            setShowChangeName((prev) =>
+                              prev.toSpliced(comboIndex, 1, true),
+                            )
+                          }}
+                        >
+                          {displayName || (
+                            <span className="text-gray-300">untitled</span>
+                          )}
+                        </span>
+                      )}
+                      {showChangeName[comboIndex] && (
+                        <input
+                          type="text"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Escape') {
                               setShowChangeName((prev) =>
+                                prev.toSpliced(comboIndex, 1, false),
+                              )
+                            } else if (e.key === 'Enter') {
+                              updateDisplayName(
+                                comboId,
+                                (e.target as HTMLInputElement).value,
+                              )
+                              setShowChangeName((prev) =>
+                                prev.toSpliced(comboIndex, 1, false),
+                              )
+                              updateCombos()
+                            }
+                          }}
+                          autoFocus
+                          defaultValue={displayName}
+                          className="border p-1"
+                        />
+                      )}
+                    </div>
+                  </td>
+                  {/* ---------------MOVES------------ */}
+                  <td className="min-w-72 px-6 py-4 text-2xs">
+                    <section className="flex max-w-72 flex-wrap sm:max-w-md">
+                      {/* ------all of the moves----- */}
+                      {sequence &&
+                        sequence.map(({ moves }, moveIndex) => {
+                          return (
+                            <ComboIdContext.Provider
+                              value={{ comboId, moveIndex, updateCombos }}
+                              key={moveIndex}
+                            >
+                              <MoveTag moves={moves} />
+                            </ComboIdContext.Provider>
+                          )
+                        })}
+                      {/* ------add button----- */}
+                      {!showAddMoveToCombo[comboIndex] &&
+                        !showRngInput[comboIndex] && (
+                          <RenderAddButtonSVG
+                            className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                            onClick={() => {
+                              setAddMoveToCombo((prev) =>
                                 prev.toSpliced(comboIndex, 1, true),
                               )
                             }}
-                          >
-                            {displayName || (
-                              <span className="text-gray-300">untitled</span>
-                            )}
-                          </span>
-                        )}
-                        {showChangeName[comboIndex] && (
-                          <input
-                            type="text"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Escape') {
-                                setShowChangeName((prev) =>
-                                  prev.toSpliced(comboIndex, 1, false),
-                                )
-                              } else if (e.key === 'Enter') {
-                                updateDisplayName(
-                                  comboId,
-                                  (e.target as HTMLInputElement).value,
-                                )
-                                setShowChangeName((prev) =>
-                                  prev.toSpliced(comboIndex, 1, false),
-                                )
-                                updateCombos()
-                              }
-                            }}
-                            autoFocus
-                            defaultValue={displayName}
-                            className="border p-1"
                           />
                         )}
-                      </div>
-                    </td>
-                    {/* ---------------MOVES------------ */}
-                    <td className="min-w-72 px-6 py-4 text-2xs">
-                      <section className="flex max-w-72 flex-wrap sm:max-w-md">
-                        {/* ------all of the moves----- */}
-                        {sequence &&
-                          sequence.map(({ moves }, moveIndex) => {
-                            return (
-                              <ComboIdContext.Provider
-                                value={{ comboId, moveIndex, updateCombos }}
-                                key={moveIndex}
-                              >
-                                <MoveTag moves={moves} />
-                              </ComboIdContext.Provider>
-                            )
-                          })}
-                        {/* ------add button----- */}
-                        {!showAddMoveToCombo[comboIndex] &&
-                          !showRngInput[comboIndex] && (
-                            <RenderAddButtonSVG
-                              className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
-                              onClick={() => {
-                                setAddMoveToCombo((prev) =>
-                                  prev.toSpliced(comboIndex, 1, true),
-                                )
-                              }}
-                            />
-                          )}
-                        {showAddMoveToCombo[comboIndex] && (
-                          <ComboIdContext.Provider
-                            value={{
-                              comboId,
-                              moveIndex: sequence.length,
-                              updateCombos,
-                            }}
-                          >
-                            <AutoComplete
-                              closeInput={() => {
-                                setAddMoveToCombo((prev) =>
-                                  prev.toSpliced(comboIndex, 1, false),
-                                )
-                              }}
-                            />
-                          </ComboIdContext.Provider>
-                        )}
-                        {/* ----------RANDOM BUTTON--------- */}
-                        {!showRngInput[comboIndex] &&
-                          !showAddMoveToCombo[comboIndex] && (
-                            <RenderDiceSvg
-                              className="my-0.5 ml-1 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-red-600 stroke-2 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
-                              onClick={() => {
-                                setShowRngInput((prev) =>
-                                  prev.toSpliced(comboIndex, 1, true),
-                                )
-                              }}
-                            />
-                          )}
-                        {showRngInput[comboIndex] && (
-                          <ComboIdContext.Provider
-                            value={{
-                              comboId,
-                              moveIndex: sequence.length,
-                              updateCombos,
-                            }}
-                          >
-                            <AutoComplete
-                              closeInput={() => {
-                                setShowRngInput((prev) =>
-                                  prev.toSpliced(comboIndex, 1, false),
-                                )
-                              }}
-                            />
-                          </ComboIdContext.Provider>
-                        )}
-                      </section>
-                    </td>
-                    {/* ----------------USABILITY------------- */}
-                    <td className="px-6 py-4">
-                      <span
-                        onClick={() => {
-                          updateExecution(
+                      {showAddMoveToCombo[comboIndex] && (
+                        <ComboIdContext.Provider
+                          value={{
                             comboId,
-                            execution < 3 ? execution + 1 : 1,
-                          )
-                          updateCombos()
-                        }}
-                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2  py-1 text-xs font-semibold
+                            moveIndex: sequence.length,
+                            updateCombos,
+                          }}
+                        >
+                          <MoveAutoComplete
+                            closeInput={() => {
+                              setAddMoveToCombo((prev) =>
+                                prev.toSpliced(comboIndex, 1, false),
+                              )
+                            }}
+                          />
+                        </ComboIdContext.Provider>
+                      )}
+                      {/* ----------RANDOM BUTTON--------- */}
+                      {!showRngInput[comboIndex] &&
+                        !showAddMoveToCombo[comboIndex] && (
+                          <RenderDiceSvg
+                            className="my-0.5 ml-1 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-red-600 stroke-2 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                            onClick={() => {
+                              allMoves &&
+                                addComboMove(
+                                  comboId as ComboId,
+                                  sequence.length,
+                                  {
+                                    type: 'move',
+                                    id: 'custom',
+                                    moves: [
+                                      allMoves[
+                                        Math.floor(
+                                          Math.random() * allMoves.length,
+                                        )
+                                      ],
+                                    ],
+                                  },
+                                )
+                              updateCombos()
+                            }}
+                          />
+                        )}
+                    </section>
+                  </td>
+                  {/* ----------------USABILITY------------- */}
+                  <td className="px-6 py-4">
+                    <span
+                      onClick={() => {
+                        updateExecution(
+                          comboId,
+                          execution < 3 ? execution + 1 : 1,
+                        )
+                        updateCombos()
+                      }}
+                      className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2  py-1 text-xs font-semibold
                         ${execution === 3 && 'bg-green-50 text-green-600'}
                         ${execution === 2 && 'bg-yellow-50 text-yellow-600'}
                         ${execution === 1 && 'bg-gray-100 text-gray-600'}
                         `}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full 
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full 
                           ${execution === 3 && 'bg-green-600'}
                           ${execution === 2 && 'bg-yellow-600'}
                           ${execution === 1 && 'bg-gray-600'}
                           `}
-                        ></span>
-                        {usabilityText[execution - 1] || 'Issue Loading'}
-                      </span>
-                    </td>
-                    {/* -----------------ROLES------------- */}
-                    {/* <td className="px-6 py-4">
+                      ></span>
+                      {usabilityText[execution - 1] || 'Issue Loading'}
+                    </span>
+                  </td>
+                  {/* -----------------ROLES------------- */}
+                  {/* <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-2">
                         <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-blue-600 rounded-full gap-1 bg-blue-50">
                           Design
@@ -348,51 +354,51 @@ export default function RenderViewCombos() {
                         </span>
                       </div>
                     </td> */}
-                    {/* ----------------ACTIONS------------ */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <section>
-                          <RenderUpArrow
-                            onClick={() => {
-                              moveCombo(comboIndex, 'up')
-                              updateCombos()
-                            }}
-                            className="size-6 cursor-pointer fill-gray-500 p-1 pb-0 hover:rounded-lg hover:bg-gray-500/20"
-                          />
-                          <RenderDownArrow
-                            onClick={() => {
-                              moveCombo(comboIndex, 'down')
-                              updateCombos()
-                            }}
-                            className="size-6 cursor-pointer fill-gray-500 p-1 pt-0  hover:rounded-lg hover:bg-gray-500/20"
-                          />
-                        </section>
-                        {/* delete button */}
-                        <RenderTrashButtonSvg
-                          className="size-8 cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
+                  {/* ----------------ACTIONS------------ */}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-4">
+                      <section>
+                        <RenderUpArrow
                           onClick={() => {
-                            deleteLsCombo(comboId as ComboId)
+                            moveCombo(comboIndex, 'up')
                             updateCombos()
                           }}
+                          className="size-6 cursor-pointer fill-gray-500 p-1 pb-0 hover:rounded-lg hover:bg-gray-500/20"
                         />
-                        {/* edit button */}
-                        {/* <RenderPenSvg
+                        <RenderDownArrow
+                          onClick={() => {
+                            moveCombo(comboIndex, 'down')
+                            updateCombos()
+                          }}
+                          className="size-6 cursor-pointer fill-gray-500 p-1 pt-0  hover:rounded-lg hover:bg-gray-500/20"
+                        />
+                      </section>
+                      {/* delete button */}
+                      <RenderTrashButtonSvg
+                        className="size-8 cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
+                        onClick={() => {
+                          deleteLsCombo(comboId as ComboId)
+                          updateCombos()
+                        }}
+                      />
+                      {/* edit button */}
+                      {/* <RenderPenSvg
                           className="size-8 cursor-pointer  p-1 hover:rounded-lg hover:bg-gray-500/20"
                           onClick={() => {
                             console.log('move user to edit combo page')
                             router.push(`/combos/make?${comboIdKey}=${comboId}`)
                           }}
                         /> */}
-                      </div>
-                    </td>
-                    {/* -------------------NOTES---------------- */}
-                    {/* <td className="px-6 py-4">
+                    </div>
+                  </td>
+                  {/* -------------------NOTES---------------- */}
+                  {/* <td className="px-6 py-4">
                       <div className="flex gap-4 text-xs">{notes}</div>
                     </td> */}
-                  </tr>
-                </tbody>
-              )
-            })}
+                </tr>
+              </tbody>
+            )
+          })}
           {!combos && (
             <tbody>
               <tr>
