@@ -2,9 +2,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { RenderUploadCloudSVG } from './Svgs'
+import { RenderDownloadSvg, RenderSpinner, RenderUploadCloudSVG } from './Svgs'
 import { Notification } from './Notification'
-import { updateUserDataClient } from '../_utils/clientActions'
+import {
+  DOWNLOAD_USER,
+  UPLOAD_USER,
+  downloadUserData,
+  updateUserDataClient,
+} from '../_utils/clientActions'
 import { useQuery } from '@tanstack/react-query'
 
 /**
@@ -20,32 +25,70 @@ export function ClientHeader({
   //-----------------state------------------------------------
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [manualUploading, setManualUploading] = useState(false)
+  const [manualDownload, setManualDownload] = useState(false)
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
 
-  const {
-    isLoading: loadingCloud,
-    refetch,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['UPLOAD_USER'],
-    queryFn: updateUserDataClient,
-    enabled: false,
-  })
   const hasUser = user.name !== null && user.profilePicture !== null
 
   // ----Refs-------
   const settingsMenu = useRef<HTMLDivElement>(null)
 
   // ----hooks------
+  const {
+    isLoading: loadingCloud,
+    refetch,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: [UPLOAD_USER],
+    queryFn: updateUserDataClient,
+    enabled: false,
+  })
+
+  const isUploading = loadingCloud || manualUploading
+
+  const {
+    isLoading: isFetchingUser,
+    isError: isFetchError,
+    error: fetchError,
+    refetch: refetchDownload,
+    isSuccess,
+  } = useQuery({
+    queryKey: [DOWNLOAD_USER],
+    queryFn: downloadUserData,
+    enabled: hasUser,
+  })
+
+  const isDownloading = isFetchingUser || manualDownload
+
+  //first time download
   useEffect(() => {
-    if (isError) {
+    if (isFetchingUser) {
+      setNotification({ visible: true, message: 'Downloading from cloud...' })
+    } else if (isSuccess) {
+      setNotification({
+        visible: true,
+        message: 'Successfully downloaded from cloud',
+      })
+    }
+  }, [isFetchingUser, isSuccess])
+
+  //error handling for queries
+  useEffect(() => {
+    if (isFetchError) {
+      setNotification({
+        visible: true,
+        message: `ERROR: ${fetchError.message}`,
+      })
+    } else if (isError) {
       setNotification({ visible: true, message: `ERROR: ${error.message}` })
     }
   }, [error, isError])
+
   //Show Notifcation for 2 seconds
   useEffect(() => {
     const fadeOutTimer = setTimeout(
@@ -175,52 +218,57 @@ export function ClientHeader({
         message={notification?.message || ''}
         className="fixed z-10"
       />
-      {/* upload button */}
+      {/* upload/download button */}
       {hasUser && (
-        <section className="fixed right-14 top-5 z-0">
-          {loadingCloud && (
-            <svg
-              className="-ml-1 mr-3 h-5 w-5 animate-spin text-indigo-500"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-          )}
-          {!loadingCloud && (
-            <RenderUploadCloudSVG
-              onClick={async () => {
-                setNotification({
-                  visible: true,
-                  message: 'Uploading to cloud...',
-                })
+        <>
+          <section className="fixed right-14 top-5 z-0 cursor-pointer">
+            {isUploading && (
+              <RenderSpinner className="-ml-1 mr-3 h-5 w-5 animate-spin text-indigo-500" />
+            )}
+            {!isUploading && (
+              <RenderUploadCloudSVG
+                onClick={async () => {
+                  setNotification({
+                    visible: true,
+                    message: 'Uploading to cloud...',
+                  })
 
-                // setLoadingCloud(true)
-                // await updateUserDataClient()
-                await refetch()
-                // setLoadingCloud(false)
-                setNotification({
-                  visible: true,
-                  message: 'Successfully uploaded',
-                })
-              }}
-              className="size-4 fill-slate-400 hover:fill-indigo-500"
-            />
-          )}
-        </section>
+                  setManualUploading(true)
+                  await refetch()
+                  setManualUploading(false)
+                  setNotification({
+                    visible: true,
+                    message: 'Successfully uploaded',
+                  })
+                }}
+                className="size-4 fill-slate-400 hover:fill-indigo-500"
+              />
+            )}
+          </section>
+          <article className="fixed right-20 top-6 z-0 cursor-pointer  ">
+            {isDownloading && (
+              <RenderSpinner className="-ml-1 mr-3 h-5 w-5 animate-spin text-indigo-500" />
+            )}
+            {!isDownloading && (
+              <RenderDownloadSvg
+                className="size-2 fill-slate-400 hover:fill-indigo-500"
+                onClick={async () => {
+                  setNotification({
+                    visible: true,
+                    message: 'Downloading from cloud...',
+                  })
+                  setManualDownload(true)
+                  await refetchDownload()
+                  setManualDownload(false)
+                  setNotification({
+                    visible: true,
+                    message: 'Successfully downloaded',
+                  })
+                }}
+              />
+            )}
+          </article>
+        </>
       )}
 
       {/* profile menu */}

@@ -1,6 +1,9 @@
 'use client'
 import { zustandLocalStorage } from './zustandLocalStorage'
 
+export const UPLOAD_USER = 'UPLOAD_USER'
+export const DOWNLOAD_USER = 'DOWNLOAD_USER'
+
 export const updateUserDataClient = async () => {
   const zustandLocalStorageRef = localStorage[zustandLocalStorage]
   if (!zustandLocalStorageRef) {
@@ -18,4 +21,9 @@ export const updateUserDataClient = async () => {
     throw new Error('Network response was not ok')
   }
   return response
+}
+
+export const downloadUserData = async () => {
+  const user = await fetch('/api/user')
+  return await user.json()
 }
