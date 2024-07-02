@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { RenderUploadCloudSVG } from './Svgs'
 import { Notification } from './Notification'
 import { updateUserDataClient } from '../_utils/clientActions'
+import { useQuery } from '@tanstack/react-query'
 
 /**
  * Renders the top header used on every page. Usually thrown in the template.tsx
@@ -19,18 +20,32 @@ export function ClientHeader({
   //-----------------state------------------------------------
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [loadingCloud, setLoadingCloud] = useState(false)
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
 
+  const {
+    isLoading: loadingCloud,
+    refetch,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['UPLOAD_USER'],
+    queryFn: updateUserDataClient,
+    enabled: false,
+  })
   const hasUser = user.name !== null && user.profilePicture !== null
 
   // ----Refs-------
   const settingsMenu = useRef<HTMLDivElement>(null)
 
   // ----hooks------
+  useEffect(() => {
+    if (isError) {
+      setNotification({ visible: true, message: `ERROR: ${error.message}` })
+    }
+  }, [error, isError])
   //Show Notifcation for 2 seconds
   useEffect(() => {
     const fadeOutTimer = setTimeout(
@@ -192,9 +207,11 @@ export function ClientHeader({
                   visible: true,
                   message: 'Uploading to cloud...',
                 })
-                setLoadingCloud(true)
-                await updateUserDataClient()
-                setLoadingCloud(false)
+
+                // setLoadingCloud(true)
+                // await updateUserDataClient()
+                await refetch()
+                // setLoadingCloud(false)
                 setNotification({
                   visible: true,
                   message: 'Successfully uploaded',

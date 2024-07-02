@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import RenderHeader from './_components/Header'
 import './globals.css'
+import { Providers } from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,10 +19,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <RenderHeader />
-        <div className="body-font relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
-          {children}
-        </div>
+        <Providers>
+          <RenderHeader />
+          <div className="body-font relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   )
