@@ -26,6 +26,19 @@ export default async function RootLayout({
           </div>
         </Providers>
       </body>
+      <footer className="border-t-foreground/10 flex w-full justify-center border-t p-8 text-center text-xs">
+        <p>
+          Made by{' '}
+          <a
+            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
+            target="_blank"
+            className="font-bold hover:underline"
+            rel="noreferrer"
+          >
+            Mark David Teo
+          </a>
+        </p>
+      </footer>
     </html>
   )
 }
