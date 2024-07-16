@@ -135,6 +135,8 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   // getState: () => GlobalStateProperties
 
   //============nested================
+  //-------battle----------
+  addRound: () => void
   //--------flows---------
   deleteLsFlow: (key: FlowId) => void
   //-------combos----------

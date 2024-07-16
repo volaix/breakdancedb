@@ -2,10 +2,10 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
+import { makeRoundId } from './lsGenerators'
 import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 import {
   GlobalStateProperties,
-  ZustandGlobalStore,
   lsBattle,
   lsCombos,
   lsConcepts,
@@ -19,6 +19,7 @@ import {
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
+  ZustandGlobalStore,
 } from './lsTypes'
 
 const currentVersion: number = 3
@@ -96,6 +97,19 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         // getState: () => get(),
 
         //============nested================
+        //--------battle-----
+        addRound: () => {
+          return set((state) => {
+            if (!state[lsBattle]) return
+
+            state[lsBattle].rounds.push({
+              displayName: 'New Sequence',
+              rating: 1,
+              id: makeRoundId(),
+              comboList: [],
+            })
+          })
+        },
         //---------flows------
         deleteLsFlow: (key) => {
           return set((state) => {
