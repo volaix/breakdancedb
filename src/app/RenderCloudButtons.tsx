@@ -7,7 +7,13 @@ import {
   useZustandStore,
   zustandLocalStorage,
 } from './_utils/zustandLocalStorage'
-import { updateUserDataClient } from './_utils/clientActions'
+import {
+  DOWNLOAD_USER,
+  UPLOAD_USER,
+  downloadUserData as downloadUserData,
+  updateUserDataClient,
+} from './_utils/clientActions'
+import { useQuery } from '@tanstack/react-query'
 
 export type NextUser = {
   payload: string
@@ -31,6 +37,28 @@ export default function RenderCloudButtons({
   )
 
   //-------------------HOOKS--------------------
+  const {
+    refetch: fetchUploadUser,
+    isError: isUploadError,
+    error: uploadError,
+    isSuccess,
+  } = useQuery({
+    queryKey: [UPLOAD_USER],
+    queryFn: updateUserDataClient,
+    enabled: false,
+  })
+
+  const {
+    refetch: fetchDownloadUser,
+    isError: isDownloadError,
+    error: downloadError,
+    isSuccess: isDownloadSuccess,
+  } = useQuery({
+    queryKey: [DOWNLOAD_USER],
+    queryFn: downloadUserData,
+    enabled: false,
+  })
+
   //On mount updates lastEdited
   useEffect(() => {
     if (userDate) {
@@ -47,24 +75,30 @@ export default function RenderCloudButtons({
     return () => clearTimeout(fadeOutTimer)
   }, [notification?.visible])
 
+  //error handling
+  useEffect(() => {
+    if (isUploadError) {
+      setNotification({ visible: true, message: uploadError?.message })
+    }
+  }, [isUploadError, isSuccess])
+
   //------------------HANDLERS---------------------
-  const downloadUserData = async () => {
+  const downloadUser = async () => {
     try {
-      const itemListRes = await fetch('/api/user')
-      const { userDb } = await itemListRes.json()
-      setNotification({ visible: true, message: 'Download successful' })
+      setNotification({ visible: true, message: 'Attempting to download' })
+      const { userDb } = await downloadUserData()
       replaceGlobalState(userDb)
+      setNotification({ visible: true, message: 'Download successful' })
     } catch (error) {
       console.error(error)
     }
   }
-  const uploadUserData = async () => {
+  const uploadUser = async () => {
     setNotification({ visible: true, message: 'Attempting to upload' })
-    await updateUserDataClient()
-    setNotification({ visible: true, message: 'Upload successful' })
-    const user = await fetch('/api/user')
-    const { editedAt } = await user.json()
+    await fetchUploadUser()
+    const { editedAt } = await downloadUserData()
     setLastEdited(editedAt)
+    setNotification({ visible: true, message: 'Upload successful' })
   }
   const deleteUserData = async () => {
     fetch('/api/user', {
@@ -113,13 +147,13 @@ export default function RenderCloudButtons({
         <section className="flex flex-col space-y-2 text-center">
           <button
             className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white  shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-            onClick={uploadUserData}
+            onClick={uploadUser}
           >
             Upload to Cloud
           </button>
           <button
             className="focus-visible:ring-ring bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center justify-center whitespace-nowrap rounded bg-indigo-500 px-6 py-2 text-xs text-white  shadow-sm transition-colors hover:bg-indigo-600 focus:outline-none focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-            onClick={downloadUserData}
+            onClick={downloadUser}
           >
             Download from Cloud
           </button>
