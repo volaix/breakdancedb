@@ -17,28 +17,32 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <Providers>
-          <RenderHeader />
-          <div className="body-font relative flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
-            {children}
-          </div>
-        </Providers>
-      </body>
-      <footer className="border-t-foreground/10 flex w-full justify-center border-t p-8 text-center text-xs">
-        <p>
-          Made by{' '}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Mark David Teo
-          </a>
-        </p>
-      </footer>
-    </html>
+    <>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${inter.className} flex min-h-screen flex-col justify-between`}
+        >
+          <Providers>
+            <RenderHeader />
+            <div className="body-font relative mb-10 flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
+              {children}
+            </div>
+            <footer className="border-t-foreground/10 flex max-h-16 w-full justify-center border-t p-4 text-center text-xs">
+              <p>
+                By{' '}
+                <a
+                  href="https://github.com/volaix"
+                  target="_blank"
+                  className="font-bold hover:underline"
+                  rel="noreferrer"
+                >
+                  Mark
+                </a>
+              </p>
+            </footer>
+          </Providers>
+        </body>
+      </html>
+    </>
   )
 }

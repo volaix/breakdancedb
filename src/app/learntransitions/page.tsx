@@ -270,7 +270,7 @@ export default function RenderTransitions() {
                                   className="mr-2"
                                   checked={isChecked}
                                   type="checkbox"
-                                  onClick={() => {
+                                  onChange={() => {
                                     //send notification if flow is overriding the ability to turn off
                                     if (isChecked && !isOverridden?.canDo) {
                                       setNotification({
