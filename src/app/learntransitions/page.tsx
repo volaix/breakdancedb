@@ -1,15 +1,10 @@
 'use client'
 // @format
-import { useRef } from 'react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Notification } from '../_components/Notification'
-import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { MoveTransition, extractMoveTransitions } from '../_utils/lib'
-import {
-  makeMoveTransitionId,
-  makePositionTransitionId,
-} from '../_utils/lsGenerators'
+import { makeMoveTransitionId } from '../_utils/lsGenerators'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 type SelectedMove = {
   selectedMove?: string
@@ -187,6 +182,7 @@ export default function RenderTransitions() {
                       {moves.map((move, moveIndex) => (
                         <label key={moveIndex} className="mb-1">
                           <input
+                            id={`${move}-${category}`}
                             type="radio"
                             name="baseMove"
                             checked={
@@ -218,7 +214,17 @@ export default function RenderTransitions() {
           </section>
           <button
             className="mt-5 rounded-md border border-indigo-500 p-1 text-2xs text-indigo-500"
-            onClick={() => setSelectedMove(getRandomMove(moves))}
+            onClick={() => {
+              const randomMove: SelectedMove = getRandomMove(moves)
+              setSelectedMove(randomMove)
+              requestAnimationFrame(() => {
+                document
+                  .getElementById(
+                    `${randomMove.selectedMove}-${randomMove.selectedCategory}`,
+                  )
+                  ?.scrollIntoView({ block: 'center', behavior: 'auto' })
+              })
+            }}
           >
             Choose Random
           </button>
