@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import RenderThunder from '../_components/RenderChilli'
 import { RenderRedXSVG } from '../_components/Svgs'
 import { isFlowId, isLegacyId } from '../_utils/lsGenerators'
-import { FlowDictionary, FlowId } from '../_utils/lsTypes'
+import { FlowDictionary, FlowId } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**

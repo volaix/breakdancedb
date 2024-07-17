@@ -2,7 +2,7 @@
 //@format
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { extractComboIds } from '../_utils/lib'
-import { ComboDictionary, ComboId, Round } from '../_utils/lsTypes'
+import { ComboDictionary, ComboId, Round } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 import {

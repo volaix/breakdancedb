@@ -2,8 +2,8 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
 
 import { RenderGreyTick, RenderRedXSVG } from '../_components/Svgs'
-import { BasicMoveSchema } from '../_utils/lsSchemas'
-import { ComboId } from '../_utils/lsTypes'
+import { BasicMoveSchema } from '../_utils/zodSchemas'
+import { ComboId } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { ComboIdContext } from './util'
 

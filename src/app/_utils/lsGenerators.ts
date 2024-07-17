@@ -6,7 +6,7 @@ import {
   POSITION_PREFIX,
   ROUND_PREFIX,
   TRANSITION_PREFIX,
-} from './lsSchemas'
+} from './zodSchemas'
 
 import {
   ComboId,
@@ -21,8 +21,8 @@ import {
   PositionTransitionId as PositionTransitionId,
   Transitions,
   MoveTransitionId,
-} from './lsTypes'
-import { MOVE_PREFIX } from './lsSchemas'
+} from './zustandTypes'
+import { MOVE_PREFIX } from './zodSchemas'
 
 // ------------------------validators-----------------------------
 

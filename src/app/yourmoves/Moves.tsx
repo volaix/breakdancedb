@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Notification } from '../_components/Notification'
-import { GlobalStateProperties, lsUserMoves } from '../_utils/lsTypes'
+import { GlobalStateProperties, lsUserMoves } from '../_utils/zustandTypes'
 import { isValidKey } from '../_utils/lsValidation'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import {

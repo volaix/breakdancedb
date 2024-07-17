@@ -1,8 +1,8 @@
-import { ComboId, LocalStorageValues, lsUserMoves } from './lsTypes'
+import { ComboId, LocalStorageValues, lsUserMoves } from './zustandTypes'
 import { validate } from 'uuid'
-import { BasicFlow, MoveId, Move } from './lsTypes'
-import { GlobalStateProperties } from './lsTypes'
-import { comboIdSchema } from './lsSchemas'
+import { BasicFlow, MoveId, Move } from './zustandTypes'
+import { GlobalStateProperties } from './zustandTypes'
+import { comboIdSchema } from './zodSchemas'
 import { isLegacyId } from './lsGenerators'
 
 /**

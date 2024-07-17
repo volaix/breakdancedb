@@ -9,7 +9,7 @@ import {
   MoveCategories,
   lsToprock,
   lsUserMoves,
-} from '../_utils/lsTypes'
+} from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 //------------------------localtypes-------------------------------

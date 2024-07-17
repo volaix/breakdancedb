@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from '@/app/_utils/lib'
 import { makeMoveId } from '@/app/_utils/lsGenerators'
-import { Move } from '@/app/_utils/lsTypes'
+import { Move } from '@/app/_utils/zustandTypes'
 import { useMoveStore } from './store'
 import { makeTransitions } from '@/app/_utils/lsGenerators'
 import { makePositions } from '@/app/_utils/lsGenerators'

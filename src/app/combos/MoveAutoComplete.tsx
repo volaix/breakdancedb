@@ -5,14 +5,14 @@ import { RenderRedXSVG } from '../_components/Svgs'
 import {
   BasicMoveSchema,
   FlowSchema,
-  MoveTransitionSchema,
-} from '../_utils/lsSchemas'
-import { ComboId } from '../_utils/lsTypes'
+  moveTransitionSchema,
+} from '../_utils/zodSchemas'
+import { ComboId } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 import { ComboIdContext } from './util'
 
 type FlowOption = z.infer<typeof FlowSchema> //flow
-type TransitionOption = z.infer<typeof MoveTransitionSchema> //single transition
+type TransitionOption = z.infer<typeof moveTransitionSchema> //single transition
 type SingleMoveOption = z.infer<typeof BasicMoveSchema> //individual move
 type Option = SingleMoveOption | TransitionOption | FlowOption
 

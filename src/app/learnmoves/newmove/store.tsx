@@ -1,6 +1,6 @@
 'use client'
 import { makeDefaultPosition } from '@/app/_utils/lsGenerators'
-import { Position } from '@/app/_utils/lsTypes'
+import { Position } from '@/app/_utils/zustandTypes'
 import { create } from 'zustand'
 import rocks from '@/db/rocks.json'
 
