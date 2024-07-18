@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@redux-devtools/extension": "^3.3.0",
-    "@tanstack/eslint-plugin-query": "^5.51.1",
+    "@tanstack/eslint-plugin-query": "^5.51.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

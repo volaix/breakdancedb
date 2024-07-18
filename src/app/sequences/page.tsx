@@ -1,23 +1,13 @@
 'use client'
 //@format
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { extractComboIds } from '../_utils/lib'
-import { ComboDictionary, ComboId, Round } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
+import { ComboDictionary, ComboId, Round } from '../_utils/zustandTypes'
 
-import {
-  RenderAddButtonSVG,
-  RenderDiceSvg,
-  RenderDownArrow,
-  RenderTrashButtonSvg,
-  RenderUpArrow,
-} from '../_components/Svgs'
-import { makeComboId, makeRoundId } from '../_utils/lsGenerators'
-import { isComboId } from '../_utils/lsValidation'
-import { useForm } from 'react-hook-form'
-import { produce } from 'immer'
-import ComboPicker from './ComboPicker'
+import { RenderTrashButtonSvg } from '../_components/Svgs'
+import { makeRoundId } from '../_utils/lsGenerators'
 import { comboIdSchema } from '../_utils/zodSchemas'
+import ComboPicker from './ComboPicker'
 
 /**
  * Shows combo transitions
@@ -45,32 +35,17 @@ export default function RenderViewCombos() {
       id: makeRoundId(),
     },
   ])
-  const setLsBattle = useZustandStore((state) => state.setLsBattle)
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
   const [showChangeName, setShowChangeName] = useState<boolean[]>([])
   const [showRngInput, setShowRngInput] = useState<boolean[]>([])
-  const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const [showAddMoveToCombo, setAddMoveToCombo] = useState<boolean[]>([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const addRound = useZustandStore((state) => state.addRound)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
-  const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
-  const updateExecution = useZustandStore((state) => state.updateExecution)
-  const setLsCombos = useZustandStore((state) => state.setLsCombos)
-  const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
-  const addComboMove = useZustandStore((state) => state.addComboMove)
   const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const deleteRound = useZustandStore((state) => state.deleteRound)
 
   //-----------------------------hooks-------------------------------
-  const comboEntries = useMemo(() => Object.entries(combos ?? {}), [combos])
-
-  const allMoves = useMemo(() => {
-    if (!combos) return null
-
-    return Object.values(getUserMoves()).flatMap((moves) => moves)
-  }, [getUserMoves, combos])
-
   //updates combos
   const updateCombos = useCallback(() => {
     setCombos(getLsCombos() || null)
