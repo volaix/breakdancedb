@@ -1,10 +1,10 @@
 import {
   BasicMoveSchema,
   FlowDictionary,
-  GlobalStateProperties,
+  globalStateProperties,
   MoveSchema,
   PositionSchema,
-} from './lsSchemas'
+} from './zodSchemas'
 import {
   BasicFlowSchema,
   comboDictionarySchema,
@@ -23,9 +23,10 @@ import {
   transitionIdSchema,
   TransitionSchema,
   TypeLoopOptions,
-} from './lsSchemas'
+} from './zodSchemas'
 import { Brand } from './typehelpers'
 import { z } from 'zod'
+import { sequenceListSchema } from './zodSchemas'
 
 //---------------Local Storage Values One Liners --------------------
 export type Transitions = Transition[]
@@ -91,7 +92,7 @@ export type ListOrder = z.infer<typeof listOrderSchema>
 export type Round = z.infer<typeof RoundSchema>
 export type FlowDictionary = z.infer<typeof FlowDictionary>
 export type BasicMove = z.infer<typeof BasicMoveSchema>
-export type GlobalStateProperties = z.infer<typeof GlobalStateProperties>
+export type GlobalStateProperties = z.infer<typeof globalStateProperties>
 
 //----------------ZUSTAND----------------
 /**
@@ -135,6 +136,15 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   // getState: () => GlobalStateProperties
 
   //============nested================
+  //-------battle----------
+  deleteRound: (roundId: RoundId) => void
+  addRound: () => void
+  setComboInRound: (
+    comboId: ComboId,
+    roundId: RoundId,
+    type: keyof z.infer<typeof sequenceListSchema>,
+    position: number,
+  ) => void
   //--------flows---------
   deleteLsFlow: (key: FlowId) => void
   //-------combos----------

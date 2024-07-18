@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import {
   lsBattle,
   lsCombos,
@@ -8,8 +7,9 @@ import {
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
-} from './lsTypes'
+} from './zustandTypes'
 import { validate } from 'uuid'
+import { z } from 'zod'
 
 //------------------utility---------------
 /**
@@ -138,11 +138,18 @@ export const listOrderSchema = z.union([
   }),
 ])
 
+export const sequenceListSchema = z.object({
+  starter: z.array(z.string()).optional(),
+  mids: z.array(z.string()).optional(),
+  finishers: z.array(z.string()).optional(),
+})
+
 export const RoundSchema = z.object({
   displayName: z.string(),
   rating: z.number(),
   id: roundIdSchema,
   comboList: listOrderSchema.array().optional(),
+  sequenceList: sequenceListSchema.optional(),
 })
 
 export const TransitionSchema = z.object({
@@ -220,7 +227,7 @@ export const FlowSchema = z.object({
 
 export const FlowDictionary = z.record(flowIdSchema, FlowSchema)
 
-export const MoveTransitionSchema = z.object({
+export const moveTransitionSchema = z.object({
   moveTransitionId: z.string().optional(),
   moveFrom: BasicMoveSchema,
   moveTo: BasicMoveSchema,
@@ -228,8 +235,8 @@ export const MoveTransitionSchema = z.object({
   isImpossible: z.boolean().optional(),
 })
 
-export const GlobalStateProperties = z.object({
-  [lsTransitions]: z.array(MoveTransitionSchema).optional(),
+export const globalStateProperties = z.object({
+  [lsTransitions]: z.array(moveTransitionSchema).optional(),
   [lsConcepts]: z.array(z.string()).optional(),
   [lsCombos]: comboDictionarySchema.optional(),
   [lsBattle]: z

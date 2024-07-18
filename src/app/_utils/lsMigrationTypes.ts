@@ -1,4 +1,4 @@
-import { BasicFlow } from './lsTypes'
+import { BasicFlow } from './zustandTypes'
 import {
   lsFlows,
   FlowDictionary,
@@ -11,7 +11,7 @@ import {
   lsUserLearning,
   Move,
   lsDanceList,
-} from './lsTypes'
+} from './zustandTypes'
 
 //==============MIGRATION STATES==================
 /**

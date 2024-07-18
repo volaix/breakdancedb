@@ -1,5 +1,10 @@
 import { useLocalStorage } from '@/app/_utils/lib'
-import { Move, MovementGroup, Position, Transition } from '@/app/_utils/lsTypes'
+import {
+  Move,
+  MovementGroup,
+  Position,
+  Transition,
+} from '@/app/_utils/zustandTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,

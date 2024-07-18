@@ -4,7 +4,7 @@ import {
   MovementGroup,
   PositionId,
   PositionTransitionId,
-} from '@/app/_utils/lsTypes'
+} from '@/app/_utils/zustandTypes'
 import {
   makeDefaultPosition,
   makeDefaultTransition,

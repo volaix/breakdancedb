@@ -15,7 +15,7 @@ import {
 } from '../_components/Svgs'
 import { comboIdKey, extractComboIds } from '../_utils/lib'
 import { makeRoundId } from '../_utils/lsGenerators'
-import { ComboDictionary, ComboId, Round } from '../_utils/lsTypes'
+import { ComboDictionary, ComboId, Round } from '../_utils/zustandTypes'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 const battleRankings = new Map([

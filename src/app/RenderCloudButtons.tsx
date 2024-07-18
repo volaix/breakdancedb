@@ -1,19 +1,16 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { signInAction, signOutAction } from './_utils/actions'
 import { Notification } from './_components/Notification'
-import {
-  useZustandStore,
-  zustandLocalStorage,
-} from './_utils/zustandLocalStorage'
+import { signInAction, signOutAction } from './_utils/actions'
 import {
   DOWNLOAD_USER,
   UPLOAD_USER,
-  downloadUserData as downloadUserData,
+  downloadUserData,
   updateUserDataClient,
 } from './_utils/clientActions'
-import { useQuery } from '@tanstack/react-query'
+import { useZustandStore } from './_utils/zustandLocalStorage'
 
 export type NextUser = {
   payload: string
@@ -80,7 +77,7 @@ export default function RenderCloudButtons({
     if (isUploadError) {
       setNotification({ visible: true, message: uploadError?.message })
     }
-  }, [isUploadError, isSuccess])
+  }, [isUploadError, isSuccess, uploadError?.message])
 
   //------------------HANDLERS---------------------
   const downloadUser = async () => {

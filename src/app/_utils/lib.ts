@@ -6,9 +6,9 @@ import {
   GlobalStateProperties,
   Round,
   lsFlows,
-} from './lsTypes'
+} from './zustandTypes'
 import { z } from 'zod'
-import { MoveTransitionSchema } from './lsSchemas'
+import { moveTransitionSchema } from './zodSchemas'
 
 //---------------JS HELPERS-------------------
 /**
@@ -63,7 +63,7 @@ export const extractComboIds = (rounds: Round[]): ComboId[] =>
     //Flats to ComboId[]
     .flat(1)
 
-export type MoveTransition = z.infer<typeof MoveTransitionSchema>
+export type MoveTransition = z.infer<typeof moveTransitionSchema>
 
 export const extractMoveTransitions = (
   flows: GlobalStateProperties[typeof lsFlows],

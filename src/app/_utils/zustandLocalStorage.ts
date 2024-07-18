@@ -2,10 +2,11 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 
+import { makeRoundId } from './lsGenerators'
 import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 import {
+  ComboId,
   GlobalStateProperties,
-  ZustandGlobalStore,
   lsBattle,
   lsCombos,
   lsConcepts,
@@ -19,7 +20,9 @@ import {
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
-} from './lsTypes'
+  RoundId,
+  ZustandGlobalStore,
+} from './zustandTypes'
 
 const currentVersion: number = 3
 
@@ -93,9 +96,39 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
-        // getState: () => get(),
 
         //============nested================
+        //--------battle-----
+        deleteRound: (roundId: RoundId) =>
+          set((state) => {
+            if (!state[lsBattle]) return
+            state[lsBattle].rounds = state[lsBattle].rounds.filter(
+              (round) => round.id !== roundId,
+            )
+          }),
+        setComboInRound: (comboId, roundId, type, position) =>
+          set((state) => {
+            if (!state[lsBattle]) return
+            const round = state[lsBattle].rounds.find(
+              (round) => round.id === roundId,
+            )
+            if (!round) return
+            round.sequenceList ??= {}
+            round.sequenceList[type] ??= []
+            round.sequenceList[type][position] = comboId
+          }),
+        addRound: () => {
+          return set((state) => {
+            if (!state[lsBattle]) return
+
+            state[lsBattle].rounds.push({
+              displayName: 'New Sequence',
+              rating: 1,
+              id: makeRoundId(),
+              comboList: [],
+            })
+          })
+        },
         //---------flows------
         deleteLsFlow: (key) => {
           return set((state) => {
@@ -269,6 +302,7 @@ const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   if (oldVersion === 2 && currentVersion === 3) {
     return true
   }
+
   return false
 }
 

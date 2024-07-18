@@ -18,7 +18,7 @@ import {
   MoveId,
   PositionTransitionId,
   lsToprock,
-} from '../../_utils/lsTypes'
+} from '../../_utils/zustandTypes'
 import {
   makeComboId,
   makeFlowId,
