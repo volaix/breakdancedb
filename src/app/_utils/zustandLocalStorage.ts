@@ -99,31 +99,23 @@ export const useZustandStore = create<ZustandGlobalStore>()(
 
         //============nested================
         //--------battle-----
+        deleteRound: (roundId: RoundId) =>
+          set((state) => {
+            if (!state[lsBattle]) return
+            state[lsBattle].rounds = state[lsBattle].rounds.filter(
+              (round) => round.id !== roundId,
+            )
+          }),
         setComboInRound: (comboId, roundId, type, position) =>
           set((state) => {
-            console.log(
-              'comboId, roundId, type, position: ',
-              comboId,
-              roundId,
-              type,
-              position,
-            )
             if (!state[lsBattle]) return
             const round = state[lsBattle].rounds.find(
               (round) => round.id === roundId,
             )
             if (!round) return
-            if (round?.sequenceList?.[type]) {
-              round.sequenceList[type]?.splice(position, 1, comboId)
-            } else {
-              if (round?.sequenceList === undefined) {
-                round.sequenceList = {
-                  [type]: [comboId],
-                }
-              } else {
-                round.sequenceList[type] = [comboId]
-              }
-            }
+            round.sequenceList ??= {}
+            round.sequenceList[type] ??= []
+            round.sequenceList[type][position] = comboId
           }),
         addRound: () => {
           return set((state) => {

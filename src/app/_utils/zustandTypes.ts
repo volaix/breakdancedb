@@ -137,6 +137,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
 
   //============nested================
   //-------battle----------
+  deleteRound: (roundId: RoundId) => void
   addRound: () => void
   setComboInRound: (
     comboId: ComboId,

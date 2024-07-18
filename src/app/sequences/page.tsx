@@ -54,15 +54,13 @@ export default function RenderViewCombos() {
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const addRound = useZustandStore((state) => state.addRound)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
-  const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
   const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
   const updateExecution = useZustandStore((state) => state.updateExecution)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
   const addComboMove = useZustandStore((state) => state.addComboMove)
   const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
-
-  // const comboEntries = Object.entries(combos ?? {})
+  const deleteRound = useZustandStore((state) => state.deleteRound)
 
   //-----------------------------hooks-------------------------------
   const comboEntries = useMemo(() => Object.entries(combos ?? {}), [combos])
@@ -156,6 +154,12 @@ export default function RenderViewCombos() {
               >
                 Finishers
               </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           {yourRounds.map(
@@ -190,7 +194,7 @@ export default function RenderViewCombos() {
                       />
                     </td>
 
-                    {/* ----------------USABILITY------------- */}
+                    {/* ----------------MIDS------------- */}
                     <td className="px-2">
                       <ComboPicker
                         value={comboIdSchema
@@ -202,6 +206,7 @@ export default function RenderViewCombos() {
                         position={0}
                       />
                     </td>
+                    {/* --------------FINISHERS-------------- */}
                     <td className="px-2">
                       <ComboPicker
                         value={comboIdSchema
@@ -212,6 +217,19 @@ export default function RenderViewCombos() {
                         type="finishers"
                         position={0}
                       />
+                    </td>
+                    {/* -----------ACTIONS------------- */}
+                    <td>
+                      <div className="flex items-center">
+                        {/* delete button */}
+                        <RenderTrashButtonSvg
+                          className="size-6 cursor-pointer stroke-gray-500 p-1 hover:rounded-lg hover:bg-gray-500/20"
+                          onClick={() => {
+                            deleteRound(id)
+                            updateSequences()
+                          }}
+                        />
+                      </div>
                     </td>
                   </tr>
                 </tbody>

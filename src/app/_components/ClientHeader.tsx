@@ -170,11 +170,6 @@ export function ClientHeader({
                       📚 Your Moves 📚
                     </Link>
                   </li>
-                  <li className="my-2 border-b border-gray-400 uppercase">
-                    <Link onClick={() => setIsNavOpen(false)} href="/sequences">
-                      ✅ Sequences ✅
-                    </Link>
-                  </li>
                   {/* <li className="my-2 border-b border-gray-400 uppercase">
                     <Link
                       onClick={() => setIsNavOpen(false)}
@@ -197,8 +192,13 @@ export function ClientHeader({
                     </Link>
                   </li>
                   <li className="my-2 border-b border-gray-400 uppercase">
-                    <a href="/battle">🥊 Battle 🥊</a>
+                    <Link onClick={() => setIsNavOpen(false)} href="/sequences">
+                      ✅ Sequences ✅
+                    </Link>
                   </li>
+                  {/* <li className="my-2 border-b border-gray-400 uppercase">
+                    <a href="/battle">🥊 Battle 🥊</a>
+                  </li> */}
                   {/* <li className="my-2 uppercase border-b border-gray-400">
                     <a href="/learnmoves">🌱 Train Moves 🌱</a>
                   </li>
