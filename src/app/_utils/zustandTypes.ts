@@ -142,6 +142,7 @@ export type ZustandGlobalStore = GlobalStateProperties & {
     comboId: ComboId,
     roundId: RoundId,
     type: keyof z.infer<typeof sequenceListSchema>,
+    position: number,
   ) => void
   //--------flows---------
   deleteLsFlow: (key: FlowId) => void

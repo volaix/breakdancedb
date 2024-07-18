@@ -5,6 +5,7 @@ import { immer } from 'zustand/middleware/immer'
 import { makeRoundId } from './lsGenerators'
 import { isGlobalStateV0, isGlobalStateV2 } from './lsMigrationTypes'
 import {
+  ComboId,
   GlobalStateProperties,
   lsBattle,
   lsCombos,
@@ -19,8 +20,9 @@ import {
   lsTransitions,
   lsUserLearning,
   lsUserMoves,
+  RoundId,
   ZustandGlobalStore,
-} from './lsTypes'
+} from './zustandTypes'
 
 const currentVersion: number = 3
 
@@ -94,10 +96,35 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsUserMoves: () => get()[lsUserMoves],
         getLsUserLearning: () => get()[lsUserLearning],
         getDanceList: () => get()[lsDanceList],
-        // getState: () => get(),
 
         //============nested================
         //--------battle-----
+        setComboInRound: (comboId, roundId, type, position) =>
+          set((state) => {
+            console.log(
+              'comboId, roundId, type, position: ',
+              comboId,
+              roundId,
+              type,
+              position,
+            )
+            if (!state[lsBattle]) return
+            const round = state[lsBattle].rounds.find(
+              (round) => round.id === roundId,
+            )
+            if (!round) return
+            if (round?.sequenceList?.[type]) {
+              round.sequenceList[type]?.splice(position, 1, comboId)
+            } else {
+              if (round?.sequenceList === undefined) {
+                round.sequenceList = {
+                  [type]: [comboId],
+                }
+              } else {
+                round.sequenceList[type] = [comboId]
+              }
+            }
+          }),
         addRound: () => {
           return set((state) => {
             if (!state[lsBattle]) return
@@ -283,6 +310,7 @@ const migrationIsSafe = (oldVersion: number, currentVersion: number) => {
   if (oldVersion === 2 && currentVersion === 3) {
     return true
   }
+
   return false
 }
 

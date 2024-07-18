@@ -17,6 +17,7 @@ import { isComboId } from '../_utils/lsValidation'
 import { useForm } from 'react-hook-form'
 import { produce } from 'immer'
 import ComboPicker from './ComboPicker'
+import { comboIdSchema } from '../_utils/zodSchemas'
 
 /**
  * Shows combo transitions
@@ -37,7 +38,7 @@ export default function RenderViewCombos() {
     message?: string
   }>(null)
   const [notes, setNotes] = useState<string>('')
-  const [yourSequences, setYourRounds] = useState<Round[]>([
+  const [yourRounds, setYourSequences] = useState<Round[]>([
     {
       displayName: roundName + ' 1',
       rating: 1,
@@ -90,12 +91,16 @@ export default function RenderViewCombos() {
     setAddMoveToCombo(comboBooleans)
   }, [combos])
 
-  //onMount get rounds
-  useEffect(() => {
+  const updateSequences = useCallback(() => {
     const data = getLsBattle()
     if (!data) return
-    setYourRounds(data.rounds)
-  }, [getLsBattle])
+    setYourSequences(data.rounds)
+  }, [])
+
+  //onMount get rounds
+  useEffect(() => {
+    updateSequences()
+  }, [])
 
   //-----------------------------render---------------------------------
   return (
@@ -152,9 +157,9 @@ export default function RenderViewCombos() {
               </th>
             </tr>
           </thead>
-          {yourSequences.map(
+          {yourRounds.map(
             (
-              { id, displayName, rating: comboRating, comboList },
+              { id, displayName, rating: comboRating, comboList, sequenceList },
               roundIndex,
             ) => {
               return (
@@ -173,15 +178,39 @@ export default function RenderViewCombos() {
                     </td>
                     {/* ---------------STARTERS------------ */}
                     <td className="px-2">
-                      <ComboPicker />
+                      <ComboPicker
+                        value={comboIdSchema
+                          .nullable()
+                          .parse(sequenceList?.starter?.[0] || null)}
+                        refreshBattle={updateSequences}
+                        roundId={id}
+                        type="starter"
+                        position={0}
+                      />
                     </td>
 
                     {/* ----------------USABILITY------------- */}
                     <td className="px-2">
-                      <ComboPicker />
+                      <ComboPicker
+                        value={comboIdSchema
+                          .nullable()
+                          .parse(sequenceList?.mids?.[0] || null)}
+                        refreshBattle={updateSequences}
+                        roundId={id}
+                        type="mids"
+                        position={0}
+                      />
                     </td>
                     <td className="px-2">
-                      <ComboPicker />
+                      <ComboPicker
+                        value={comboIdSchema
+                          .nullable()
+                          .parse(sequenceList?.finishers?.[0] || null)}
+                        refreshBattle={updateSequences}
+                        roundId={id}
+                        type="finishers"
+                        position={0}
+                      />
                     </td>
                   </tr>
                 </tbody>
