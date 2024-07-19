@@ -1,8 +1,8 @@
 'use client'
 //@format
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
-import { ComboDictionary, ComboId, Round } from '../_utils/zustandTypes'
+import { ComboDictionary, Round } from '../_utils/zustandTypes'
 
 import { RenderTrashButtonSvg } from '../_components/Svgs'
 import { makeRoundId } from '../_utils/lsGenerators'
@@ -15,19 +15,12 @@ import ComboPicker from './ComboPicker'
  */
 export default function RenderViewCombos() {
   //------------------------------state---------------------------------
-  const [{ hideUsedCombos, roundName, show }, setAdvancedOptions] = useState<{
+  const [{ roundName }] = useState<{
     show: boolean
     hideUsedCombos: boolean
     roundName: string
   }>({ hideUsedCombos: true, roundName: 'Round', show: false })
-  const [openEdit, setOpenEdit] = useState<{ [key: number]: true }>()
-  const [openInfo, setOpenInfo] = useState<{ [key: ComboId]: true }>()
 
-  const [notification, setNotification] = useState<null | {
-    visible?: boolean
-    message?: string
-  }>(null)
-  const [notes, setNotes] = useState<string>('')
   const [yourRounds, setYourSequences] = useState<Round[]>([
     {
       displayName: roundName + ' 1',
@@ -36,13 +29,9 @@ export default function RenderViewCombos() {
     },
   ])
   const [combos, setCombos] = useState<ComboDictionary | null>(null)
-  const [showChangeName, setShowChangeName] = useState<boolean[]>([])
-  const [showRngInput, setShowRngInput] = useState<boolean[]>([])
-  const [showAddMoveToCombo, setAddMoveToCombo] = useState<boolean[]>([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const addRound = useZustandStore((state) => state.addRound)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
-  const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
   const deleteRound = useZustandStore((state) => state.deleteRound)
 
   //-----------------------------hooks-------------------------------
@@ -56,24 +45,16 @@ export default function RenderViewCombos() {
     updateCombos()
   }, [updateCombos])
 
-  //initialises inputs as false
-  useEffect(() => {
-    const comboBooleans = Object.keys(combos || {}).map(() => false)
-    setShowRngInput(comboBooleans)
-    setShowChangeName(comboBooleans)
-    setAddMoveToCombo(comboBooleans)
-  }, [combos])
-
   const updateSequences = useCallback(() => {
     const data = getLsBattle()
     if (!data) return
     setYourSequences(data.rounds)
-  }, [])
+  }, [getLsBattle])
 
   //onMount get rounds
   useEffect(() => {
     updateSequences()
-  }, [])
+  }, [updateSequences])
 
   //-----------------------------render---------------------------------
   return (
