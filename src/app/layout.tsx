@@ -27,13 +27,13 @@ export default async function RootLayout({
             <div className="body-font relative mb-10 flex w-full flex-col items-center text-gray-600 dark:text-gray-600">
               {children}
             </div>
-            <footer className="border-t-foreground/10 flex max-h-16 w-full justify-center border-t p-4 text-center text-xs">
-              <p>
+            <footer className="border-t-foreground/10 flex max-h-16 w-full justify-center border-t p-4 text-center text-xs dark:border-indigo-800">
+              <p className="dark:text-gray-600">
                 By{' '}
                 <a
                   href="https://github.com/volaix"
                   target="_blank"
-                  className="font-bold hover:underline"
+                  className="font-bold hover:underline dark:text-gray-600"
                   rel="noreferrer"
                 >
                   Mark
