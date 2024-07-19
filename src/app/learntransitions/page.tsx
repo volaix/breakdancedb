@@ -1,337 +1,517 @@
 'use client'
-//@format
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { extractComboIds } from '../_utils/lib'
-import { ComboDictionary, ComboId } from '../_utils/zustandTypes'
+// @format
+import { useEffect, useRef, useState } from 'react'
+import { Notification } from '../_components/Notification'
+import { MoveTransition, extractMoveTransitions } from '../_utils/lib'
+import { makeMoveTransitionId } from '../_utils/lsGenerators'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
-import {
-  RenderAddButtonSVG,
-  RenderDiceSvg,
-  RenderDownArrow,
-  RenderTrashButtonSvg,
-  RenderUpArrow,
-} from '../_components/Svgs'
-import { makeComboId } from '../_utils/lsGenerators'
-import { isComboId } from '../_utils/lsValidation'
+type SelectedMove = {
+  selectedMove?: string
+  selectedCategory?: string
+}
 
-/**
- * Shows combo transitions
- * @returns jsx
+function getRandomMove(arr: Array<[string, string[]]>): SelectedMove {
+  const newArr = arr.filter((val) => val[1].length > 1)
+  if (newArr.length === 0) return {}
+
+  const randomElement = newArr[Math.floor(Math.random() * newArr.length)]
+  if (randomElement[1].length === 0) return {}
+  const val = {
+    selectedMove:
+      randomElement[1][Math.floor(Math.random() * randomElement[1].length)],
+    selectedCategory: randomElement[0],
+  }
+  return val
+}
+
+//----------------------------mainrender--------------------------
+
+/*
+ * Renders 3 moves with 3 buttons at the bottom.
  */
-export default function RenderViewCombos() {
-  //------------------------------state---------------------------------
-  const [combos, setCombos] = useState<ComboDictionary | null>(null)
-  const [hideMovesIfBattle, setHideMovesIfBattle] = useState<boolean>(false)
-  const [showChangeName, setShowChangeName] = useState<boolean[]>([])
-  const [showRngInput, setShowRngInput] = useState<boolean[]>([])
-  const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
-  const [showAddMoveToCombo, setAddMoveToCombo] = useState<boolean[]>([])
-  const getLsCombos = useZustandStore((state) => state.getLsCombos)
-  const getLsBattle = useZustandStore((state) => state.getLsBattle)
-  const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
-  const moveCombo = useZustandStore((state) => state.upDownMoveComboPosition)
-  const updateExecution = useZustandStore((state) => state.updateExecution)
-  const setLsCombos = useZustandStore((state) => state.setLsCombos)
-  const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
-  const addComboMove = useZustandStore((state) => state.addComboMove)
-  const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
+export default function RenderTransitions() {
+  //-----------------------------state-----------------------------
+  //learning refers to "what will be displayed" and is RNG set
+  const [{ notificationVisible, message }, setNotification] = useState<{
+    notificationVisible: boolean
+    message: string
+  }>({ notificationVisible: false, message: '' })
+  const [{ selectedMove, selectedCategory }, setSelectedMove] =
+    useState<SelectedMove>({})
+  const [flowTransitions, setTransitions] = useState<MoveTransition[]>([])
+  const [moves, setMoves] = useState<Array<[string, string[]]>>([])
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [overrideTransitions, setOverrideTransitions] = useState<
+    MoveTransition[]
+  >([])
+  const getLsUserMoves = useZustandStore((state) => state.getLsUserMoves)
+  const getLsFlows = useZustandStore((state) => state.getLsFlows)
+  const getLsTransitions = useZustandStore((state) => state.getLsTransitions)
+  const setLsTransitions = useZustandStore((state) => state.setLsTransitions)
 
-  // const comboEntries = Object.entries(combos ?? {})
+  const modalRef = useRef<HTMLDivElement>(null)
+  const totalRelevantTransitionsCanDo: number = overrideTransitions.filter(
+    ({ canDo, moveFrom }) =>
+      canDo &&
+      selectedCategory === moveFrom.category &&
+      moveFrom.displayName === selectedMove,
+  ).length
+  const totalFlowTransitions =
+    moves?.reduce((acc, [, strings]) => acc + strings.length, 0) || 0
+  const totalImpossiblesFromMoveA = overrideTransitions.filter(
+    ({ isImpossible, moveFrom }) =>
+      isImpossible &&
+      selectedCategory === moveFrom.category &&
+      moveFrom.displayName === selectedMove,
+  ).length
 
-  //-----------------------------hooks-------------------------------
-  const comboEntries = useMemo(() => Object.entries(combos ?? {}), [combos])
-
-  const allMoves = useMemo(() => {
-    if (!combos) return null
-
-    return Object.values(getUserMoves()).flatMap((moves) => moves)
-  }, [getUserMoves, combos])
-
-  //Advanced Option: Set Combos used in Battle
+  const options = [
+    { id: 'job-1', label: 'I can do it! ❤️‍🔥', description: 'Success' },
+    { id: 'job-2', label: 'Too hard 🐸', description: 'Attempt' },
+    {
+      id: 'job-3',
+      label: "It's literally impossible 😅",
+      description: 'Invalid Selection',
+    },
+    {
+      id: 'job-4',
+      label: "I'm skipping 🏃‍♂️",
+      description: 'Not going to try',
+    },
+  ]
+  // --------------hooks--------
+  //onload getCurrentLsTransitions and set to override local state
   useEffect(() => {
-    if (!hideMovesIfBattle) return
-    const lsBattle = getLsBattle()
-    if (!lsBattle) return
-    setCombosInBattle(extractComboIds(lsBattle.rounds))
-  }, [getLsBattle, hideMovesIfBattle])
+    setOverrideTransitions(getLsTransitions() || [])
+  }, [getLsTransitions])
 
-  //updates combos
-  const updateCombos = useCallback(() => {
-    setCombos(getLsCombos() || null)
-  }, [getLsCombos])
-
-  //on mount get combos
+  //Sets transitions from flow on load
   useEffect(() => {
-    updateCombos()
-  }, [updateCombos])
+    const allTrans = extractMoveTransitions(getLsFlows())
+    //filters transitions to just MoveA
+    setTransitions(
+      allTrans.filter(
+        ({ moveFrom }) =>
+          moveFrom.category === selectedCategory &&
+          moveFrom.displayName === selectedMove,
+      ),
+    )
+  }, [getLsFlows, selectedCategory, selectedMove])
 
-  //initialises inputs as false
+  //Show Notifcation for 2 seconds
   useEffect(() => {
-    const comboBooleans = Object.keys(combos || {}).map(() => false)
-    setShowRngInput(comboBooleans)
-    setShowChangeName(comboBooleans)
-    setAddMoveToCombo(comboBooleans)
-  }, [combos])
+    const fadeOutTimer = setTimeout(
+      () => setNotification({ notificationVisible: false, message: '' }),
+      2000,
+    )
+    return () => clearTimeout(fadeOutTimer)
+  }, [notificationVisible])
 
-  //-----------------------------render---------------------------------
+  //Hide
+  useEffect(() => {
+    setMoves(Object.entries(getLsUserMoves()))
+  }, [getLsUserMoves])
+
+  //Modal Handling
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen])
+
+  //-------------------------handlers--------------------------------
+  //Modal Click Outside
+  const handleClickOutside = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      setIsOpen(false)
+    }
+  }
+
+  //-----------------------render--------------------
   return (
-    <main className="mt-20 w-full dark:bg-gray-900">
-      {/* ------------header------------- */}
-      <header className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
-        <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
-          Sequences
-        </h1>
-        {/* ---------------subtitle---------- */}
-        <p className="mx-auto px-2 text-base leading-relaxed lg:w-2/3">
-          Drill this list. Review your combos for practice and comfortability.
+    <main className="mt-20 flex w-full max-w-xs flex-col items-center justify-between text-sm dark:text-gray-600 ">
+      {/* -------------------TITLE SECTION--------------- */}
+      <section className="mb-5 flex w-full flex-col text-center dark:text-gray-400">
+        {/* ---------------------------TITLE------------------------ */}
+        <hgroup>
+          <h1 className="title-font mb-2 text-3xl font-medium sm:text-4xl dark:text-white">
+            Transitions
+          </h1>
+          <p className="mx-auto px-2 text-sm leading-relaxed lg:w-2/3">
+            {`Learn every move into every other move`}
+          </p>
+        </hgroup>
+      </section>
+      {/* ----------END OF TITLE SECTION------------- */}
+      <section className="mb-2">
+        <p className="text-default-500 text-small">
+          {selectedMove
+            ? `Selected: ${selectedMove}`
+            : `Select a move below 🤫`}
         </p>
-      </header>
-      {/* ------------ADD COMBO------------- */}
-      <section className="flex justify-center">
-        <button
-          onClick={() => {
-            setLsCombos(
-              {
-                displayName: 'new combo',
-                execution: 1,
-                sequence: [],
-                notes: '',
-              },
-              makeComboId(),
-            )
-            updateCombos()
-          }}
-          className="mt-5 inline-flex rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
-        >
-          Add New Combo
-        </button>
+        <p>
+          {selectedMove &&
+            `${flowTransitions.length + totalRelevantTransitionsCanDo}/${totalFlowTransitions - totalImpossiblesFromMoveA}`}
+        </p>
       </section>
-      {/* -----------------advanced options---------------- */}
-      {/* //battle does not exist right now */}
-      {false && (
-        <section className="mt-5 text-center">
-          <details className="flex flex-col leading-snug">
-            <summary className="text-xs">Advanced Options</summary>
-            <section className="mt-2">
-              <article>
-                <label className="text-xs">
-                  Hide combos already used in Battle
-                </label>
-                <input
-                  className="ml-1"
-                  checked={hideMovesIfBattle}
-                  onChange={(e) => {
-                    setHideMovesIfBattle(e.target.checked)
-                  }}
-                  type="checkbox"
-                />
-              </article>
-            </section>
-          </details>
-          <section className="flex flex-col"></section>
-        </section>
-      )}
-      {/* ------------------end of advanced options------------- */}
-      {/* -----------------TABLE--------------- */}
-      <section className="scroll mx-0 my-5 overflow-hidden overflow-x-auto rounded-lg border border-gray-200 shadow-md md:mx-5 dark:border-gray-700">
-        <table className="w-full border-collapse bg-white text-left text-sm text-gray-500 dark:bg-gray-900">
-          <thead className="bg-gray-50 font-medium text-gray-900 dark:bg-slate-900">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
-              >
-                Starters
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
-              >
-                Mids
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
-              >
-                Finishers
-              </th>
-              {/* <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                Role
-              </th> */}
-              <th
-                scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
-              >
-                Actions
-              </th>
-              {/* <th
-                scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
-              >
-                Notes
-              </th> */}
-            </tr>
-          </thead>
-          {comboEntries.map(([comboId, comboVal], comboIndex) => {
-            if (!comboVal || !isComboId(comboId)) return
-            //Advanced Option
-            if (
-              hideMovesIfBattle &&
-              combosInBattle?.includes(comboId as ComboId)
-            ) {
-              return
-            }
+      {/* ---------------MOVES---------------- */}
+      <section className="flex w-full">
+        {/* //----------------------MOVE A----------------------- */}
+        <article className="w-1/2 rounded-lg bg-slate-100 p-2 pb-10 dark:bg-gray-800 dark:bg-opacity-40">
+          <h2 className="text-lg">Move A</h2>
+          <section
+            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark h-64 overflow-y-scroll rounded p-4 
+ "
+          >
+            {moves &&
+              moves.map(([category, moves], moveIndex) => {
+                //dont show empty categories
+                if (moves.length < 1) return
 
-            const { displayName, notes, execution, sequence } = comboVal
-            return (
-              <tbody
-                key={comboId}
-                className="divide-gray-100 border-t border-gray-100 dark:border-gray-800"
-              >
-                <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
-                  {/* ------------COMBO NUMBER---------- */}
-                  <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                    <div className="text-sm">
-                      <div className="text-gray-400 dark:font-medium dark:text-gray-700">
-                        Combo {comboIndex + 1}
-                      </div>
-                      {!showChangeName[comboIndex] && (
-                        <span
-                          className="font-medium text-gray-700 dark:text-gray-400 "
-                          onDoubleClick={() => {
-                            setShowChangeName((prev) =>
-                              prev.toSpliced(comboIndex, 1, true),
-                            )
-                          }}
-                        >
-                          {displayName || (
-                            <span className="text-gray-300">untitled</span>
-                          )}
-                        </span>
-                      )}
-                      {showChangeName[comboIndex] && (
-                        <input
-                          type="text"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Escape') {
-                              setShowChangeName((prev) =>
-                                prev.toSpliced(comboIndex, 1, false),
-                              )
-                            } else if (e.key === 'Enter') {
-                              updateDisplayName(
-                                comboId,
-                                (e.target as HTMLInputElement).value,
-                              )
-                              setShowChangeName((prev) =>
-                                prev.toSpliced(comboIndex, 1, false),
-                              )
-                              updateCombos()
+                return (
+                  <article key={moveIndex}>
+                    <h3 className="mb-1 text-base font-bold">{category}</h3>
+                    <section className="flex flex-col">
+                      {moves.map((move, moveIndex) => (
+                        <label key={moveIndex} className="mb-1">
+                          <input
+                            id={`${move}-${category}`}
+                            type="radio"
+                            name="baseMove"
+                            checked={
+                              selectedMove === move &&
+                              selectedCategory === category
                             }
-                          }}
-                          autoFocus
-                          defaultValue={displayName}
-                          className="border p-1"
-                        />
-                      )}
-                    </div>
-                  </td>
-                  {/* ---------------MOVES------------ */}
-                  <td>hi</td>
-
-                  {/* ----------------USABILITY------------- */}
-                  <td className="px-6 py-4">
-                    <span
-                      onClick={() => {
-                        updateExecution(
-                          comboId,
-                          execution < 3 ? execution + 1 : 1,
+                            className="mr-2 text-blue-500"
+                            value={move}
+                            onClick={() => {
+                              //deselect if selected
+                              if (selectedMove === move) {
+                                setSelectedMove({})
+                              }
+                            }}
+                            onChange={(e) => {
+                              setSelectedMove({
+                                selectedMove: e.target.value,
+                                selectedCategory: category,
+                              })
+                            }}
+                          />
+                          {move}
+                        </label>
+                      ))}
+                    </section>
+                  </article>
+                )
+              })}
+          </section>
+          <button
+            className="mt-5 rounded-md border border-indigo-500 p-1 text-2xs text-indigo-500"
+            onClick={() => {
+              const randomMove: SelectedMove = getRandomMove(moves)
+              setSelectedMove(randomMove)
+              requestAnimationFrame(() => {
+                document
+                  .getElementById(
+                    `${randomMove.selectedMove}-${randomMove.selectedCategory}`,
+                  )
+                  ?.scrollIntoView({ block: 'center', behavior: 'auto' })
+              })
+            }}
+          >
+            Choose Random
+          </button>
+        </article>
+        {/* -------------------MOVE B---------------- */}
+        <article
+          className={`ml-1 w-1/2 rounded-lg bg-slate-100 p-2 pb-10 dark:bg-gray-800 dark:bg-opacity-40 ${selectedMove || 'opacity-20'}`}
+        >
+          <h2 className="text-lg">Move B</h2>
+          <div
+            className="scrollbar scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-dark mx-4 h-64 overflow-y-scroll rounded 
+ "
+          >
+            {moves &&
+              moves.map(([category, moves], moveIndex) => {
+                return (
+                  <article key={moveIndex}>
+                    <h3 className="mb-1 text-base font-bold">{category}</h3>
+                    <section className="flex flex-col">
+                      {moves.map((move, moveIndex) => {
+                        const isOverridden = overrideTransitions.find(
+                          ({ moveTo, moveFrom }) => {
+                            return (
+                              moveTo.category === category &&
+                              moveTo.displayName === move &&
+                              moveFrom.category === selectedCategory &&
+                              moveFrom.displayName === selectedMove
+                            )
+                          },
                         )
-                        updateCombos()
-                      }}
-                      className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2  py-1 text-xs font-semibold
-                        ${execution === 3 && 'bg-green-50 text-green-600'}
-                        ${execution === 2 && 'bg-yellow-50 text-yellow-600'}
-                        ${execution === 1 && 'bg-gray-100 text-gray-600'}
-                        `}
-                    >
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full 
-                          ${execution === 3 && 'bg-green-600'}
-                          ${execution === 2 && 'bg-yellow-600'}
-                          ${execution === 1 && 'bg-gray-600'}
-                          `}
-                      ></span>
-                    </span>
-                  </td>
-                  {/* -----------------ROLES------------- */}
-                  {/* <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-blue-600 rounded-full gap-1 bg-blue-50">
-                          Design
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-indigo-600 rounded-full gap-1 bg-indigo-50">
-                          Product
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full gap-1 bg-violet-50 text-violet-600">
-                          Develop
-                        </span>
-                      </div>
-                    </td> */}
-                  {/* ----------------ACTIONS------------ */}
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <section>
-                        <RenderUpArrow
-                          onClick={() => {
-                            moveCombo(comboIndex, 'up')
-                            updateCombos()
-                          }}
-                          className="size-6 cursor-pointer fill-gray-500 p-1 pb-0 hover:rounded-lg hover:bg-gray-500/20"
-                        />
-                        <RenderDownArrow
-                          onClick={() => {
-                            moveCombo(comboIndex, 'down')
-                            updateCombos()
-                          }}
-                          className="size-6 cursor-pointer fill-gray-500 p-1 pt-0  hover:rounded-lg hover:bg-gray-500/20"
-                        />
-                      </section>
-                      {/* delete button */}
-                      <RenderTrashButtonSvg
-                        className="size-8 cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
-                        onClick={() => {
-                          deleteLsCombo(comboId as ComboId)
-                          updateCombos()
-                        }}
-                      />
-                      {/* edit button */}
-                      {/* <RenderPenSvg
-                          className="size-8 cursor-pointer  p-1 hover:rounded-lg hover:bg-gray-500/20"
-                          onClick={() => {
-                            console.log('move user to edit combo page')
-                            router.push(`/combos/make?${comboIdKey}=${comboId}`)
-                          }}
-                        /> */}
-                    </div>
-                  </td>
-                  {/* -------------------NOTES---------------- */}
-                  {/* <td className="px-6 py-4">
-                      <div className="flex gap-4 text-xs">{notes}</div>
-                    </td> */}
-                </tr>
-              </tbody>
-            )
-          })}
-          {!combos && (
-            <tbody>
-              <tr>
-                <td className="text-center">No combos to load</td>
-              </tr>
-            </tbody>
-          )}
-        </table>
+                        const isImpossible = isOverridden?.isImpossible
+
+                        const isChecked =
+                          flowTransitions.some(({ moveTo }) => {
+                            return (
+                              moveTo.category === category &&
+                              moveTo.displayName === move
+                            )
+                          }) || !!isOverridden?.canDo
+
+                        return (
+                          <article
+                            className="mb-3 flex flex-col"
+                            key={moveIndex}
+                          >
+                            <label className="">
+                              {!!isImpossible || (
+                                <input
+                                  className="mr-2"
+                                  checked={isChecked}
+                                  type="checkbox"
+                                  onChange={() => {
+                                    //send notification if flow is overriding the ability to turn off
+                                    if (isChecked && !isOverridden?.canDo) {
+                                      setNotification({
+                                        notificationVisible: true,
+                                        message: 'Flow is overriding this move',
+                                      })
+                                      return
+                                    }
+
+                                    setOverrideTransitions((prev) => {
+                                      if (isOverridden) {
+                                        const index = prev.findIndex(
+                                          (move) =>
+                                            move.moveTransitionId ===
+                                            isOverridden.moveTransitionId,
+                                        )
+                                        return index > -1 && isOverridden
+                                          ? prev.toSpliced(index, 1, {
+                                              ...isOverridden,
+                                              isImpossible: false,
+                                              canDo: !isChecked,
+                                            })
+                                          : prev
+                                      }
+                                      const newTrans: MoveTransition = {
+                                        canDo: !isChecked,
+                                        moveTransitionId:
+                                          makeMoveTransitionId(),
+                                        isImpossible: false,
+                                        moveFrom: {
+                                          category: selectedCategory || '',
+                                          displayName: selectedMove || '',
+                                        },
+                                        moveTo: {
+                                          category,
+                                          displayName: move,
+                                        },
+                                      }
+                                      return [...prev, newTrans]
+                                    })
+                                  }}
+                                />
+                              )}
+                              <span
+                                className={`${isImpossible && 'line-through'}`}
+                              >
+                                {move}
+                              </span>
+                            </label>
+                            <section className="flex">
+                              {false && (
+                                <button
+                                  onClick={() => setIsOpen(true)}
+                                  className={`mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${!isImpossible ? 'opacity-100' : 'opacity-20'}`}
+                                  type="button"
+                                >
+                                  Attempt
+                                </button>
+                              )}
+                              <button
+                                onClick={() =>
+                                  setOverrideTransitions((prev) => {
+                                    if (isOverridden) {
+                                      const overrideIndex = prev.findIndex(
+                                        (move) =>
+                                          move.moveTransitionId ===
+                                          isOverridden.moveTransitionId,
+                                      )
+                                      return overrideIndex > -1 && isOverridden
+                                        ? prev.toSpliced(overrideIndex, 1, {
+                                            ...isOverridden,
+                                            isImpossible: !isImpossible,
+                                          })
+                                        : prev
+                                    }
+                                    const newTrans: MoveTransition = {
+                                      canDo: isChecked,
+                                      moveTransitionId: makeMoveTransitionId(),
+                                      isImpossible: true,
+                                      moveFrom: {
+                                        category: selectedCategory || '',
+                                        displayName: selectedMove || '',
+                                      },
+                                      moveTo: {
+                                        category,
+                                        displayName: move,
+                                      },
+                                    }
+                                    return [...prev, newTrans]
+                                  })
+                                }
+                                className={`ml-1 mt-1 w-min rounded-md border border-indigo-500 p-0.5  py-0 text-3xs text-indigo-500 ${isImpossible ? 'opacity-100' : 'opacity-20'}`}
+                                type="button"
+                              >
+                                Impossible
+                              </button>
+                            </section>
+                          </article>
+                        )
+                      })}
+                    </section>
+                  </article>
+                )
+              })}
+          </div>
+        </article>
+        {/* ---------------END OF MOVE B------------ */}
       </section>
+      {/* ---------------END OF MOVES------------ */}
+
+      {/* ----------------------------------RESULT BUTTONS------------------------------------ */}
+      <Notification visible={notificationVisible} message={message} />
+      <p>{`Transitions from flows: ${flowTransitions.length}`}</p>
+      <p>{`Transitions manually set here: ${totalRelevantTransitionsCanDo}`}</p>
+      <p>{`Moves total: ${totalFlowTransitions}`}</p>
+      <p>{`Impossible moves: ${totalImpossiblesFromMoveA}`}</p>
+
+      {
+        <div className="flex justify-evenly px-2 py-5 text-xs">
+          <section>
+            <button
+              onClick={(_) => {
+                setNotification({ notificationVisible: true, message: 'Saved' })
+                setLsTransitions(overrideTransitions)
+              }}
+              className="inline-flex h-fit rounded border-0 bg-indigo-500 px-6 py-2 text-xs text-white hover:bg-indigo-600 focus:outline-none"
+            >
+              SAVE
+            </button>
+          </section>
+        </div>
+      }
+
+      {/* ==================MODAL===================== */}
+      {isOpen && (
+        <div
+          id="select-modal"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed inset-0 z-50 flex h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-800 bg-opacity-50"
+        >
+          <div
+            className="relative max-h-full w-full max-w-md p-4"
+            ref={modalRef}
+          >
+            {/* Modal content */}
+            <div className="relative rounded-lg bg-white shadow dark:bg-gray-700">
+              {/* Modal header */}
+              <div className="flex items-center justify-between rounded-t border-b p-4 md:p-5 dark:border-gray-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Attempt Move
+                </h3>
+                <button
+                  type="button"
+                  className="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <svg
+                    className="h-3 w-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span className="sr-only">Close modal</span>
+                </button>
+              </div>
+              {/* Modal body */}
+              <article className="p-4 md:p-5">
+                <p>{`Backflip -> Chocolate hunter`}</p>
+                <p className="mb-4 text-gray-500 dark:text-gray-400">
+                  Update the status:
+                </p>
+                <ul className="mb-4 space-y-4">
+                  {options.map((option) => (
+                    <li key={option.id}>
+                      <input
+                        type="radio"
+                        id={option.id}
+                        name="job"
+                        value={option.id}
+                        className="peer hidden"
+                        required={option.id === 'job-1'}
+                      />
+                      <label
+                        htmlFor={option.id}
+                        className="inline-flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-200 bg-white p-5 text-gray-900 hover:bg-gray-100 hover:text-gray-900 peer-checked:border-blue-600 peer-checked:text-blue-600 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 dark:hover:text-gray-300 dark:peer-checked:text-blue-500"
+                      >
+                        <div className="block">
+                          <div className="w-full text-lg font-semibold">
+                            {option.label}
+                          </div>
+                          <div className="w-full text-gray-500 dark:text-gray-400">
+                            {option.description}
+                          </div>
+                        </div>
+                        <svg
+                          className="ms-3 h-4 w-4 text-gray-500 rtl:rotate-180 dark:text-gray-400"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 14 10"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 5h12m0 0L9 1m4 4L9 9"
+                          />
+                        </svg>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  className="inline-flex w-full justify-center rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Save
+                </button>
+              </article>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* //-----------------end of modal------------ */}
     </main>
   )
 }

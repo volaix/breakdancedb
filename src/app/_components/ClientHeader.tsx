@@ -6,11 +6,15 @@ import { RenderDownloadSvg, RenderSpinner, RenderUploadCloudSVG } from './Svgs'
 import { Notification } from './Notification'
 import {
   DOWNLOAD_USER,
+  DOWNLOAD_USER_HEADER,
+  ERRORCODES,
   UPLOAD_USER,
   downloadUserData,
+  headerDownload,
   updateUserDataClient,
 } from '../_utils/clientActions'
 import { useQuery } from '@tanstack/react-query'
+import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
  * Renders the top header used on every page. Usually thrown in the template.tsx
@@ -27,10 +31,14 @@ export function ClientHeader({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [manualUploading, setManualUploading] = useState(false)
   const [manualDownload, setManualDownload] = useState(false)
+  const [modal, setModal] = useState(false)
   const [notification, setNotification] = useState<null | {
     visible?: boolean
     message?: string
   }>(null)
+  const replaceGlobalState = useZustandStore(
+    (state) => state.replaceGlobalState,
+  )
 
   const hasUser = user.name !== null && user.profilePicture !== null
 
@@ -40,7 +48,7 @@ export function ClientHeader({
   // ----hooks------
   const {
     isLoading: loadingCloud,
-    refetch,
+    refetch: uploadToCloud,
     isError,
     error,
   } = useQuery({
@@ -58,9 +66,21 @@ export function ClientHeader({
     refetch: refetchDownload,
     isSuccess,
   } = useQuery({
+    queryKey: [DOWNLOAD_USER_HEADER],
+    queryFn: headerDownload,
+    enabled: hasUser,
+  })
+
+  //For downloading and replacing user data
+  const {
+    isLoading: isDownloadingUser,
+    isError: isErrorDownloading,
+    error: downloadingError,
+    refetch: refetchDownloadUser,
+  } = useQuery({
     queryKey: [DOWNLOAD_USER],
     queryFn: downloadUserData,
-    enabled: hasUser,
+    enabled: false,
   })
 
   const isDownloading = isFetchingUser || manualDownload
@@ -72,7 +92,7 @@ export function ClientHeader({
     } else if (isSuccess) {
       setNotification({
         visible: true,
-        message: 'Successfully downloaded from cloud',
+        message: 'Successfully in sync with cloud',
       })
     }
   }, [isFetchingUser, isSuccess])
@@ -80,14 +100,19 @@ export function ClientHeader({
   //error handling for queries
   useEffect(() => {
     if (isFetchError) {
-      setNotification({
-        visible: true,
-        message: `ERROR: ${fetchError.message}`,
-      })
+      //EDGE CASE: local data and server data are mismatched. show modal to remedy.
+      if (fetchError.message === ERRORCODES[205]) {
+        setModal(true)
+      } else {
+        setNotification({
+          visible: true,
+          message: `ERROR: ${fetchError.message}`,
+        })
+      }
     } else if (isError) {
       setNotification({ visible: true, message: `ERROR: ${error.message}` })
     }
-  }, [error, isError])
+  }, [error, fetchError?.message, isError, isFetchError])
 
   //Show Notifcation for 2 seconds
   useEffect(() => {
@@ -239,7 +264,7 @@ export function ClientHeader({
                   })
 
                   setManualUploading(true)
-                  await refetch()
+                  await uploadToCloud()
                   setManualUploading(false)
                   setNotification({
                     visible: true,
@@ -258,6 +283,7 @@ export function ClientHeader({
               <RenderDownloadSvg
                 className="size-2 fill-slate-400 hover:fill-indigo-500"
                 onClick={async () => {
+                  console.log('hello world')
                   setNotification({
                     visible: true,
                     message: 'Downloading from cloud...',
@@ -389,6 +415,57 @@ export function ClientHeader({
           </section>
         </div>
       </div>
+      {/* -----------------MISMATCH CLOUD WITH LOCAL MODAL---------------- */}
+      {modal && (
+        <article className="fixed inset-0 bottom-0 left-0 right-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-gray-500 bg-opacity-75">
+          <div className="rounded-lg p-6 shadow-xl dark:bg-slate-500">
+            <h2 className="mb-4 text-xl font-bold">Data mismatch</h2>
+            <p>Cloud data differs from local data.</p>
+            <section className="flex gap-2">
+              {/* ----------------REPLACE LOCAL---------------- */}
+              <button
+                onClick={async () => {
+                  const data = await refetchDownloadUser()
+                  if (data.isSuccess) {
+                    setModal(false)
+                    replaceGlobalState(data.data.userDb)
+                    setNotification({
+                      visible: true,
+                      message:
+                        'Successfully replaced local data with server data',
+                    })
+                  }
+                }}
+                className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              >
+                Replace Local
+              </button>
+              {/* ----------------UPLOAD LOCAL---------------- */}
+              <button
+                onClick={async () => {
+                  await uploadToCloud()
+                  setModal(false)
+                  setNotification({
+                    visible: true,
+                    message: 'Successfully uploaded local data to cloud',
+                  })
+                }}
+                className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              >
+                Upload Local
+              </button>
+              <button
+                onClick={() => {
+                  setModal(false)
+                }}
+                className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              >
+                Skip
+              </button>
+            </section>
+          </div>
+        </article>
+      )}
     </>
   )
 }
