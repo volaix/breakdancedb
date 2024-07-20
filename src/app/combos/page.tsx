@@ -146,7 +146,9 @@ export default function RenderViewCombos() {
             <tr>
               <th
                 scope="col"
-                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
+                className="
+                py-4 pl-2 font-medium 
+                 text-gray-900 lg:pl-6 lg:pr-6 dark:text-white"
               >
                 Combo #
               </th>
@@ -197,7 +199,7 @@ export default function RenderViewCombos() {
               >
                 <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/20">
                   {/* ------------COMBO NUMBER---------- */}
-                  <td className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                  <td className="flex gap-3 py-4 pl-2 font-normal text-gray-900 lg:pl-6 lg:pr-6">
                     <div className="text-sm">
                       <div className="text-gray-400 dark:font-medium dark:text-gray-700">
                         Combo {comboIndex + 1}
