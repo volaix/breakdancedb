@@ -418,7 +418,7 @@ export function ClientHeader({
       {/* -----------------MISMATCH CLOUD WITH LOCAL MODAL---------------- */}
       {modal && (
         <article className="fixed inset-0 bottom-0 left-0 right-0 top-0 z-20 flex h-screen w-screen items-center justify-center bg-gray-500 bg-opacity-75">
-          <div className="rounded-lg p-6 shadow-xl dark:bg-slate-500">
+          <div className="rounded-lg bg-slate-200 p-6 shadow-xl dark:bg-slate-500">
             <h2 className="mb-4 text-xl font-bold">Data mismatch</h2>
             <p>Cloud data differs from local data.</p>
             <section className="flex gap-2">
