@@ -431,8 +431,7 @@ export function ClientHeader({
                     replaceGlobalState(data.data.userDb)
                     setNotification({
                       visible: true,
-                      message:
-                        'Successfully replaced local data with server data',
+                      message: 'Successfully replaced. Please refresh',
                     })
                   }
                 }}
