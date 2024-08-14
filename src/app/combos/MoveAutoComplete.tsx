@@ -24,11 +24,9 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const [flipSuggestion, setFlipSuggestion] = useState<boolean>(false)
 
-  // const transitons = useZustandStore((state) => state.moveTransitions)
   const singleMoves = useZustandStore((state) => state.userMoves)
   const addComboMove = useZustandStore((state) => state.addComboMove)
 
-  // const transitionOptions: TransitionOption[] = transitons ?? []
   const basicMoveOptions: SingleMoveOption[] = Object.entries(
     singleMoves,
   ).flatMap(([key, value]) =>
@@ -164,38 +162,6 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
                     <small className="ml-1">{`Category: ${suggestion.category}`}</small>
                   </section>
                 )}
-                {/* {isTransition(suggestion) &&
-                  (() => {
-                    const transitionLabel = `${suggestion.moveFrom.displayName} -> ${suggestion.moveTo.displayName}`
-                    return (
-                      <>
-                        <section
-                          onClick={() => {
-                            setValue(transitionLabel)
-                            const id = transitionIdSchema.safeParse(
-                              suggestion.moveTransitionId,
-                            ).data
-                            if (!id) return
-                            comboId &&
-                              moveIndex !== undefined &&
-                              addComboMove(comboId as ComboId, moveIndex, {
-                                moves: [
-                                  suggestion.moveFrom.displayName,
-                                  suggestion.moveTo.displayName,
-                                ],
-                                id,
-                                type: 'transition',
-                              })
-                            updateCombos && updateCombos()
-                            closeInput()
-                          }}
-                        >
-                          <label>{transitionLabel}</label>
-                          <small className="ml-1">Transition</small>
-                        </section>
-                      </>
-                    )
-                  })()} */}
               </li>
             )
           })}
@@ -216,7 +182,5 @@ const AutoComplete = ({ closeInput }: { closeInput: () => void }) => {
 
 const isSingleMove = (suggestion: Option): suggestion is SingleMoveOption =>
   BasicMoveSchema.safeParse(suggestion).success
-// const isTransition = (suggestion: Option): suggestion is TransitionOption =>
-//   MoveTransitionSchema.safeParse(suggestion).success
 
 export default AutoComplete
