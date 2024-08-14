@@ -142,6 +142,7 @@ const CategoryAutoComplete = ({ closeInput }: { closeInput: () => void }) => {
             )
           })}
           {filteredOptions.length === 0 &&
+            userEntryValue !== '' &&
             (() => {
               return (
                 <li
