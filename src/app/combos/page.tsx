@@ -44,10 +44,8 @@ export default function RenderViewCombos() {
   const updateExecution = useZustandStore((state) => state.updateExecution)
   const setLsCombos = useZustandStore((state) => state.setLsCombos)
   const updateDisplayName = useZustandStore((state) => state.updateDisplayName)
-  const addComboMove = useZustandStore((state) => state.addComboMove)
   const getUserMoves = useZustandStore((state) => state.getLsUserMoves)
-
-  // const comboEntries = Object.entries(combos ?? {})
+  const deleteCategory = useZustandStore((state) => state.deleteCategory)
 
   //-----------------------------hooks-------------------------------
   const comboEntries = useMemo(() => Object.entries(combos ?? {}), [combos])
@@ -364,6 +362,13 @@ export default function RenderViewCombos() {
                               className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-600"
                             >
                               {category}
+                              <RenderTrashButtonSvg
+                                className="cursor-pointer p-1 hover:rounded-lg hover:bg-gray-500/20"
+                                onClick={() => {
+                                  deleteCategory(comboId, index)
+                                  updateCombos()
+                                }}
+                              />
                             </span>
                           )
                         })}

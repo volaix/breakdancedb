@@ -165,7 +165,7 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         deleteCategory: (comboId, position) => {
           return set((state) => {
             if (!state[lsCombos]?.[comboId]?.categories) return
-            delete state[lsCombos][comboId]?.categories[position]
+            state[lsCombos][comboId]?.categories.splice(position, 1)
           })
         },
         addComboMove: (comboId, position, comboMove) => {
