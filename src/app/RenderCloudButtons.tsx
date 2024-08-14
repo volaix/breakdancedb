@@ -11,6 +11,7 @@ import {
   updateUserDataClient,
 } from './_utils/clientActions'
 import { useZustandStore } from './_utils/zustandLocalStorage'
+import Link from 'next/link'
 
 export type NextUser = {
   payload: string
@@ -124,7 +125,10 @@ export default function RenderCloudButtons({
           </button>
         </form>
         {!userLoggedIn && (
-          <p className="text-xs leading-none">Or continue in offline mode</p>
+          <p className="mt-2 text-xs leading-none">
+            {`Or continue in `}
+            <Link href="/yourmoves">offline mode</Link>
+          </p>
         )}
       </article>
       {lastEdited && (
