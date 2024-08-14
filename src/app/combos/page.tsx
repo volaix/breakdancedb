@@ -375,7 +375,7 @@ export default function RenderViewCombos() {
                     </div>
                     {!showAddCategoryToCombo[comboIndex] && (
                       <RenderAddButtonSVG
-                        className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                        className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-violet-50 fill-violet-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
                         onClick={() => {
                           setShowAddCategoryToCombo((prev) =>
                             prev.toSpliced(comboIndex, 1, true),
