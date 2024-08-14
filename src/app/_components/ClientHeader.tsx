@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useZustandStore } from '../_utils/zustandLocalStorage'
 
 /**
- * Renders the top header used on every page. Usually thrown in the template.tsx
+ * Renders the top header used on every page. used in master layout.tsx
  * Hamburger menu, top left, text mid, profile pic top right.
  * @returns
  */
@@ -69,6 +69,7 @@ export function ClientHeader({
     queryKey: [DOWNLOAD_USER_HEADER],
     queryFn: headerDownload,
     enabled: hasUser,
+    retry: 0,
   })
 
   //For downloading and replacing user data
