@@ -17,6 +17,7 @@ import { isComboId } from '../_utils/lsValidation'
 import MoveAutoComplete from './MoveAutoComplete'
 import MoveTag from './MoveTag'
 import { ComboIdContext } from './util'
+import CategoryAutoComplete from './CategoryAutoComplete'
 
 const usabilityText = ['Inactive', 'WIP', 'Active']
 
@@ -33,6 +34,9 @@ export default function RenderViewCombos() {
   const [showRngInput, setShowRngInput] = useState<boolean[]>([])
   const [combosInBattle, setCombosInBattle] = useState<ComboId[]>()
   const [showAddMoveToCombo, setAddMoveToCombo] = useState<boolean[]>([])
+  const [showAddCategoryToCombo, setShowAddCategoryToCombo] = useState<
+    boolean[]
+  >([])
   const getLsCombos = useZustandStore((state) => state.getLsCombos)
   const getLsBattle = useZustandStore((state) => state.getLsBattle)
   const deleteLsCombo = useZustandStore((state) => state.deleteLsCombo)
@@ -78,6 +82,7 @@ export default function RenderViewCombos() {
     setShowRngInput(comboBooleans)
     setShowChangeName(comboBooleans)
     setAddMoveToCombo(comboBooleans)
+    setShowAddCategoryToCombo(comboBooleans)
   }, [combos])
 
   //-----------------------------render---------------------------------
@@ -163,6 +168,12 @@ export default function RenderViewCombos() {
                 className="px-6 py-4 font-medium text-gray-900 dark:text-white"
               >
                 Usability
+              </th>
+              <th
+                scope="col"
+                className="px-6 py-4 font-medium text-gray-900 dark:text-white"
+              >
+                Category
               </th>
               {/* <th scope="col" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                 Role
@@ -289,7 +300,7 @@ export default function RenderViewCombos() {
                         </ComboIdContext.Provider>
                       )}
                       {/* ----------RANDOM BUTTON--------- */}
-                      {!showRngInput[comboIndex] &&
+                      {/* {!showRngInput[comboIndex] &&
                         !showAddMoveToCombo[comboIndex] && (
                           <RenderDiceSvg
                             className="my-0.5 ml-1 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-red-600 stroke-2 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
@@ -303,9 +314,9 @@ export default function RenderViewCombos() {
                                     id: 'custom',
                                     moves: [
                                       allMoves[
-                                        Math.floor(
-                                          Math.random() * allMoves.length,
-                                        )
+                                      Math.floor(
+                                        Math.random() * allMoves.length,
+                                      )
                                       ],
                                     ],
                                   },
@@ -313,7 +324,7 @@ export default function RenderViewCombos() {
                               updateCombos()
                             }}
                           />
-                        )}
+                        )} */}
                     </section>
                   </td>
                   {/* ----------------USABILITY------------- */}
@@ -342,20 +353,49 @@ export default function RenderViewCombos() {
                       {usabilityText[execution - 1] || 'Issue Loading'}
                     </span>
                   </td>
-                  {/* -----------------ROLES------------- */}
-                  {/* <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-blue-600 rounded-full gap-1 bg-blue-50">
-                          Design
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold text-indigo-600 rounded-full gap-1 bg-indigo-50">
-                          Product
-                        </span>
-                        <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full gap-1 bg-violet-50 text-violet-600">
-                          Develop
-                        </span>
-                      </div>
-                    </td> */}
+                  {/* -----------------CATEGORY------------- */}
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {comboVal.categories &&
+                        comboVal.categories.map((category, index) => {
+                          return (
+                            <span
+                              key={index}
+                              className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-600"
+                            >
+                              {category}
+                            </span>
+                          )
+                        })}
+                    </div>
+                    {!showAddCategoryToCombo[comboIndex] && (
+                      <RenderAddButtonSVG
+                        className="my-0.5 flex size-7 items-center gap-1 text-ellipsis rounded-sm bg-blue-50 fill-blue-600 px-2 py-0.5 text-xs font-semibold text-blue-600 hover:cursor-pointer hover:bg-blue-300/30 dark:bg-blue-600/20 dark:hover:bg-blue-900/70"
+                        onClick={() => {
+                          setShowAddCategoryToCombo((prev) =>
+                            prev.toSpliced(comboIndex, 1, true),
+                          )
+                        }}
+                      />
+                    )}
+                    {showAddCategoryToCombo[comboIndex] && (
+                      <ComboIdContext.Provider
+                        value={{
+                          comboId,
+                          moveIndex: sequence.length,
+                          updateCombos,
+                        }}
+                      >
+                        <CategoryAutoComplete
+                          closeInput={() => {
+                            setShowAddCategoryToCombo((prev) =>
+                              prev.toSpliced(comboIndex, 1, false),
+                            )
+                          }}
+                        />
+                      </ComboIdContext.Provider>
+                    )}
+                  </td>
                   {/* ----------------ACTIONS------------ */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">

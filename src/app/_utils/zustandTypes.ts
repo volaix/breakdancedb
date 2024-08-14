@@ -150,6 +150,8 @@ export type ZustandGlobalStore = GlobalStateProperties & {
   //-------combos----------
   deleteLsCombo: (key: ComboId) => void
   getLsComboById: (id: ComboId) => ComboDictionary[keyof ComboDictionary] | null
+  addCategory: (comboId: ComboId, position: number, category: string) => void
+  deleteCategory: (comboId: ComboId, position: number) => void
   addComboMove: (
     comboId: ComboId,
     position: number,

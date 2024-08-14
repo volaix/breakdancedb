@@ -146,6 +146,28 @@ export const useZustandStore = create<ZustandGlobalStore>()(
         getLsComboById(id) {
           return get()[lsCombos]?.[id] || null
         },
+        addCategory: (comboId, position, category) => {
+          console.log(
+            'comboId, position, category: ',
+            comboId,
+            position,
+            category,
+          )
+          return set((state) => {
+            const combo = state[lsCombos]?.[comboId]
+            if (!combo) return
+            if (!combo.categories) {
+              combo.categories = []
+            }
+            combo?.categories.splice(position + 1, 0, category)
+          })
+        },
+        deleteCategory: (comboId, position) => {
+          return set((state) => {
+            if (!state[lsCombos]?.[comboId]?.categories) return
+            delete state[lsCombos][comboId]?.categories[position]
+          })
+        },
         addComboMove: (comboId, position, comboMove) => {
           return set((state) => {
             if (!state[lsCombos]) return

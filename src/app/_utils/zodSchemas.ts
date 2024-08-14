@@ -122,6 +122,7 @@ export const comboValSchema = z.object({
   notes: z.string(),
   execution: z.number(),
   sequence: z.array(comboMoveSchema),
+  categories: z.array(z.string()).optional(),
 })
 export const comboDictionarySchema = z.record(comboIdSchema, comboValSchema)
 
@@ -179,8 +180,8 @@ export const TypeLoopOptions = z.object({
 export const MovementGroupSchema = z.object({
   movementId: movementIdSchema,
   displayName: z.string(),
-  positionId: positionIdSchema.optional(), // Replace z.any() with the appropriate zod schema for PositionId
-  transitionId: transitionIdSchema.optional(), // Replace z.any() with the appropriate zod schema for TransitionId
+  positionId: positionIdSchema.optional(),
+  transitionId: transitionIdSchema.optional(),
 })
 
 export const MoveExecutionSchema = z.object({
